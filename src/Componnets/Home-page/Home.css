@@ -1,0 +1,225 @@
+/* Home.css */
+
+.spacer {
+  height: 100px;
+}
+
+.home-page .home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f7f4f4;
+  color: #333;
+}
+
+.content {
+  margin-top: 3rem;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-family: "Quicksand", sans-serif;
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+}
+
+p {
+  font-family: "Georgia", serif;
+  font-size: 1.6rem;
+  line-height: 1.5;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.highlight {
+  color: #f39c12;
+}
+
+.button-container {
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+button {
+  background: linear-gradient(to right, #f39c12, #e74c3c);
+  color: #fff;
+  padding: 1.5rem 2rem; /* Ajustez la taille du bouton selon vos besoins */
+  font-size: 2.5rem;
+  border: none;
+  border-radius: 10px; /* Ajustez le border-radius pour des coins arrondis */
+  cursor: pointer;
+  overflow: hidden;
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out,
+    transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0 5px 15px rgba(211, 92, 1, 0.3);
+}
+
+.button-container::before {
+  /* Ajustez le border-radius pour des coins arrondis */
+
+  content: "";
+  position: absolute;
+  background: #fff;
+  width: 0;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transition: width 0.5s ease-out;
+  z-index: 0;
+}
+
+.button-container:hover::before {
+  width: 100%;
+}
+
+button:hover {
+  background: linear-gradient(to right, #e74c3c, #f39c12);
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  margin-top: 2rem;
+}
+
+.animated-image {
+  width: 100%;
+  height: auto;
+  max-width: 1020px;
+  border-radius: 15px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.image-container:hover .animated-image {
+  transform: scale(1.1);
+  filter: saturate(120%);
+}
+
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 3rem;
+  background-color: #f4f4f4;
+  padding: 2rem;
+  border-radius: 15px;
+}
+
+.feature {
+  width: 30%;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.feature:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #ffffff, #f3efe9);
+}
+
+.feature:active {
+  background-color: #f39c12; /* Couleur d'orange lorsqu'on clique */
+}
+
+.feature img {
+  width: 50%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease-in-out;
+}
+
+.feature:active img {
+  transform: scale(1.5); /* Zoom de l'image lorsqu'on clique */
+}
+
+.feature-text {
+  text-align: center;
+}
+
+.feature h2 {
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.feature p {
+  font-family: "Georgia", serif;
+  font-size: 1rem;
+  color: #777;
+  line-height: 1.5;
+}
+
+@media screen and (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem; /* Ajustez la taille du titre selon vos besoins */
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1rem; /* Ajustez la taille du paragraphe selon vos besoins */
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem; /* Ajustez la taille du texte du bouton selon vos besoins */
+  }
+
+  .image-container {
+    display: none;
+    margin-top: 1rem;
+  }
+
+  .features {
+    margin-top: 1.5rem;
+  }
+
+  .feature {
+    width: 100%; /* Modifier la largeur à 100% pour occuper toute la largeur de l'écran */
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #ecf0f1;
+    border-radius: 15px;
+  }
+
+  .feature h2 {
+    font-size: 1.5rem; /* Ajustez la taille du titre de la feature selon vos besoins */
+    margin-bottom: 0.5rem;
+  }
+
+  .feature p {
+    font-size: 1rem;
+    color: #777;
+  }
+}

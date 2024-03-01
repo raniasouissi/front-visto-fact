@@ -1,0 +1,161 @@
+/* About.css */
+
+.about-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 80px;
+}
+
+.hero,
+.description,
+.advantages,
+.functionalities,
+.contact {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  color: #002d62;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.4rem;
+  color: #555;
+}
+h1 .fact {
+  color: #002d62;
+}
+
+.description p {
+  font-size: 1.5rem;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.advantages h2,
+.functionalities h2,
+.contact h2 {
+  font-size: 2.8rem;
+  color: #002d62;
+  margin-bottom: 30px;
+}
+
+.advantages,
+.functionalities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  justify-content: space-around;
+}
+
+.advantage,
+.functionality {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  cursor: pointer;
+}
+
+.advantage:hover,
+.functionality:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+  font-size: 3rem;
+  color: #e44d26;
+  margin-bottom: 20px;
+}
+
+.advantage p,
+.functionality p {
+  font-size: 1.5rem;
+  color: #555;
+  line-height: 1.8;
+  font-weight: bold;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact p {
+  font-size: 1.8rem;
+  color: #555;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.contact-button {
+  display: inline-block;
+  padding: 15px 30px;
+  font-size: 1.7rem;
+  background-color: #002d62;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 12px;
+  text-align: right;
+  transition: background-color 0.4s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.contact-button:hover {
+  background-color: #002d62;
+  transform: scale(1.05);
+}
+
+/* signup.css */
+
+@media screen and (max-width: 600px) {
+  .signup-container {
+    overflow-x: hidden; /* Empêcher le défilement horizontal */
+  }
+
+  .signup-form {
+    padding: 0rem;
+    border: none;
+    box-shadow: none;
+    background: none;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  input {
+    font-size: 1.1rem;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%; /* Utiliser toute la largeur du conteneur parent */
+  }
+
+  .signup-button {
+    font-size: 1.5rem;
+    padding: 12px;
+  }
+}

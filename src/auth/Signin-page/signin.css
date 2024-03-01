@@ -1,0 +1,235 @@
+/* Signin.css */
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #f7f4f4;
+}
+
+.signin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  background-color: #f7f4f4;
+}
+
+.form-container {
+  max-width: 550px;
+  width: 100%;
+  padding: 40px;
+  background: linear-gradient(
+    to right,
+    rgb(243, 240, 240),
+    hsl(0, 0%, 100%)
+  ); /* Dégradé de couleur entre orange et blanc */
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(2, 0, 77, 0.5), 0 0 10px rgba(255, 165, 0, 0.7);
+
+  transition: transform 0.5s ease-in-out;
+  animation: fadeIn 0.7s ease-in-out, textSlide 1.7s ease-in-out; /* Ajout de l'animation textSlide */
+
+  color: #002d62;
+  font-weight: bold;
+  font-family: Candara;
+}
+
+/* Ajout d'une animation pour le texte */
+.form-container h2 {
+  animation: textFade 1.5s ease-in-out;
+}
+
+@keyframes textFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-container:hover {
+  transform: scale(1.03);
+}
+
+.error-message {
+  color: #ff0000;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: bold;
+}
+
+.form-input {
+  padding: 17px;
+  font-size: 1.3rem; /* Ajustement de la taille du texte de l'input */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  color: #333;
+  width: 100%;
+  border-color: #002d62;
+}
+
+.submit-button {
+  background-color: #e6d2b3;
+  color: #fff;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out; /* Ajout de l'animation pour le bouton */
+  display: inline-block; /* Ajout de cette ligne pour permettre au bouton d'être centré */
+  margin: 20px auto 0;
+  width: 100%;
+}
+.center-button {
+  text-align: center;
+}
+
+.submit-button:hover {
+  background-color: #d98e10;
+  transform: scale(1.05);
+}
+
+.mt-3 {
+  margin-top: 40px;
+  color: #002d62;
+  font-size: 2rem;
+  animation: fadeIn 0.5s ease-in-out;
+  font-weight: bold;
+}
+
+.signup-link {
+  font-size: 1.3rem;
+  color: #1f1e1e;
+}
+p {
+  color: #002d62;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+h2 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+.password-input {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.error-border {
+  border: 2px solid #ff0000;
+}
+
+.orange-text {
+  color: orange;
+}
+
+.blue-text {
+  color: blue;
+}
+
+@media screen and (max-width: 480px) {
+  .form-container {
+    border: none;
+    box-shadow: none;
+    background: none;
+  }
+
+  .form-label {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  .form-input {
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .submit-button {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .mt-3 {
+    margin-top: 15px;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+  }
+
+  .eye-icon {
+    right: 6px;
+  }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .form-container {
+    padding: 20px;
+    max-width: 80%;
+  }
+
+  .form-label {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+  }
+
+  .form-input {
+    padding: 12px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .submit-button {
+    padding: 12px;
+    font-size: 1.1rem;
+  }
+
+  .mt-3 {
+    margin-top: 20px;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+
+  .eye-icon {
+    right: 8px;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .form-container {
+    max-width: 80%;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+}

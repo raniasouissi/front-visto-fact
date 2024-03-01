@@ -1,0 +1,96 @@
+/* Contact.css */
+
+.contact-section {
+  background-color: #f7f4f4;
+  padding: 2rem 0;
+}
+
+.contact-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-container h2 {
+  font-size: 1.8rem;
+  color: #002d62;
+  margin-bottom: 1rem;
+}
+
+.contact-container p {
+  font-size: 1.2rem;
+  color: #201f1f;
+  margin-bottom: 2rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+label {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #002d62;
+  display: block;
+  font-weight: bold;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+
+  transition: border-color 0.3s ease-in-out;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #f39c12;
+}
+
+.form-textarea {
+  height: 120px;
+}
+
+.submit-button {
+  background-color: #0362cd;
+  color: #fff;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #f39c12;
+}
+
+p.error-message {
+  color: #ff0000;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Media Query pour les appareils mobiles */
+@media only screen and (max-width: 768px) {
+  .contact-form {
+    padding: 0 1rem;
+  }
+
+  .form-input,
+  .form-textarea,
+  .submit-button {
+    width: 100%;
+  }
+}

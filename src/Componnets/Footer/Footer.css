@@ -1,0 +1,139 @@
+/* Footer.css */
+.footer {
+  background-color: #062a78;
+  color: #fff;
+  padding: 30px 0;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.footer-section {
+  text-align: center;
+  flex: 1;
+  max-width: 25%;
+  margin: 0 15px;
+}
+
+.logo-footer {
+  max-width: 140px;
+}
+
+.brand-name {
+  margin-top: 10px;
+  font-size: 28px;
+  color: #f39c12;
+}
+.brand-name .blue {
+  color: white;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.useful-links,
+.social-icons,
+.address-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-weight: bold;
+}
+
+.useful-links a,
+.social-icons a,
+.address-links a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 17px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+}
+
+.social-icons a {
+  margin: 0 10px;
+  font-size: 27px;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.footer-bottom p {
+  font-size: 15px;
+  margin: 0;
+  color: #fff;
+}
+.instagram {
+  color: #e4405f !important;
+}
+
+.facebook {
+  color: #1877f2 !important;
+}
+
+.linkedin {
+  color: #0e76a8 !important;
+}
+.orange {
+  color: orange;
+}
+
+.blue {
+  color: blue;
+}
+
+.social-icon:hover {
+  transform: scale(1.4);
+}
+.useful-links a:hover {
+  transform: scale(1);
+  color: #f39c12;
+}
+.address-links a:hover {
+  transform: scale(1);
+  color: #f39c12;
+}
+@media screen and (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-section {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .useful-links,
+  .social-icons,
+  .address-links {
+    text-align: center;
+  }
+
+  .useful-links a,
+  .social-icons a,
+  .address-links a {
+    font-size: 16px;
+  }
+
+  .social-icons {
+    margin-top: 20px;
+  }
+
+  .footer-bottom {
+    margin-top: 10px;
+  }
+}
