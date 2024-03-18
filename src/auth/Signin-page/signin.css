@@ -82,24 +82,29 @@ body {
 }
 
 .submit-button {
-  background-color: #e6d2b3;
+  background: linear-gradient(to right, #f39c12, #e74c3c);
   color: #fff;
   padding: 15px;
   border: none;
   border-radius: 10px;
+  font-weight: bold;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   cursor: pointer;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out; /* Ajout de l'animation pour le bouton */
   display: inline-block; /* Ajout de cette ligne pour permettre au bouton d'être centré */
   margin: 20px auto 0;
   width: 100%;
+  transition: background 0.3s ease-in-out, color 0.3s ease-in-out,
+    transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0 5px 15px rgba(211, 92, 1, 0.3);
 }
 .center-button {
   text-align: center;
 }
 
 .submit-button:hover {
-  background-color: #d98e10;
+  background: linear-gradient(to right, #f39c12, #e74c3c);
   transform: scale(1.05);
 }
 

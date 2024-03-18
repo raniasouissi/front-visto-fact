@@ -1,0 +1,57 @@
+.client-management-container {
+  padding: 20px;
+}
+
+.add-client-button {
+  float: right;
+  background-color: #062a78;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin-right: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.home-button {
+  background: linear-gradient(to right, #f39c12, #e74c3c);
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin-right: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.client-table {
+  margin-top: 20px;
+}
+
+.action-icon {
+  cursor: pointer;
+}
+
+.edit-icon {
+  color: #1890ff;
+}
+
+.delete-icon {
+  color: #ff4d4f;
+}
+
+.client-form {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-item {
+  margin-bottom: 15px;
+}
+
+.submit-button {
+  width: 100%;
+}

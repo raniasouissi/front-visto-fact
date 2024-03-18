@@ -1,36 +1,45 @@
-// Header.jsx
-import React, { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import React from "react";
+import PropTypes from "prop-types";
+import { FaBars } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import logo1 from "../../assets/images/logo1.png";
 import "./Header.css";
+import Logout from "../../auth/logout/logout";
 
-const Header = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const Header = ({ isLoggedIn }) => {
   const location = useLocation();
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+  const isDashboardAdmin = location.pathname === "/dashboard-admin";
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
 
-  const hideMobileMenu = () => {
-    setMobileMenuOpen(false);
-  };
+  const headerClass = isDashboardAdmin ? "header dashboard-header" : "header";
 
-  // Vérifie si la page est soit signin ou signup
-  const isLoginPage =
-    location.pathname === "/login" || location.pathname === "/register";
+  if (isDashboardAdmin) {
+    return (
+      <header className={headerClass} style={{ background: "transparent" }}>
+        <div className="header-container">
+          <Link to="/" className="logo">
+            <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
+            <span className="visto">Visto</span>
+            <span className="fact">Fact</span>
+          </Link>
+          <div className="logout-icon">
+            <Logout /> {/* Affichez le composant de déconnexion */}
+          </div>
+        </div>
+      </header>
+    );
+  }
 
-  // Si c'est une page de connexion, ne pas afficher le Header
-  if (isLoginPage) {
+  if (isLoginPage || isRegisterPage) {
     return null;
   }
 
   return (
-    // Le reste de votre composant Header
-    <header className={`header ${mobileMenuOpen ? "active" : ""}`}>
+    <header className={headerClass}>
       <div className="header-container">
-        <Link to="/" className="logo" onClick={hideMobileMenu}>
+        <Link to="/" className="logo">
           <div className="logo-container">
             <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
           </div>
@@ -38,45 +47,51 @@ const Header = () => {
           <span className="fact">Fact</span>
         </Link>
 
-        <div
-          className={`menu-icon ${mobileMenuOpen ? "active" : ""}`}
-          onClick={toggleMobileMenu}
-        >
-          {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+        <div className="menu-icon">
+          <FaBars />
         </div>
 
-        <ul className={`nav-menu ${mobileMenuOpen ? "active" : ""}`}>
+        <ul className="nav-menu">
           <li className="nav-item">
-            <Link
-              to="/devis"
-              className="nav-link bordered-button devis"
-              onClick={hideMobileMenu}
-            >
+            <Link to="/devis" className="nav-link bordered-button devis">
               Devis
             </Link>
           </li>
-          <li className="nav-item">
-            <Link
-              to="/login"
-              className="nav-link bordered-button connect"
-              onClick={hideMobileMenu}
-            >
-              Se Connecter
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link
-              to="/register"
-              className="nav-link bordered-button register"
-              onClick={hideMobileMenu}
-            >
-              Inscription
-            </Link>
-          </li>
+          {!isLoginPage &&
+            !isRegisterPage &&
+            isLoggedIn && ( // Afficher uniquement si l'utilisateur est connecté
+              <li className="nav-item">
+                {/* Placez Logout à droite */}
+                <div style={{ marginLeft: "auto" }}>
+                  <Logout /> {/* Affichez le composant de déconnexion */}
+                </div>
+              </li>
+            )}
+          {!isLoggedIn && ( // Afficher uniquement si l'utilisateur n'est pas connecté
+            <>
+              <li className="nav-item">
+                <Link to="/login" className="nav-link bordered-button connect">
+                  Se Connecter
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  to="/register"
+                  className="nav-link bordered-button register"
+                >
+                  Inscription
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </header>
   );
+};
+
+Header.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
 export default Header;

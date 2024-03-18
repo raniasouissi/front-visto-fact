@@ -1,0 +1,22 @@
+/* LogoutButton.css */
+.logout-button {
+  background-color: #062a78 !important; /* Couleur de fond du bouton */
+  color: #fff; /* Couleur du texte */
+  border: none; /* Supprimer la bordure */
+  border-radius: 20px; /* Bordure arrondie */
+  padding: 10px 20px; /* Espacement interne */
+  font-weight: bold; /* Texte en gras */
+  transition: background-color 0.3s ease; /* Transition fluide */
+}
+
+.logout-button:hover {
+  background-color: #4d53ff; /* Couleur de fond au survol */
+}
+
+.logout-button:active {
+  background-color: #cf1322; /* Couleur de fond au clic */
+}
+
+.logout-button .anticon {
+  margin-right: 8px; /* Espacement entre l'icône et le texte */
+}

@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./signin.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+//import Cookies from "js-cookie";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -60,29 +61,30 @@ const Signin = () => {
 
       const data = await response.json();
 
-      // Vérifiez si 'token' et 'user' existent dans la réponse
       if (!data.token || !data.user) {
         console.error("Champs manquants dans la réponse :", data);
         setLoginError("Erreur lors de la connexion");
         return;
       }
 
-      // Stocker le token dans un cookie
-      document.cookie = `AuthenticationToken=${data.token}; expires=1; path=/`;
+      console.log("Utilisateur connecté :", data.user);
+      console.log("Token d'authentification :", data.token);
+
+      // Enregistrez le token dans les cookies
+      document.cookie = `AuthenticationToken=${data.token}; path=/`;
 
       // Utilisez history.push correctement
       switch (data.user.roles[0]) {
         case "admin":
-          history.push("/dashboard-admin");
+          history("/dashboard-admin");
           break;
         case "client":
-          history.push("/dashboard-client");
+          history("/dashboard-client");
           break;
         case "financier":
-          history.push("/dashboard-financier");
+          history("/dashboard-financier");
           break;
         default:
-          // Gérez d'autres rôles ou scénarios ici
           break;
       }
     } catch (error) {
@@ -135,6 +137,7 @@ const Signin = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
               <span
                 className="eye-icon"
                 onClick={() => setShowPassword(!showPassword)}
@@ -143,6 +146,13 @@ const Signin = () => {
               </span>
             </div>
             {passwordError && <p className="error-message">{passwordError}</p>}
+          </div>
+          <div className="mt-3">
+            <p>
+              <Link to="/reset-password" className="forgot-password-link">
+                Mot de passe oublié? Réinitialisez-le ici
+              </Link>
+            </p>
           </div>
           <div className="center-button">
             <button type="submit" className="submit-button">

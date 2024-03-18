@@ -14,16 +14,16 @@ body {
   align-items: center;
   padding: 15px;
   background: linear-gradient(to right, rgb(243, 240, 240), hsl(0, 0%, 100%));
-
   color: #002d62;
   font-weight: bold;
   font-family: Candara;
 }
+
 .signup-form {
   border-radius: 15px;
   border: 1px solid #ffffff;
   box-shadow: 0 4px 8px rgb(177, 116, 3);
-  padding: 20px; /* Ajout de marge intérieure pour améliorer l'apparence */
+  padding: 20px;
   background: linear-gradient(to right, rgb(243, 240, 240), hsl(0, 0%, 100%));
   margin-top: 20px;
   transition: all 0.3s ease;
@@ -77,7 +77,6 @@ input {
   border: none;
   border-radius: 8px;
   border: 2px solid #7d7b7b;
-
   font-size: 1.3rem;
   transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
@@ -95,11 +94,6 @@ input:focus {
   top: 50%;
   transform: translateY(-50%);
   color: #d98e10;
-}
-.error-message {
-  color: #ff6347;
-  font-size: 14px;
-  margin-top: 5px;
 }
 
 .button-container {
@@ -132,9 +126,10 @@ input:focus {
   font-weight: bold;
   font-size: 1.2rem;
 }
+
 .text-fade-in {
   font-size: 1.9rem;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
   color: #002d62;
   font-weight: bold;
@@ -144,7 +139,6 @@ input:focus {
 .text-fade-in .orange-text {
   color: #f39c12;
   animation: textFadeIn 1.5s ease-in-out;
-
   font-size: 2rem;
 }
 
@@ -155,6 +149,48 @@ input:focus {
   font-size: 2rem;
 }
 
+.checkbox-container {
+  display: flex;
+  align-items: center; /* Alignement vertical */
+}
+
+.checkbox-input {
+  display: none; /* Masquer la véritable checkbox */
+}
+
+.checkbox-label {
+  position: relative;
+  padding-left: 30px; /* Espace pour l'icône personnalisée */
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+.checkbox-label:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #333;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.checkbox-input:checked + .checkbox-label:before {
+  background-color: #4caf50; /* Couleur de fond lorsque la checkbox est cochée */
+  border: 2px solid #4caf50; /* Couleur de bordure lorsque la checkbox est cochée */
+}
+
+.checkbox-input:checked + .checkbox-label:after {
+  content: "\2713"; /* Code unicode pour la coche (vérification) */
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  font-size: 18px;
+  color: #fff; /* Couleur de l'icône lorsque la checkbox est cochée */
+}
 @keyframes textFadeIn {
   0% {
     opacity: 0;
@@ -165,21 +201,38 @@ input:focus {
     transform: translateY(0);
   }
 }
+
+.email-input {
+  border: 1px solid #ccc;
+  padding: 8px;
+  transition: border-color 0.3s;
+}
+
+.email-input.error-border {
+  border-color: #ff0000; /* Rouge */
+}
+
+.success-message {
+  color: #008000; /* Vert */
+  margin-top: 5px;
+}
+
 .back-button {
   text-decoration: none;
   color: #062a78;
   font-weight: bold;
   font-size: 1.8rem;
-  display: block; /* Afficher le bouton en tant que bloc pour occuper l'espace disponible */
-  margin-left: 20px; /* Ajuster la marge gauche selon vos besoins */
-  position: absolute; /* Position absolue pour sortir du flux normal du document */
-  top: 20px; /* Ajuster la distance depuis le haut selon vos besoins */
-  left: 20px; /* Ajuster la distance depuis la gauche selon vos besoins */
+  display: block;
+  margin-left: 20px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 .back-button:hover {
   color: #f39c12;
 }
+
 .loading-container {
   position: fixed;
   top: 0;
@@ -189,7 +242,7 @@ input:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: #d98e10;
   z-index: 1000;
 }
 
@@ -197,30 +250,31 @@ input:focus {
   margin-left: 10px;
   font-weight: bold;
 }
+
 .error-message {
   color: #ff6347 !important;
   font-size: 14px;
   margin-top: 5px;
   font-weight: bold;
-  background-color: #ffe2e2; /* Couleur de fond pour les erreurs */
-  padding: 10px; /* Espacement interne pour une meilleure lisibilité */
-  border-radius: 8px; /* Coins arrondis */
+  background-color: #ffe2e2;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-/* Styles pour le message de réussite */
 .success-message {
   color: #4caf50;
   font-size: 16px;
   margin-top: 10px;
   font-weight: bold;
-  background-color: #e6ffe6; /* Couleur de fond pour la réussite */
-  padding: 15px; /* Espacement interne pour une meilleure lisibilité */
-  border-radius: 8px; /* Coins arrondis */
+  background-color: #e6ffe6;
+  padding: 15px;
+  border-radius: 8px;
 }
 
 @media screen and (max-width: 600px) {
   .signup-container {
-    overflow-x: hidden; /* Empêcher le défilement horizontal */
+    overflow-x: hidden;
+    padding: 10px; /* Ajout de la marge intérieure pour un meilleur espacement */
   }
 
   .signup-form {
@@ -229,16 +283,16 @@ input:focus {
     background: none;
     transition: all 0.3s ease;
     width: 100%;
-    padding: 0px;
+    padding: 10px; /* Ajout de la marge intérieure */
   }
 
   h2 {
     font-size: 1.7rem;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
 
   .form-group {
-    margin-bottom: 0rem;
+    margin-bottom: 1rem; /* Ajout de la marge inférieure */
   }
 
   label {
@@ -251,9 +305,9 @@ input:focus {
     margin-bottom: 10px;
     padding: 12px;
     font-size: 1.1rem;
-    height: 40px; /* Ajustez la hauteur du champ d'entrée selon vos besoins */
+    height: 40px;
     box-sizing: border-box;
-    width: 100%; /* Utiliser toute la largeur du conteneur parent */
+    width: 100%;
   }
 
   .signup-button {

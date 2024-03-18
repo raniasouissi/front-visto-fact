@@ -1,0 +1,42 @@
+.dashboard-container {
+  height: 100vh;
+  display: flex;
+  background-color: #f0f3f6; /* Couleur de fond inspirante */
+}
+
+.sidebar {
+  background-color: #182e4c; /* Couleur de fond de la barre latérale */
+  padding: 24px 0;
+  width: 250px;
+}
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-name {
+  color: #fff;
+  font-size: 18px;
+  margin-top: 8px;
+  font-weight: bold;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.menu {
+  margin-bottom: 24px;
+}
+
+.site-layout {
+  background-color: #fff; /* Couleur de fond du contenu principal */
+  padding: 24px;
+  flex: 1;
+}
+
+.content {
+  padding: 24px;
+  min-height: calc(100vh - 112px);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}

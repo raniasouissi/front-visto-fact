@@ -1,0 +1,232 @@
+.verification-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px;
+}
+.spacer {
+  height: 100px;
+}
+.back-button {
+  font-size: 1.5rem;
+  color: #002d62;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  max-width: 600px;
+  width: 100%;
+  padding: 40px;
+  background: linear-gradient(to right, rgb(243, 240, 240), hsl(0, 0%, 100%));
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(2, 0, 77, 0.5), 0 0 10px rgba(255, 165, 0, 0.7);
+  transition: transform 0.5s ease-in-out;
+  animation: fadeIn 0.7s ease-in-out, textSlide 1.7s ease-in-out;
+  color: #002d62;
+  font-weight: bold;
+  font-family: Candara;
+}
+
+.form-container h2 {
+  animation: textFade 1.5s ease-in-out;
+}
+
+.form-container:hover {
+  transform: scale(1.03);
+}
+
+.error-message {
+  color: #ff0000;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  color: #002d62;
+  font-weight: bold;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.form-input {
+  padding: 17px;
+  font-size: 1.3rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  color: #333;
+  width: 100%;
+  border-color: #002d62;
+}
+
+.submit-button {
+  background-color: #e6d2b3;
+  color: #fff;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  display: inline-block;
+  margin: 20px auto 0;
+  width: 100%;
+}
+
+.submit-button:hover {
+  background-color: #d98e10;
+  transform: scale(1.05);
+}
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+}
+
+p {
+  font-size: 1.4rem;
+  color: #1f1d1d;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: bold;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #4caf50;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.code-expired-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  color: #fff;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.code-expired-message p {
+  margin: 0;
+  font-size: 18px;
+}
+
+.time-left {
+  color: #002d62;
+  font-weight: bold; /* Remplacez cette valeur par la couleur de votre choix */
+}
+
+.code-expired-message button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.code-expired-message button:hover {
+  background-color: #555;
+}
+
+@media screen and (max-width: 480px) {
+  .verification-container {
+    padding-top: 30px;
+  }
+
+  .spacer {
+    height: 50px;
+  }
+
+  .form-container {
+    padding: 20px;
+  }
+
+  .form-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-input {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .submit-button {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .code-expired-message p {
+    font-size: 16px;
+  }
+
+  .code-expired-message button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+.time-span {
+  color: #03227a; /* Changez cette couleur selon vos préférences */
+  font-weight: bold;
+}
+
+/* Pour les écrans de taille entre 481 et 768 pixels */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .verification-container {
+    padding-top: 50px;
+  }
+
+  .spacer {
+    height: 70px;
+  }
+
+  .form-container {
+    padding: 30px;
+  }
+
+  .form-container h2 {
+    font-size: 1.8rem;
+  }
+
+  .form-input {
+    padding: 15px;
+    font-size: 1.2rem;
+  }
+
+  .submit-button {
+    padding: 14px;
+    font-size: 1.2rem;
+  }
+
+  .code-expired-message p {
+    font-size: 16px;
+  }
+
+  .code-expired-message button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

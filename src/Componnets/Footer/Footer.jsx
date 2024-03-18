@@ -1,4 +1,3 @@
-// Footer.jsx
 import React from "react";
 import {
   FaPhone,
@@ -9,9 +8,17 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import logo from "../../assets/images/logo.png";
+import { useLocation } from "react-router-dom";
 import "./Footer.css";
 
 const Footer = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname === "/dashboard-admin";
+
+  if (isAdminPage) {
+    return null; // Si c'est la page d'administration, ne rien afficher
+  }
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -21,7 +28,6 @@ const Footer = () => {
           </a>
           <p className="brand-name">
             <span className="orange">Visto</span>
-
             <span className="blue">Fact</span>
           </p>
           <p className="description">
@@ -30,7 +36,6 @@ const Footer = () => {
         </div>
         <div className="footer-section">
           <h2>Liens Utiles</h2>
-
           <ul className="useful-links">
             <li>
               <a href="/">Accueil</a>

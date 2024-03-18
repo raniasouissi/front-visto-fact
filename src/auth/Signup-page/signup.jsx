@@ -16,11 +16,16 @@ const Signup = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [phonenumber, setPhoneNumber] = useState("");
   const [codepostale, setCodePostale] = useState("");
+  const [matriculeFiscale, setMatriculeFiscale] = useState("");
+  const [isMatriculeFiscaleOptional, setIsMatriculeFiscaleOptional] =
+    useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [isButtonVisible, setButtonVisibility] = useState(true);
+  const [emailError, setEmailError] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const countryOptions = [
     "Tunisie",
@@ -48,8 +53,35 @@ const Signup = () => {
     "Suisse",
   ].map((country) => ({ value: country, label: country }));
 
+  const validatePhoneNumber = (phoneNumber) => {
+    const numericPhoneNumber = phoneNumber.replace(/\D/g, "");
+
+    if (numericPhoneNumber.length < 8) {
+      return false;
+    }
+
+    if (!/^\d+$/.test(numericPhoneNumber)) {
+      return false;
+    }
+
+    return true;
+  };
+  useEffect(() => {
+    // Efface les messages d'erreur et de succès après 5 secondes
+    const timeout = setTimeout(() => {
+      setError("");
+      setSuccess("");
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [error, success]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      return;
+    }
 
     const roles = ["client"];
 
@@ -64,13 +96,6 @@ const Signup = () => {
     ) {
       setError("Veuillez remplir tous les champs obligatoires");
       return;
-    } else {
-      setError("");
-    }
-
-    if (!email.includes("@")) {
-      setError("Adresse e-mail invalide");
-      return;
     }
 
     const passwordRegex =
@@ -80,32 +105,33 @@ const Signup = () => {
         "Le mot de passe doit faire au moins 8 caractères, contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
       );
       return;
-    } else {
-      setError("");
     }
 
-    const phoneRegex = /^\d{8}$/;
-    if (!phonenumber.match(phoneRegex)) {
-      setError("Numéro de téléphone invalide (8 chiffres)");
+    if (!validatePhoneNumber(phonenumber)) {
+      setError("Numéro de téléphone invalide");
       return;
-    } else {
-      setError("");
     }
 
     try {
       setLoading(true);
+      const requestBody = {
+        name,
+        email,
+        password,
+        address,
+        pays: selectedCountry.value,
+        phonenumber,
+        codepostale,
+        roles,
+      };
+
+      if (isMatriculeFiscaleOptional) {
+        requestBody.matriculeFiscale = matriculeFiscale;
+      }
+
       const response = await axios.post(
         "http://localhost:5000/api/auth/signup",
-        {
-          name,
-          email,
-          password,
-          address,
-          pays: selectedCountry.value,
-          phonenumber,
-          codepostale,
-          roles,
-        }
+        requestBody
       );
 
       setName("");
@@ -115,13 +141,29 @@ const Signup = () => {
       setSelectedCountry(null);
       setPhoneNumber("");
       setCodePostale("");
-      setSuccess(true);
+      setMatriculeFiscale("");
+      setIsMatriculeFiscaleOptional(false);
+      setSuccess("Inscription réussie ! ");
 
       document.cookie = `AuthenticationToken=${response.data.token}; path=/`;
-      history("/login");
+      setTimeout(() => {
+        history(`/verification?email=${email}`);
+      }, 3000); // Redirection après 3 secondes
     } catch (error) {
       console.error("Erreur lors de l'inscription :", error);
-      setError("Une erreur est survenue lors de l'inscription.");
+
+      if (error.response && error.response.status) {
+        if (error.response.status === 409) {
+          // 409 Conflict, l'adresse e-mail existe déjà
+          setError("L'adresse e-mail est déjà utilisée.");
+        } else {
+          // Autres erreurs du serveur
+          setError("Une erreur est survenue lors de l'inscription.");
+        }
+      } else {
+        // Erreurs non gérées
+        setError("Une erreur est survenue lors de l'inscription.");
+      }
     } finally {
       setLoading(false);
     }
@@ -135,40 +177,32 @@ const Signup = () => {
   const handleCountryOpen = () => {
     setButtonVisibility(false);
   };
+  const isValidEmail = (email) => {
+    // Expression régulière pour valider une adresse e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-  useEffect(() => {
-    let timeout;
-    if (error) {
-      timeout = setTimeout(() => {
-        setError("");
-      }, 5000);
-    }
-    return () => clearTimeout(timeout);
-  }, [error]);
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    setEmailError(!isValidEmail(newEmail));
+  };
 
   return (
     <div className="signup-container">
       <Link to="/" className="back-button">
-        <FaArrowLeft /> Retour
+        <FaArrowLeft />
       </Link>
+      <div className="spacer" />
 
       <form className="signup-form" onSubmit={handleSubmit}>
-        {loading && (
-          <div className="loading-container">
-            <FaSpinner className="loading-icon" />
-            <p>Chargement en cours...</p>
-          </div>
-        )}
         {error && (
           <div className="error-message">
             <p>{error}</p>
           </div>
         )}
-        {success && (
-          <p className="success-message">
-            Inscription réussie ! Redirection vers la page de connexion...
-          </p>
-        )}
+        {success && <p className="success-message">{success}</p>}
         <h2 className="text-fade-in">
           Créez votre compte chez <span className="orange-text">Visto</span>
           <span className="blue-text">Fact</span>
@@ -180,6 +214,7 @@ const Signup = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className={error && !name ? "error-border" : ""}
             />
           </div>
           <div className="form-group">
@@ -187,8 +222,16 @@ const Signup = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
+              className={`${
+                (error && !email) || emailError ? "error-border" : ""
+              }`}
             />
+            {emailError && (
+              <p className="error-message">
+                Veuillez entrer une adresse e-mail valide.
+              </p>
+            )}
           </div>
         </div>
         <div className="form-row">
@@ -199,6 +242,7 @@ const Signup = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className={error && !password ? "error-border" : ""}
               />
               <span
                 className="eye-icon"
@@ -209,15 +253,33 @@ const Signup = () => {
             </div>
           </div>
           <div className="form-group">
+            <label>Confirmer Mot de Passe</label>
+            <div className="password-input">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={error && !confirmPassword ? "error-border" : ""}
+              />
+              <span
+                className="eye-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
             <label>Adresse</label>
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              className={error && !address ? "error-border" : ""}
             />
           </div>
-        </div>
-        <div className="form-row">
           <div className="form-group">
             <label>Pays</label>
             <Select
@@ -225,6 +287,7 @@ const Signup = () => {
               onChange={handleCountryChange}
               options={countryOptions}
               onMenuOpen={handleCountryOpen}
+              className={error && !selectedCountry ? "error-border" : ""}
             />
           </div>
           <div className="form-group">
@@ -233,23 +296,57 @@ const Signup = () => {
               type="text"
               value={phonenumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              className={error && !phonenumber ? "error-border" : ""}
             />
           </div>
-        </div>
-        <div className="form-row">
           <div className="form-group">
             <label>Code Postal</label>
             <input
               type="text"
               value={codepostale}
               onChange={(e) => setCodePostale(e.target.value)}
+              className={error && !codepostale ? "error-border" : ""}
+            />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="checkbox-container">
+            <input
+              type="checkbox"
+              id="matriculeFiscaleCheckbox"
+              className="checkbox-input"
+              checked={isMatriculeFiscaleOptional}
+              onChange={() =>
+                setIsMatriculeFiscaleOptional(!isMatriculeFiscaleOptional)
+              }
+            />
+            <label
+              htmlFor="matriculeFiscaleCheckbox"
+              className="checkbox-label"
+            >
+              Matricule Fiscale
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Matricule Fiscale</label>
+            <input
+              type="text"
+              value={matriculeFiscale}
+              onChange={(e) => setMatriculeFiscale(e.target.value)}
+              disabled={!isMatriculeFiscaleOptional}
             />
           </div>
         </div>
         {isButtonVisible && (
           <div className="center-button">
-            <button type="submit" className="submit-button">
+            <button type="submit" className="submit-button" disabled={loading}>
               S&apos;inscrire
+              {loading && (
+                <div className="loading-container">
+                  <FaSpinner className="loading-icon" />
+                  <p>Chargement en cours...</p>
+                </div>
+              )}
             </button>
           </div>
         )}
@@ -262,6 +359,7 @@ const Signup = () => {
           </p>
         </div>
       </form>
+      <div className="spacer" />
     </div>
   );
 };

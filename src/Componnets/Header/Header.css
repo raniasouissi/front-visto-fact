@@ -10,7 +10,7 @@
   padding: 1rem 0;
   position: fixed;
   width: 100%;
-  z-index: 1000;
+  z-index: 800;
   transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .app-logo {
-  max-width: 60px;
+  max-width: 50px;
   border: 2px solid #062a78;
   border-radius: 60%;
   margin-right: 10px;
@@ -42,7 +42,7 @@
 .visto,
 .fact {
   font-family: "Consolas", sans-serif;
-  font-size: 2.4rem;
+  font-size: 2.1rem;
 }
 
 .visto {
