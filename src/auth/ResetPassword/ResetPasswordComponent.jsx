@@ -208,7 +208,7 @@ const ResetPasswordComponent = () => {
 
   return (
     <div className="reset-password-container">
-      <Link to="/" className="back-button">
+      <Link to="/login" className="back-button">
         <FaArrowLeft />
       </Link>
       <div className="spacer" />

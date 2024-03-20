@@ -10,8 +10,11 @@ import {
   message,
   Popconfirm,
 } from "antd";
-import { EditOutlined, DeleteOutlined, HomeOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 import "./ClientManagement.css";
 
@@ -20,18 +23,27 @@ const ClientManagement = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [form] = Form.useForm();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [searchQuery]);
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/clients");
+      let url = "http://localhost:5000/api/clients";
+      if (searchQuery) {
+        url += `/search/${searchQuery}`;
+      }
+      const response = await axios.get(url);
       setClients(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des clients :", error);
     }
+  };
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
   };
 
   const handleAddClient = async (values) => {
@@ -184,15 +196,25 @@ const ClientManagement = () => {
 
   return (
     <div className="client-management-container">
+      <Input
+        className="search-input"
+        prefix={<SearchOutlined className="search-icon" />}
+        placeholder="Rechercher par nom ou email"
+        value={searchQuery}
+        onChange={(e) => handleSearch(e.target.value)}
+      />
       <Button type="primary" onClick={openModal} className="add-client-button">
         Ajouter un Client
       </Button>
-      <Link to="/">
-        <Button type="primary" icon={<HomeOutlined />} className="home-button">
-          Home
-        </Button>
-      </Link>
-      <Table dataSource={clients} columns={columns} />
+
+      <Table
+        dataSource={clients}
+        columns={columns}
+        pagination={{
+          pageSize: 12,
+          showTotal: (total) => `Total ${total} clients`,
+        }}
+      />
       <Modal
         title={selectedClient ? "Modifier un Client" : "Ajouter un Client"}
         visible={modalIsOpen}

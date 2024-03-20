@@ -12,8 +12,7 @@ const { Title, Paragraph } = Typography;
 
 const features = [
   {
-    title:
-      "Augmentez votre productivité, suivez facilement vos heures de travail",
+    title: "Améliorez votre productivité en suivant vos heures de travail",
     description:
       "Suivez et enregistrez vos heures de travail avec facilité. Facturez votre temps avec précision et efficacité.",
     image: feature1Image,
@@ -34,9 +33,9 @@ const features = [
 
 const Feature = ({ title, description, image }) => {
   return (
-    <div className="feature">
+    <div className="new-feature-card">
       <img alt={title} src={image} className="feature-image" />
-      <div className="feature-text">
+      <div className="feature-details">
         <h2>{title}</h2>
         <p>{description}</p>
       </div>

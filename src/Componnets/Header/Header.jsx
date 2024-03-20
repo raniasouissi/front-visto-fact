@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FaBars } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
@@ -8,6 +8,11 @@ import Logout from "../../auth/logout/logout";
 
 const Header = ({ isLoggedIn }) => {
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const isDashboardAdmin = location.pathname === "/dashboard-admin";
   const isLoginPage = location.pathname === "/login";
@@ -47,27 +52,24 @@ const Header = ({ isLoggedIn }) => {
           <span className="fact">Fact</span>
         </Link>
 
-        <div className="menu-icon">
+        <div className="menu-icon" onClick={toggleMenu}>
           <FaBars />
         </div>
 
-        <ul className="nav-menu">
+        <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
           <li className="nav-item">
             <Link to="/devis" className="nav-link bordered-button devis">
               Devis
             </Link>
           </li>
-          {!isLoginPage &&
-            !isRegisterPage &&
-            isLoggedIn && ( // Afficher uniquement si l'utilisateur est connecté
-              <li className="nav-item">
-                {/* Placez Logout à droite */}
-                <div style={{ marginLeft: "auto" }}>
-                  <Logout /> {/* Affichez le composant de déconnexion */}
-                </div>
-              </li>
-            )}
-          {!isLoggedIn && ( // Afficher uniquement si l'utilisateur n'est pas connecté
+          {!isLoginPage && !isRegisterPage && isLoggedIn && (
+            <li className="nav-item">
+              <div style={{ marginLeft: "auto" }}>
+                <Logout />
+              </div>
+            </li>
+          )}
+          {!isLoggedIn && (
             <>
               <li className="nav-item">
                 <Link to="/login" className="nav-link bordered-button connect">

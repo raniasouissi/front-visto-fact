@@ -10,8 +10,11 @@ import {
   message,
   Popconfirm,
 } from "antd";
-import { EditOutlined, DeleteOutlined, HomeOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 import "./FinancierManagement.css";
 
@@ -20,20 +23,28 @@ const FinancierManagement = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedFinancier, setSelectedFinancier] = useState(null);
   const [form] = Form.useForm();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchFinanciers();
-  }, []);
+  }, [searchQuery]);
 
   const fetchFinanciers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/financiers");
+      let url = "http://localhost:5000/api/financiers";
+      if (searchQuery) {
+        url += `/search/${searchQuery}`;
+      }
+      const response = await axios.get(url);
       setFinanciers(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des financiers :", error);
     }
   };
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
   const handleAddFinancier = async (values) => {
     try {
       const response = await axios.post(
@@ -164,6 +175,13 @@ const FinancierManagement = () => {
 
   return (
     <div className="financier-management-container">
+      <Input
+        className="search-input"
+        prefix={<SearchOutlined className="search-icon" />}
+        placeholder="Rechercher par nom ou email"
+        value={searchQuery}
+        onChange={(e) => handleSearch(e.target.value)}
+      />
       <Button
         type="primary"
         onClick={openModal}
@@ -171,12 +189,15 @@ const FinancierManagement = () => {
       >
         Ajouter un Financier
       </Button>
-      <Link to="/">
-        <Button type="primary" icon={<HomeOutlined />} className="home-button">
-          Home
-        </Button>
-      </Link>
-      <Table dataSource={financiers} columns={columns} />
+
+      <Table
+        dataSource={financiers}
+        columns={columns}
+        pagination={{
+          pageSize: 12,
+          showTotal: (total) => `Total ${total} financiers`,
+        }}
+      />
       <Modal
         title={
           selectedFinancier ? "Modifier un Financier" : "Ajouter un Financier"

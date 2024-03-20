@@ -103,7 +103,7 @@ const VerificationPage = () => {
 
   return (
     <div className="verification-container">
-      <Link to="/" className="back-button">
+      <Link to="/register" className="back-button">
         <FaArrowLeft />
       </Link>
       <div className="spacer" />
