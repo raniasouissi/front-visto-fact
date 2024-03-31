@@ -14,6 +14,7 @@ import DashboardClient from "./Client/DashboardClient";
 import DashboardFinancier from "./Financier/DashboardFinancier";
 import ResetPasswordComponent from "./auth/ResetPassword/ResetPasswordComponent";
 import VerificationPage from "./auth/Verif-email/VerificationPage";
+import SetPassword from "./Admin/ClientManagement/SetPassword/SetPassword";
 
 import "./App.css";
 
@@ -48,6 +49,7 @@ const App = () => {
               element={<DashboardFinancier />}
             />
             <Route path="/verification" element={<VerificationPage />} />
+            <Route path="/set-password/:token" element={<SetPassword />} />
           </Routes>
         </main>
         <Footer />

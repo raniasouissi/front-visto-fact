@@ -163,7 +163,7 @@ const ClientManagement = () => {
       key: "pays",
     },
     {
-      title: "Code Postal",
+      title: "Code Postale",
       dataIndex: "codepostale",
       key: "codepostale",
     },
@@ -199,7 +199,7 @@ const ClientManagement = () => {
       <Input
         className="search-input"
         prefix={<SearchOutlined className="search-icon" />}
-        placeholder="Rechercher par nom ou email"
+        placeholder="Rechercher ..."
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
       />
@@ -220,68 +220,119 @@ const ClientManagement = () => {
         visible={modalIsOpen}
         onCancel={closeModal}
         footer={null}
+        className="client-form-modal" // Ajoutez une classe au modal
       >
         <Form
           form={form}
           onFinish={selectedClient ? handleUpdateClient : handleAddClient}
         >
-          <Form.Item
-            label="Nom"
-            name="name"
-            rules={[
-              {
-                required: true,
-                message: "Veuillez entrer le nom du client !",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              {
-                required: true,
-                message: "Veuillez entrer l'email du client !",
-              },
-              { type: "email", message: "Veuillez entrer un email valide !" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Numéro de Téléphone"
-            name="phonenumber"
-            rules={[
-              {
-                required: true,
-                message: "Veuillez entrer le numéro de téléphone du client !",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Adresse" name="address">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Pays" name="pays">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Code Postal" name="codepostale">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Matricule Fiscale" name="matriculeFiscale">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Type" name="type">
-            <Input disabled={!selectedClient} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              {selectedClient ? "Modifier" : "Ajouter"}
-            </Button>
-          </Form.Item>
+          <div className="form-button-container">
+            <Form.Item
+              label="Nom"
+              name="name"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer le nom du client !",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Email"
+              name="email"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer l'email du client !",
+                },
+                { type: "email", message: "Veuillez entrer un email valide !" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Numéro de Téléphone"
+              name="phonenumber"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer le numéro de téléphone du client !",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Adresse"
+              name="address"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer l'adresse du client !",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Pays"
+              name="pays"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer le pays du client !",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Code Postale"
+              name="codepostale"
+              hasFeedback
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer le code postal du client !",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item label="Matricule Fiscale" name="matriculeFiscale">
+              <Input />
+            </Form.Item>
+            {selectedClient && (
+              <Form.Item
+                label="Type"
+                name="type"
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez sélectionner le type du client !",
+                  },
+                ]}
+              >
+                <Input disabled={!selectedClient} />
+              </Form.Item>
+            )}
+            <Form.Item className="centered-button">
+              <Button type="primary" htmlType="submit">
+                {selectedClient ? "Modifier" : "Ajouter"}
+              </Button>
+              <Button onClick={closeModal} style={{ marginLeft: "8px" }}>
+                Annuler
+              </Button>
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
     </div>

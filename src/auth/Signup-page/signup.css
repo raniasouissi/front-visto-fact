@@ -36,8 +36,8 @@ body {
 form {
   display: flex;
   flex-direction: column;
-  width: 90%;
-  max-width: 700px;
+  width: 100%;
+  max-width: 750px;
 }
 
 .form-row {
@@ -73,7 +73,7 @@ label {
 
 input {
   width: 100%;
-  padding: 15px;
+  padding: 18px;
   border: none;
   border-radius: 8px;
   border: 2px solid #7d7b7b;
@@ -302,8 +302,8 @@ input:focus {
   }
 
   input {
-    margin-bottom: 10px;
-    padding: 12px;
+    margin-bottom: 20px;
+    padding: 0px;
     font-size: 1.1rem;
     height: 40px;
     box-sizing: border-box;

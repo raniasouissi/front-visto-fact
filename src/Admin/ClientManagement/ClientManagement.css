@@ -1,5 +1,5 @@
 .client-management-container {
-  margin: 70px 0;
+  margin: 70px auto;
 }
 
 .add-client-button {
@@ -15,52 +15,16 @@
   text-align: center;
 }
 
-.home-button {
-  background: linear-gradient(to right, #f39c12, #e74c3c);
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  margin-right: 20px;
-  border-radius: 8px;
-  text-align: center;
+.add-client-button:hover {
+  background-color: transparent; /* Changement de couleur au survol */
 }
 
-.client-table {
-  margin-top: 20px;
-}
-
-.action-icon {
-  cursor: pointer;
-}
-
-.edit-icon {
-  color: #1890ff;
-}
-
-.delete-icon {
-  color: #ff4d4f;
-}
-
-.client-form {
-  width: 100%;
-  max-width: 400px;
-}
-
-.form-item {
-  margin-bottom: 15px;
-}
-
-.submit-button {
-  width: 100%;
-}
 .search-input {
   width: 300px;
   margin-bottom: 20px;
   border-radius: 4px;
   border: 1px solid #d9d9d9;
-  padding: 8px 12px;
+  padding: 5px 12px;
   transition: border-color 0.3s;
   font-weight: bold;
   border-color: #062a78;
@@ -74,9 +38,102 @@
 
 .search-icon {
   color: #062a78;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .search-icon:hover {
   color: #062a78;
+}
+
+/* Style pour la bordure noire sous le titre */
+.ant-modal-title {
+  border-bottom: 4px solid #5f9ea0;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  margin-top: 10px;
+}
+
+/* Style pour le texte de couleur noire */
+.ant-modal-title,
+.ant-form-item-label,
+.ant-input {
+  color: black;
+  font-size: 2rem;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  margin-top: 10px;
+}
+.action-icon edit-icon {
+  color: #309504;
+}
+/* Style pour organiser les champs de saisie et les libellés */
+.ant-form-item {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ant-form-item-label {
+  width: 270px;
+  font-weight: bold;
+  margin-right: 20px;
+  text-align: left; /* Alignez le texte à droite */
+
+  flex: 0 0 180px; /* Ajout d'une flexibilité pour que les libellés gardent leur largeur */
+}
+
+.ant-input {
+  flex: 5;
+  border-radius: 10px;
+  border: 1px solid #a2a7a7;
+  padding: 8px 12px;
+  transition: border-color 0.3s;
+  font-size: 16px;
+}
+
+.ant-input:focus {
+  border-color: #062a78;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ant-btn-primary {
+  background-color: #4682b4; /* Changement de couleur du bouton Ajouter dans le formulaire */
+  border-color: #4682b4;
+  font-weight: bold;
+  text-align: center;
+  align-items: center;
+}
+
+.ant-btn-primary:hover {
+  background-color: transparent; /* Changement de couleur au survol */
+  border-color: #5f9ea0;
+}
+.centered-button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.form-button-container .ant-form-item {
+  flex: 1;
+  margin-right: 10px; /* Ajustez la marge selon vos besoins */
+}
+
+.form-button-container .ant-form-item:last-child {
+  margin-right: 0; /* Supprimez la marge du dernier élément pour éviter le débordement */
+}
+.form-container {
+  transition: all 0.1s ease;
+}
+
+/* Animation pour l'apparition du formulaire */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

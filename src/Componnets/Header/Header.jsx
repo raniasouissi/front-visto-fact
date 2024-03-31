@@ -17,6 +17,8 @@ const Header = ({ isLoggedIn }) => {
   const isDashboardAdmin = location.pathname === "/dashboard-admin";
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
+  const isSetpasswordpage = location.pathname.startsWith("/set-password");
+  const isResetPassword = location.pathname === "/reset-password";
 
   const headerClass = isDashboardAdmin ? "header dashboard-header" : "header";
 
@@ -25,19 +27,44 @@ const Header = ({ isLoggedIn }) => {
       <header className={headerClass} style={{ background: "transparent" }}>
         <div className="header-container">
           <Link to="/" className="logo">
-            <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
+            <div className="logo-container">
+              <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
+            </div>
             <span className="visto">Visto</span>
             <span className="fact">Fact</span>
           </Link>
-          <div className="logout-icon">
-            <Logout /> {/* Affichez le composant de déconnexion */}
+
+          <div className="menu-icon" onClick={toggleMenu}>
+            <FaBars />
           </div>
+
+          <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
+            <li className="nav-item">
+              <Logout />
+            </li>
+          </ul>
         </div>
       </header>
     );
   }
 
-  if (isLoginPage || isRegisterPage) {
+  if (isSetpasswordpage || isResetPassword) {
+    return (
+      <header className={headerClass}>
+        <div className="header-container">
+          <Link to="/" className="logo">
+            <div className="logo-container">
+              <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
+            </div>
+            <span className="visto">Visto</span>
+            <span className="fact">Fact</span>
+          </Link>
+        </div>
+      </header>
+    );
+  }
+
+  if (isLoginPage || isRegisterPage || isSetpasswordpage) {
     return null;
   }
 
@@ -62,13 +89,6 @@ const Header = ({ isLoggedIn }) => {
               Devis
             </Link>
           </li>
-          {!isLoginPage && !isRegisterPage && isLoggedIn && (
-            <li className="nav-item">
-              <div style={{ marginLeft: "auto" }}>
-                <Logout />
-              </div>
-            </li>
-          )}
           {!isLoggedIn && (
             <>
               <li className="nav-item">

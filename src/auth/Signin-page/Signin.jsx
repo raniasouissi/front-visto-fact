@@ -114,6 +114,7 @@ const Signin = () => {
             <label htmlFor="email" className="form-label">
               Email
             </label>
+
             <input
               type="email"
               id="email"
@@ -128,6 +129,7 @@ const Signin = () => {
             <label htmlFor="password" className="form-label">
               Mot de Passe
             </label>
+
             <div className="password-input">
               <input
                 type={showPassword ? "text" : "password"}

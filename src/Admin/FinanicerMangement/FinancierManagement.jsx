@@ -45,6 +45,7 @@ const FinancierManagement = () => {
   const handleSearch = (value) => {
     setSearchQuery(value);
   };
+
   const handleAddFinancier = async (values) => {
     try {
       const response = await axios.post(
@@ -74,10 +75,8 @@ const FinancierManagement = () => {
 
   const handleUpdateFinancier = async (values) => {
     try {
-      const { name, email, phonenumber } = values;
-      const updatedFinancier = { name, email, phonenumber };
       const url = `http://localhost:5000/api/financiers/${selectedFinancier._id}`;
-      const response = await axios.put(url, updatedFinancier);
+      const response = await axios.put(url, values);
 
       if (response.status === 200) {
         fetchFinanciers();
@@ -126,6 +125,9 @@ const FinancierManagement = () => {
       name: financier.name,
       email: financier.email,
       phonenumber: financier.phonenumber,
+      codepostale: financier.codepostale,
+      address: financier.address,
+      pays: financier.pays,
     });
   };
 
@@ -150,6 +152,21 @@ const FinancierManagement = () => {
       title: "Numéro de Téléphone",
       dataIndex: "phonenumber",
       key: "phonenumber",
+    },
+    {
+      title: "Code Postal",
+      dataIndex: "codepostale",
+      key: "codepostale",
+    },
+    {
+      title: "Adresse",
+      dataIndex: "address",
+      key: "address",
+    },
+    {
+      title: "Pays",
+      dataIndex: "pays",
+      key: "pays",
     },
     {
       title: "Actions",
@@ -178,7 +195,7 @@ const FinancierManagement = () => {
       <Input
         className="search-input"
         prefix={<SearchOutlined className="search-icon" />}
-        placeholder="Rechercher par nom ou email"
+        placeholder="Rechercher ..."
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
       />
@@ -215,6 +232,7 @@ const FinancierManagement = () => {
           <Form.Item
             label="Nom"
             name="name"
+            hasFeedback
             rules={[
               {
                 required: true,
@@ -227,6 +245,7 @@ const FinancierManagement = () => {
           <Form.Item
             label="Email"
             name="email"
+            hasFeedback
             rules={[
               {
                 required: true,
@@ -240,6 +259,7 @@ const FinancierManagement = () => {
           <Form.Item
             label="Numéro de Téléphone"
             name="phonenumber"
+            hasFeedback
             rules={[
               {
                 required: true,
@@ -250,9 +270,52 @@ const FinancierManagement = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item>
+          <Form.Item
+            label="Code Postal"
+            name="codepostale"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "Veuillez entrer le code postal du financier !",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Adresse"
+            name="address"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "Veuillez entrer l'adresse du financier !",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Pays"
+            name="pays"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "Veuillez entrer le pays du financier !",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item className="centered-button">
             <Button type="primary" htmlType="submit">
               {selectedFinancier ? "Modifier" : "Ajouter"}
+            </Button>
+            <Button onClick={closeModal} style={{ marginLeft: "8px" }}>
+              Annuler
             </Button>
           </Form.Item>
         </Form>

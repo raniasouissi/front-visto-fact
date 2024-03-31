@@ -1,8 +1,8 @@
-// Importez les composants nécessaires
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
+
 import "./ResetPasswordComponent.css";
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -97,6 +97,7 @@ const ResetPasswordComponent = () => {
         setEmailError("");
         setStep(2);
         startCountdown();
+        setCode(["", "", "", "", "", ""]); // Réinitialiser le formulaire de code
       } else {
         setError(response.data.message);
       }
@@ -197,10 +198,41 @@ const ResetPasswordComponent = () => {
 
   // Ajoutez cette fonction pour gérer le passage au champ suivant
   const handleCodeKeyDown = (index, event) => {
-    if (event.key === "Enter" && index < codeRefs.length - 1) {
-      event.preventDefault();
+    const key = event.key;
+    const isDigit = /^[0-9]$/.test(key); // Vérifiez si la touche est un chiffre
+
+    if (isDigit) {
+      const newValue = parseInt(key, 10); // Convertir la touche en nombre entier
+      const newCode = [...code];
+      newCode[index] = newValue.toString(); // Mettez à jour la valeur du champ de code
+
+      setCode(newCode); // Mettez à jour l'état du code
+
+      // Déplacez automatiquement le focus vers le champ suivant s'il y en a un
+      if (index < codeRefs.length - 1) {
+        codeRefs[index + 1].current.focus();
+      }
+    } else if (key === "Backspace") {
+      // Si l'utilisateur appuie sur la touche "Backspace", supprimez le chiffre
+      const newCode = [...code];
+      newCode[index] = ""; // Effacez la valeur du champ de code
+
+      setCode(newCode); // Mettez à jour l'état du code
+
+      // Déplacez automatiquement le focus vers le champ précédent s'il y en a un
+      if (index > 0) {
+        codeRefs[index - 1].current.focus();
+      }
+    } else if (key === "ArrowLeft" && index > 0) {
+      // Si l'utilisateur appuie sur la touche "Flèche gauche", déplacez le focus vers le champ précédent
+      codeRefs[index - 1].current.focus();
+    } else if (key === "ArrowRight" && index < codeRefs.length - 1) {
+      // Si l'utilisateur appuie sur la touche "Flèche droite", déplacez le focus vers le champ suivant
       codeRefs[index + 1].current.focus();
     }
+  };
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   // Ajoutez cette référence pour les champs de code
@@ -294,7 +326,7 @@ const ResetPasswordComponent = () => {
                 <div className="code-expired-message">
                   <p>Le code a expiré.</p>
                   <button type="button" onClick={goToStep1}>
-                    Retourner à l&apos;étape de vérification
+                    Renvoyer le code de vérification
                   </button>
                 </div>
               )}
@@ -325,11 +357,8 @@ const ResetPasswordComponent = () => {
                       handleInputChange(e, setNewPassword, setPasswordError)
                     }
                   />
-                  <span
-                    className="eye-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  <span className="eye-icon" onClick={togglePasswordVisibility}>
+                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
                   </span>
                 </div>
               </div>
@@ -340,23 +369,16 @@ const ResetPasswordComponent = () => {
                 <div className="password-input">
                   <input
                     type={showPassword ? "text" : "password"}
-                    id="confirmNewPassword"
+                    id="newPassword"
                     className={`form-input ${passwordError && "error-border"}`}
-                    placeholder="Confirmez votre nouveau mot de passe"
-                    value={confirmNewPassword}
+                    placeholder="Entrez votre nouveau mot de passe"
+                    value={newPassword}
                     onChange={(e) =>
-                      handleInputChange(
-                        e,
-                        setConfirmNewPassword,
-                        setPasswordError
-                      )
+                      handleInputChange(e, setNewPassword, setPasswordError)
                     }
                   />
-                  <span
-                    className="eye-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  <span className="eye-icon" onClick={togglePasswordVisibility}>
+                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
                   </span>
                 </div>
                 {passwordError && (
