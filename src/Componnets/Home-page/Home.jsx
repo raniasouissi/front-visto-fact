@@ -1,111 +1,412 @@
-import React, { useEffect } from "react";
-import "./Home.css"; // Importez votre fichier CSS
-import homeImage from "../../assets/images/home.jpg";
-import feature1Image from "../../assets/images/feature1.jpg";
-import feature2Image from "../../assets/images/feature2.jpg";
-import feature3Image from "../../assets/images/feature3.jpg";
+import React, { useRef, useEffect, useState } from "react";
+import {
+  FaCalculator,
+  FaFileInvoice,
+  FaUsers,
+  FaListAlt,
+  FaMoneyBillAlt,
+  FaBox,
+  FaChevronDown,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { Typography, Row, Col } from "antd";
-import PropTypes from "prop-types";
+import heroImage from "../../assets/images/h4.jpg";
+import featureImage1 from "../../assets/images/im1.jpg";
+import featureImage2 from "../../assets/images/evo.jpg";
+import featureImage3 from "../../assets/images/nn.jpg";
+import Image1 from "../../assets/images/loi.png";
+import Image2 from "../../assets/images/t.png";
+import Image3 from "../../assets/images/avp.png";
+import w1 from "../../assets/images/oo.jpg";
+import w2 from "../../assets/images/ss.jpg";
+import w3 from "../../assets/images/w.jpg";
+import contactImage from "../../assets/images/contact.jpg";
+import "./Home.css";
+import "./media.css";
 
-const { Title, Paragraph } = Typography;
+function HomePage() {
+  const testimonials = [
+    {
+      id: 1,
+      text: "Vbill a changé la façon dont je gère mes factures. C'est tellement simple et intuitif!",
+      author: "Marie Dupont",
+    },
+    {
+      id: 2,
+      text: "Je recommande Vbill à tous ceux qui cherchent un moyen efficace de gérer leur facturation.",
+      author: "Jean Martin",
+    },
+    {
+      id: 3,
+      text: "Super outil ! Vraiment pratique pour suivre mes factures et mes clients.",
+      author: "Pauline Leroy",
+    },
+    {
+      id: 4,
+      text: "Vbill a révolutionné la gestion de ma petite entreprise. Merci pour cette solution!",
+      author: "Antoine Dubois",
+    },
+    {
+      id: 5,
+      text: "Je suis impressionné par la simplicité d'utilisation de Vbill. Hautement recommandé!",
+      author: "Sophie Lambert",
+    },
+    {
+      id: 6,
+      text: "Grâce à Vbill, je gagne énormément de temps dans la gestion de mes factures.",
+      author: "Pierre Durand",
+    },
+    {
+      id: 7,
+      text: "Excellent service client et outil très performant. Je ne pourrais plus m'en passer!",
+      author: "Camille Martin",
+    },
+    {
+      id: 8,
+      text: "Vbill est de loin le meilleur logiciel de facturation que j'ai utilisé jusqu'à présent.",
+      author: "Nicolas Leclerc",
+    },
+  ];
+  const newFeatureSectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-const features = [
-  {
-    title: "Améliorez votre productivité en suivant vos heures de travail",
-    description:
-      "Suivez et enregistrez vos heures de travail avec facilité. Facturez votre temps avec précision et efficacité.",
-    image: feature1Image,
-  },
-  {
-    title: "Facturation en ligne sécurisée et intuitive",
-    description:
-      "Générez des factures professionnelles en quelques clics. Un processus de facturation simple et sécurisé.",
-    image: feature2Image,
-  },
-  {
-    title: "Gestion comptable simplifiée avec des outils intelligents",
-    description:
-      "Automatisez vos tâches comptables et suivez vos finances en temps réel. Simplifiez la gestion de votre entreprise.",
-    image: feature3Image,
-  },
-];
+  const [activeIndex, setActiveIndex] = useState(null);
 
-const Feature = ({ title, description, image }) => {
-  return (
-    <div className="new-feature-card">
-      <img alt={title} src={image} className="feature-image" />
-      <div className="feature-details">
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </div>
-    </div>
-  );
-};
+  const [isTextVisible, setIsTextVisible] = useState(false);
 
-Feature.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired,
-};
-
-const Home = () => {
   useEffect(() => {
-    document.body.classList.add("new-home-page");
-    return () => {
-      document.body.classList.remove("new-home-page");
-    };
+    const section = newFeatureSectionRef.current;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      });
+    });
+    observer.observe(section);
+    return () => observer.unobserve(section);
   }, []);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Change the time according to your requirement
+    return () => clearTimeout(timeout);
+  }, []);
+  const toggleTextVisibility = () => {
+    setIsTextVisible(!isTextVisible);
+  };
+
   return (
-    <div className="new-home">
-      <div className="new-spacer" />
+    <div className="home-page">
+      <div className="spacer" />
+      {isLoading && <div className="spinner"></div>}
+      <section className="hero-section">
+        {/* Hero section content */}
+        <img src={heroImage} alt="Invoice App" className="hero-img" />
 
-      <div className="new-content">
-        <Title level={1}>
-          Un logiciel de facturation complet pour votre entreprise.
-        </Title>
-        <Paragraph
-          style={{
-            fontSize: "1.4rem",
-            lineHeight: "1.5",
-            fontFamily: "serif",
-            fontWeight: "bold",
-          }}
-        >
-          Gérez vos finances avec facilité grâce à notre plateforme intuitive.{" "}
-          <span className="new-highlight">
-            Découvrez une nouvelle façon de travailler.
-          </span>
-        </Paragraph>
-        <Link to="/register">
-          <button className="new-button">Commencer</button>
-        </Link>
-      </div>
+        <div className="hero-overlay"></div>
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Gérez vos factures en toute simplicité{" "}
+            <div className="line-divid"></div>
+          </h1>
+          <p className="hero-subtitlee">
+            Créez, envoyez et gérez vos factures en quelques clics avec notre
+            application intuitive.
+          </p>
+          <Link to="/register" className="btn-get-startedd">
+            Commencer
+          </Link>
+        </div>
+      </section>
+      <section className="pre-new-features-section">
+        <div className="pre-new-features-container">
+          <img src={Image1} alt="Image 1" className="pre-new-feature-img" />
+          <img src={Image2} alt="Image 2" className="pre-new-feature-img" />
+          <img src={Image3} alt="Image 3" className="pre-new-feature-img" />
+        </div>
+      </section>
+      <section ref={newFeatureSectionRef} className="new-features-section">
+        <div className="f-content">
+          <h1 className="f-title">
+            Un outil complet et simple d&apos;utilisation.
+          </h1>
+          <p className="f-subtitle">
+            Pour vous permettre de vous concentrer sur l&apos;essentiel
+          </p>
+        </div>
+        <div className="new-feature">
+          <img
+            src={featureImage1}
+            alt="Feature 1"
+            className={`new-feature-img ${isVisible ? "visible" : ""}`}
+          />
+          <div className="new-feature-info">
+            <h2 className="new-feature-title"> Complet et Sécurisé</h2>
+            <p className="new-feature-description">
+              Un module multi-entreprises gratuit, la gestion de votre
+              facturation, de vos devis et de vos règlements en quelques clics.
+              La mise à disposition d&apos;un tableau de bord complet et
+              graphique pour un suivi précis de votre entreprise.
+            </p>
+          </div>
+        </div>
+        <div className="new-feature">
+          <img
+            src={featureImage2}
+            alt="Feature 2"
+            className={`new-feature-img ${isVisible ? "visible" : ""}`}
+          />
+          <div className="new-feature-info">
+            <h2 className="new-feature-title"> Évolutif et Mobile</h2>
+            <p className="new-feature-description">
+              Notre outil a été conçu pour s&apos;adapter au plus près à vos
+              besoins avec une construction en blocs/packs, la mise à
+              disposition de statistiques poussées et des mises à jour
+              régulières.
+            </p>
+          </div>
+        </div>
+        <div className="new-feature">
+          <img
+            src={featureImage3}
+            alt="Feature 3"
+            className={`new-feature-img ${isVisible ? "visible" : ""}`}
+          />
+          <div className="new-feature-info">
+            <h2 className="new-feature-title">Intuitif et Gratuit</h2>
+            <p className="new-feature-description">
+              Un site pensé par et pour les entreprises, des didacticiels pour
+              vous accompagner pas à pas et des formations accessibles si
+              besoin. Des fonctionnalités essentielles pour la prise de décision
+              dans la gestion de votre entreprise.
+            </p>
+          </div>
+        </div>
+      </section>
+      {/* Nouvelle section */}
+      <section className="additional-features-section">
+        <div className="a-content">
+          <h1 className="a-title">
+            La solution tout-en-un{" "}
+            <span className="a-text">simplifie votre quotidien !</span>
+            <p className="d-text">
+              Gérez votre entreprise. Depuis une seule application.
+            </p>
+          </h1>
+        </div>
+        <div className="feature-card circle blue">
+          <FaCalculator className="feature-icon" />
+          <h2 className="feature-title">Gratuit</h2>
+          <p className="feature-description">
+            Gérez vos factures en toute simplicité.
+          </p>
+        </div>
+        <div className="feature-card circle green">
+          <FaFileInvoice className="feature-icon" />
+          <h2 className="feature-title">Factures</h2>
+          <p className="feature-description">
+            Créez et envoyez vos factures en un clic.
+          </p>
+        </div>
+        <div className="feature-card circle red">
+          <FaUsers className="feature-icon" />
+          <h2 className="feature-title">Clients</h2>
+          <p className="feature-description">
+            Gérez facilement votre liste de clients.
+          </p>
+        </div>
+        <div className="feature-card circle yellow">
+          <FaListAlt className="feature-icon" />
+          <h2 className="feature-title">Devis</h2>
+          <p className="feature-description">
+            Créez et suivez vos devis en ligne.
+          </p>
+        </div>
+        <div className="feature-card circle purple">
+          <FaMoneyBillAlt className="feature-icon" />
+          <h2 className="feature-title">Règlements</h2>
+          <p className="feature-description">
+            Effectuez et suivez les paiements.
+          </p>
+        </div>
+        <div className="feature-card circle orange">
+          <FaBox className="feature-icon" />
+          <h2 className="feature-title">Services</h2>
+          <p className="feature-description">
+            Gérez votre inventaire de services.
+          </p>
+        </div>
+      </section>
+      <section className="why-use-vbill-section">
+        <h1 className="why-use-vbill-title">Pourquoi utiliser Vbill </h1>
+        <div className="why-use-vbill-content">
+          <div className="why-use-vbill-images">
+            <div className="why-use-vbill-images-row">
+              <img src={w1} alt="Image 1" className="circle-image w1" />
+            </div>
+            <div className="why-use-vbill-images-row">
+              <img src={w2} alt="Image 2" className="circle-image w2" />
+            </div>
+            <div className="why-use-vbill-images-row">
+              <img src={w3} alt="Image 3" className="circle-image w3" />
+            </div>
+          </div>
 
-      <div className="new-image-container">
-        <img
-          src={homeImage}
-          alt="Image d'accueil"
-          className="new-animated-image"
-        />
-      </div>
-
-      <div className="new-features">
-        <Row gutter={[16, 16]} justify="center">
-          {features.map((feature, index) => (
-            <Col xs={24} sm={12} md={8} key={index}>
-              <Feature
-                title={feature.title}
-                description={feature.description}
-                image={feature.image}
+          <div className="why-use-vbill-cards-container">
+            <div className="why-use-vbill-card">
+              <h2 className="why-use-vbill-card-title">
+                Devis et facturation adaptés au secteur du bâtiment
+              </h2>
+              <p
+                className={`why-use-vbill-card-text ${
+                  isTextVisible ? "visible" : ""
+                }`}
+              >
+                Grâce à notre logiciel de facturation, rédigez des devis et
+                factures adaptés aux attentes de votre secteur : multiples taux
+                de TVA, attestations de TVA, gestion avancée de votre
+                bibliothèque d’ouvrages, fournitures, main d’oeuvre… Toutes les
+                marges sont ensuite calculées en temps réel, sans intervention
+                de votre part.
+              </p>
+              <FaChevronDown
+                className="toggle-icon"
+                onClick={toggleTextVisibility}
               />
-            </Col>
-          ))}
-        </Row>
-      </div>
+            </div>
+            <div className="why-use-vbill-card">
+              <h2 className="why-use-vbill-card-title">
+                Personnalisation des devis & factures
+              </h2>
+              <p className="why-use-vbill-card-text">
+                Soigner l’image de ses documents est essentiel dans un secteur
+                aussi concurrentiel que le bâtiment. Apprenez comment créer un
+                devis et personnalisez à 100% vos documents en y insérant votre
+                logo, en modifiant les styles et couleurs ou encore en affichant
+                vos labels (Qualibat, RGE, etc.) ! Tout ceci, sans aucune
+                connaissance technique grâce à une interface intuitive,
+                ergonomique et adaptée à votre secteur.
+              </p>
+              <FaChevronDown
+                className="toggle-icon"
+                onClick={toggleTextVisibility}
+              />
+            </div>
+            <div className="why-use-vbill-card">
+              <h2 className="why-use-vbill-card-title">
+                Gestion des clients BTP & suivi des chantiers
+              </h2>
+              <p className="why-use-vbill-card-text">
+                Pour une TPE/PME la bonne gestion et le suivi des chantiers sont
+                primordiaux. Suivez l’ensemble de vos prospects, clients et
+                fournisseurs sur une seule et même interface. En déplacement,
+                prenez des notes et ajoutez des photos pour ne rien oublier ! Si
+                votre chantier se déroule sur plusieurs mois, établissez
+                simplement des factures de situation à vos clients.
+              </p>
+              <FaChevronDown
+                className="toggle-icon"
+                onClick={toggleTextVisibility}
+              />
+            </div>
+            <div className="why-use-vbill-card">
+              <h2 className="why-use-vbill-card-title">
+                Statistiques et pilotage dans votre logiciel BTP
+              </h2>
+              <p className="why-use-vbill-card-text">
+                Surveillez votre activité en temps réel grâce aux données
+                disponibles sur le tableau de bord. Véritable assistant au
+                quotidien, vous y trouverez les factures en attente de
+                règlement, vos performances commerciales ou encore votre taux
+                d’acceptation des devis.
+              </p>
+              <FaChevronDown
+                className="toggle-icon"
+                onClick={toggleTextVisibility}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="testimonials-section">
+        <div className="testimonials-container">
+          <h2 className="testimonials-title">
+            T<span>é</span>m<span>o</span>ign<span>a</span>ges
+          </h2>
+          <div className="testimonials-grid">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={testimonial.id}
+                className={`testimonial ${
+                  index === activeIndex ? "active" : ""
+                }`}
+                onClick={() => setActiveIndex(index)}
+              >
+                <div className="testimonial-content">
+                  <p className="testimonial-text">{testimonial.text}</p>
+                  <p className="testimonial-author">- {testimonial.author}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="contact-us-section">
+        <div className="contact-us-container">
+          <div className="contact-us-content">
+            <form className="contact-us-form1">
+              <h2 className="contact-us-title">Contactez-nous</h2>
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Votre nom"
+                  className="form-input1"
+                />
+              </div>
+              <div className="input-group">
+                <input
+                  type="email"
+                  placeholder="Votre email"
+                  className="form-input1"
+                />
+              </div>
+              <div className="input-group">
+                <input
+                  type="tel"
+                  placeholder="Votre numéro de téléphone"
+                  className="form-input1"
+                />
+              </div>
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Sujet"
+                  className="form-input1"
+                />
+              </div>
+              <div className="input-group">
+                <textarea
+                  placeholder="Votre message"
+                  rows="6"
+                  className="form-textarea1"
+                ></textarea>
+              </div>
+              <button type="submit" className="btn-submit">
+                Envoyer
+              </button>
+            </form>
+          </div>
+          <div className="contact-us-image">
+            <img src={contactImage} alt="Contact Us" />
+          </div>
+        </div>
+      </section>
     </div>
   );
-};
+}
 
-export default Home;
+export default HomePage;

@@ -7,7 +7,7 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/vbil2.png";
 import { useLocation } from "react-router-dom";
 import "./Footer.css";
 
@@ -27,8 +27,8 @@ const Footer = () => {
             <img src={logo} alt="Logo VistoFact" className="logo-footer" />
           </a>
           <p className="brand-name">
-            <span className="orange">Visto</span>
-            <span className="blue">Fact</span>
+            <span className="orange">V</span>
+            <span className="blue">Bill</span>
           </p>
           <p className="description">
             Votre partenaire intelligent pour une gestion financière efficace.

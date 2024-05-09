@@ -1,0 +1,267 @@
+/* Media query pour les appareils mobiles */
+@media only screen and (max-width: 768px) {
+  .hero-img {
+    height: auto;
+    max-height: 100vh;
+    object-fit: cover;
+    background-color: transparent;
+    width: auto;
+  }
+  .home-page {
+    height: auto; /* Définit la hauteur de la section sur 100% de la hauteur de l'écran */
+    width: 100%;
+  }
+
+  .home-page {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .hero-content {
+    padding: 10px; /* Ajouter de l'espacement autour du contenu */
+  }
+
+  .hero-title {
+    font-size: 2rem; /* Augmenter la taille du titre */
+    margin-bottom: 10px; /* Augmenter l'espacement en bas du titre */
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-subtitle {
+    font-size: 0.8rem; /* Réduire la taille du sous-titre */
+    margin-bottom: 10px; /* Augmenter l'espacement en bas du sous-titre */
+    font-weight: bold;
+    color: #f6f9f1;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-family: "Times New Roman", Times, serif;
+  }
+
+  .vbill-text {
+    font-size: 2.1rem; /* Augmenter la taille du texte */
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+
+  .vbill-text.blue {
+    color: #043295;
+  }
+
+  .icon-container {
+    display: flex;
+    justify-content: space-around; /* Espacement égal entre les icônes */
+    margin-top: 20px; /* Ajouter de l'espacement en haut */
+  }
+
+  .calc,
+  .invoice {
+    font-size: 1.7rem; /* Augmenter la taille des icônes */
+    color: #1254e3;
+    font-weight: bold;
+  }
+
+  .btn-get-started {
+    padding: 5px 5px; /* Augmenter la taille du bouton */
+    font-size: 0.6rem; /* Augmenter la taille du texte du bouton */
+    background: linear-gradient(45deg, #043295, #043295);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    animation: buttonAnimation 2s ease-in-out infinite; /* Animation continue */
+  }
+
+  .pre-new-features-section {
+    text-align: center;
+    background-color: transparent;
+    padding: 20px 0;
+    overflow-x: hidden; /* Pour masquer le débordement horizontal */
+  }
+
+  .pre-new-features-container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .pre-new-feature-img {
+    width: 20%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    animation: zoomRotate 5s ease-in-out infinite alternate;
+  }
+  .new-features-section {
+    padding: 20px 0; /* Réduire l'espacement intérieur */
+  }
+
+  .new-feature {
+    flex-direction: column; /* Afficher les fonctionnalités en colonnes */
+    align-items: center; /* Centrer les éléments horizontalement */
+    text-align: center; /* Centrer le texte */
+    margin-bottom: 30px; /* Espacement entre les fonctionnalités */
+  }
+
+  .new-feature-title {
+    font-size: 1.8rem; /* Réduire la taille du titre */
+    margin-bottom: 10px; /* Espacement en bas du titre */
+  }
+
+  .new-feature-description {
+    font-size: 1.2rem; /* Réduire la taille de la description */
+  }
+
+  .new-feature-img {
+    width: 100%; /* Ajuster la largeur de l'image */
+    max-width: 400px; /* Limiter la largeur maximale de l'image */
+    margin-bottom: 20px; /* Espacement en bas de l'image */
+  }
+  .f-title {
+    font-size: 2.1rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    animation: fadeIn 1s ease-out;
+    margin-right: 20px;
+    color: #043295;
+    text-align: center;
+  }
+
+  .f-subtitle {
+    font-size: 1.4rem;
+
+    font-weight: bold;
+    color: #161616;
+    animation: fadeIn 1s ease-out;
+    text-align: center;
+  }
+  .feature-card {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 15px; /* Coins arrondis pour les cartes */
+    background: #ffffff; /* Fond blanc */
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1); /* Ombre portée pour les cartes */
+    width: 250px; /* Largeur des cartes */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* Permet de positionner les pseudo-éléments */
+    overflow: hidden; /* Masque les éléments animés qui dépassent */
+    transition: transform 0.3s, box-shadow 0.3s; /* Animation de transition */
+  }
+
+  /* Style pour l'icône de fonctionnalité */
+  .feature-icon {
+    font-size: 45px; /* Taille de l'icône */
+    color: #043295;
+  }
+
+  /* Style pour le titre de fonctionnalité */
+  .feature-title {
+    font-size: 20px; /* Taille de police pour le titre */
+    color: #043295; /* Couleur du titre */
+    text-align: center; /* Centrer le texte */
+    font-weight: bold; /* Texte en gras */
+  }
+
+  /* Style pour la description de la fonctionnalité */
+  .feature-description {
+    font-size: 16px; /* Taille de police pour la description */
+    color: #666666; /* Couleur de la description */
+    text-align: center; /* Centrer le texte */
+  }
+
+  .a-title {
+    font-size: 1.9rem; /* Taille de police du titre */
+
+    font-weight: bold; /* Texte en gras */
+    color: #333333; /* Couleur du texte */
+    animation: fadeInUp 1s ease; /* Animation de fondu et montée */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Ombre portée */
+  }
+
+  /* Style pour le texte d'accompagnement */
+  .a-text {
+    font-size: 1.9rem; /* Taille de police du texte d'accompagnement */
+    font-weight: bold; /* Texte en gras */
+    color: #043295;
+  }
+
+  /* Style pour le sous-titre */
+  .a-subtitle {
+    font-size: 1.5rem; /* Taille de police du sous-titre */
+    color: #efe9e9; /* Couleur du texte */
+    animation: fadeInUp 1s ease; /* Animation de fondu et montée */
+    font-weight: bold;
+  }
+
+  .why-use-vbill-content {
+    display: flex;
+    flex-direction: column; /* Met les éléments en colonne */
+    align-items: center; /* Centre les éléments horizontalement */
+  }
+
+  .why-use-vbill-images {
+    width: 90%; /* Assure que les images prennent toute la largeur disponible */
+    margin-bottom: 20px; /* Espace entre les images et les cartes */
+  }
+
+  .why-use-vbill-images-row {
+    display: flex;
+    justify-content: space-between; /* Espace les images également sur la ligne */
+    margin-bottom: 20%;
+  }
+
+  .circle-image {
+    border-radius: 50%;
+    position: absolute;
+    border: 8px solid white; /* Ajout d'une bordure blanche */
+    width: 180px;
+    height: 180px;
+  }
+  .why-use-vbill-cards-container {
+    width: 80%; /* Assure que les cartes occupent toute la largeur */
+  }
+
+  .testimonials-grid {
+    flex-direction: row; /* Réorganiser les témoignages en colonne */
+    align-items: center; /* Centrer les témoignages horizontalement */
+  }
+
+  .testimonial {
+    width: 50%; /* Occuper toute la largeur disponible */
+    margin-bottom: 20px; /* Espacement entre les témoignages */
+  }
+
+  .contact-us-container {
+    flex-direction: column-reverse; /* Inverser l'ordre des éléments pour les petits écrans */
+  }
+
+  .contact-us-form {
+    width: 150%; /* Définir une largeur de 90% pour le formulaire */
+
+    margin: 0 auto; /* Centrer le formulaire horizontalement */
+    padding: 40px;
+    align-items: center;
+  }
+
+  .contact-us-title {
+    font-size: 24px; /* Réduire la taille du titre pour les petits écrans */
+  }
+
+  .input-group {
+    margin-bottom: 15px; /* Réduire l'espace entre les groupes d'entrée pour les petits écrans */
+  }
+
+  .form-input,
+  .form-textarea {
+    padding: 10px; /* Réduire le padding pour les petits écrans */
+  }
+
+  .contact-us-image {
+    margin-left: 0; /* Réinitialiser la marge pour les petits écrans */
+    margin-bottom: 20px; /* Ajouter un espace en bas de l'image */
+  }
+}

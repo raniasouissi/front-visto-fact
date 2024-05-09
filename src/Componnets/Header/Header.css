@@ -1,73 +1,106 @@
-/* Header.css */
-.body {
-  font-family: "Arial", sans-serif;
-  margin: 0;
+/* Couleurs principales */
+:root {
+  --primary-color: #121477;
+  --secondary-color: #ea4848;
+  font-family: "Poppins", sans-serif; /* Changer la police de caractères à Poppins */
 }
 
+/* Header */
 .header {
-  background-color: #f7f4f4;
-  color: #062a78;
-  padding: 1rem 0;
+  background-color: white;
+  color: var(--primary-color);
   position: fixed;
   width: 100%;
-  z-index: 800;
+  z-index: 400;
   transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
 }
 
 .header-container {
-  max-width: 1400px;
+  background-color: transparent;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-height: 80px;
 }
 
+/* Logo */
 .logo {
   text-decoration: none;
   display: flex;
   align-items: center;
 }
-.logo-container {
-  display: flex;
-  align-items: center;
-}
 
 .app-logo {
-  max-width: 50px;
-  border: 2px solid #062a78;
-  border-radius: 60%;
-  margin-right: 10px;
+  width: 40px;
+  height: 35px;
 }
+
+/* Styles pour le titre du header */
 .visto,
 .fact {
-  font-family: "Consolas", sans-serif;
-  font-size: 2.1rem;
+  font-family: "Poppins", sans-serif; /* Changer la police de caractères à Poppins */
+
+  font-weight: bold; /* Gras */
+  position: relative;
+  display: inline-block;
+}
+.logoname {
+  font-size: 2.4rem;
 }
 
 .visto {
-  color: #f39c12;
-  font-weight: bold;
-  margin-right: 2px;
+  color: var(--secondary-color); /* Couleur du texte pour "Visto" */
 }
 
 .fact {
-  color: #062a78;
-  font-weight: bold;
+  color: var(--primary-color); /* Couleur du texte pour "Fact" */
+}
+.v {
+  font-family: "Poppins", sans-serif;
+  font-weight: bold; /* Gras */
+  color: var(--secondary-color); /* Couleur du texte pour "Visto" */
+  font-size: 2.3rem;
+}
+.b {
+  font-family: "Poppins", sans-serif;
+  font-weight: bold; /* Gras */
+  color: var(--primary-color); /* Couleur du texte pour "Fact" */
+  font-size: 2.3rem;
 }
 
+/* Animation pour le titre */
+.visto::after,
+.fact::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 3px;
+
+  bottom: -5px; /* Position de la ligne sous "Visto" */
+  left: 0;
+}
+
+/* Animation au survol */
+.visto:hover::after,
+.fact:hover::after {
+  transform: scaleX(1);
+}
+/* Menu Icon */
 .menu-icon {
   display: none;
   font-size: 2.8rem;
   cursor: pointer;
-  color: #f39c12;
+  color: var(--secondary-color);
   transition: color 0.3s ease-in-out;
 }
 
 .menu-icon.active {
-  color: #ffffff;
+  color: white;
 }
 
+/* Navigation Menu */
 .nav-menu {
   list-style: none;
   display: flex;
@@ -77,38 +110,58 @@
 .nav-item {
   margin-right: 1.5rem;
   font-weight: bold;
-  font-size: 1.3rem;
-  font-family: "Consolas", sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
+/* Navigation Link */
 .nav-link {
-  font-family: "Quicksand", sans-serif;
-  color: #062a78;
+  font-family: "Poppins", sans-serif; /* Changer la police de caractères à Poppins */
+
+  color: var(--primary-color);
   font-weight: bold;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  padding: 0.7rem 1rem;
-  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1.5rem;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+
   position: relative;
   overflow: hidden;
+  text-transform: uppercase;
 }
 
+.nav-link:hover {
+  color: white;
+  font-weight: bold;
+}
+
+/* Bouton avec bordure */
 .bordered-button {
   position: relative;
   display: inline-block;
-  color: #062a78;
+  color: var(--primary-color);
   text-decoration: none;
-  padding: 0.7rem 1rem;
+  padding: 0.5rem 1.5rem;
   overflow: hidden;
-  background-color: transparent;
-  transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+  border: 2px solid var(--secondary-color);
+  border-radius: 20px;
+  transition: color 0.3s ease-in-out;
 }
 
+/* Effet de survol sur les boutons */
+.bordered-button:hover {
+  color: var(--secondary-color);
+}
+
+/* Animation au survol */
 .bordered-button::before,
 .bordered-button::after {
   content: "";
   position: absolute;
-  background-color: #f39c12;
+  background-color: var(--secondary-color);
   height: 3px;
   width: 0;
   transition: width 0.4s ease-in-out;
@@ -124,15 +177,12 @@
   right: 0;
 }
 
-.bordered-button:hover {
-  border-color: #f39c12;
-}
-
 .bordered-button:hover::before,
 .bordered-button:hover::after {
   width: 100%;
 }
 
+/* Media Query pour les écrans mobiles */
 @media (max-width: 768px) {
   .header-container {
     padding: 0 1rem;
@@ -162,16 +212,10 @@
     visibility: visible;
   }
 
-  .logo-container {
-    display: flex;
-    align-items: center;
-  }
-
   .app-logo {
     max-width: 50px;
-    border: 2px solid #f39c12;
+
     border-radius: 50%;
-    margin-right: 10px;
   }
 
   .nav-item {
@@ -191,6 +235,20 @@
   }
 
   .nav-menu.active .menu-icon {
-    color: #f39c12;
+    color: var(--secondary-color);
+  }
+  .visto,
+  .fact {
+    font-family: Georgia, "Times New Roman", Times, serif; /* Utilisation d'une police de caractères stylisée */
+    font-size: 2.5rem; /* Réduction de la taille du texte */
+    color: var(--secondary-color); /* Changement de couleur du texte */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Légère ombre portée */
+  }
+  .visto {
+    color: var(--secondary-color); /* Couleur du texte pour "Visto" */
+  }
+
+  .fact {
+    color: var(--primary-color); /* Couleur du texte pour "Fact" */
   }
 }

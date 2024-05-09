@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Card, Form, Input, message, Row, Col } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
+import successImage from "../../../assets/images/vrm.jpg";
+import "./SetPassword.css"; // Importation du fichier CSS
 
 function SetPassword() {
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ function SetPassword() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/clients/set-password/${token}`,
+        `http://localhost:5000/api/users/set-password/${token}`,
         {
           method: "POST",
           headers: {
@@ -58,68 +60,37 @@ function SetPassword() {
   };
 
   const customButtonStyle = {
-    background: "linear-gradient(to right, #f39c12, #e74c3c)",
+    background: "linear-gradient(to right, #0f12a4, #121477)",
     color: "#fff",
     border: "none",
-    padding: "12px 24px",
-    borderRadius: "6px",
-    width: "100%",
+    padding: "12px",
+    borderRadius: "4px",
+    width: "82%",
     fontSize: "16px",
     cursor: "pointer",
     transition: "background-color 0.3s",
-    fontFamily: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif',
-    fontWeight: "bold",
+    fontFamily: "Poppins",
+
+    marginLeft: "58px",
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f5",
-        fontFamily:
-          '"Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif',
-      }}
-    >
-      <Card
-        title={
-          <span
-            style={{
-              color: "rgb(223, 107, 6)",
-              fontWeight: "bold",
-              fontSize: "20px",
-            }}
-          >
-            Réinitialisation du mot de passe
-          </span>
-        }
-        style={{
-          maxWidth: "550px",
-          borderRadius: "8px",
-          boxShadow: "0 0 10px rgba(182, 105, 3, 0.1)",
-        }}
-      >
-        <Form onFinish={handleResetPasswordSubmit}>
-          <Row gutter={[16, 16]} style={{ display: "flex", flexWrap: "wrap" }}>
-            <Col span={24}>
-              <p
-                style={{
-                  marginBottom: "16px",
-                  fontSize: "20px",
-                  color: "#333",
-                }}
-              >
+    <div className="container">
+      <Card className="card">
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={24} md={12} className="col-left">
+            <div className="image-container">
+              <img src={successImage} alt="New Password" className="image" />
+            </div>
+          </Col>
+          <Col xs={24} sm={24} md={12}>
+            <Form onFinish={handleResetPasswordSubmit}>
+              <p className="form-title">
                 Veuillez saisir votre nouveau mot de passe :
               </p>
-            </Col>
-            <Col span={24}>
               <Form.Item
                 name="newPassword"
-                label="Nouveau mot de passe"
-                labelCol={{ span: 24 }}
-                style={{ marginBottom: "16px" }} // Ajouter de l'espace en bas
+                className="form-item"
                 rules={[
                   {
                     required: true,
@@ -128,17 +99,15 @@ function SetPassword() {
                 ]}
                 hasFeedback
               >
-                <span style={{ marginRight: "8px" }}>
-                  <Input.Password onChange={handlePasswordChange} />
-                </span>
+                <Input.Password
+                  onChange={handlePasswordChange}
+                  placeholder="Nouveau mot de passe"
+                  className="input-field"
+                />
               </Form.Item>
-            </Col>
-            <Col span={24}>
               <Form.Item
                 name="confirmPassword"
-                label="Confirmer le mot de passe"
-                labelCol={{ span: 24 }}
-                style={{ marginBottom: "16px", width: "100%" }} // Ajouter la largeur complète au label
+                className="form-item"
                 dependencies={["newPassword"]}
                 hasFeedback
                 validateStatus={passwordError ? "error" : ""}
@@ -160,17 +129,12 @@ function SetPassword() {
                   }),
                 ]}
               >
-                <span style={{ marginRight: "15px" }}>
-                  <Input.Password />
-                </span>
+                <Input.Password
+                  placeholder="Confirmer le mot de passe"
+                  className="input-field"
+                />
               </Form.Item>
-            </Col>
-          </Row>
-          {errorMessage && (
-            <p style={{ color: "red", marginTop: "16px" }}>{errorMessage}</p>
-          )}
-          <Row justify="center">
-            <Col>
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
               <Form.Item>
                 <button
                   type="submit"
@@ -180,9 +144,9 @@ function SetPassword() {
                   {loading ? "Chargement..." : "Réinitialiser le mot de passe"}
                 </button>
               </Form.Item>
-            </Col>
-          </Row>
-        </Form>
+            </Form>
+          </Col>
+        </Row>
       </Card>
     </div>
   );

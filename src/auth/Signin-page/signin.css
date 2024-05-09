@@ -1,240 +1,243 @@
-/* Signin.css */
-body {
-  margin: 0;
-  font-family: "Arial", sans-serif;
-  background-color: #f7f4f4;
-}
-
-.signin-container {
+.custom-signin-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f7f4f4;
+  background-color: #ebebeb;
+
+  border-radius: 1px;
+
+  /* Animation */
+  animation: fadeIn 1s ease-out forwards;
+  transform-origin: center;
+  opacity: 0;
 }
 
-.form-container {
-  max-width: 550px;
-  width: 100%;
-  padding: 40px;
-  background: linear-gradient(
-    to right,
-    rgb(243, 240, 240),
-    hsl(0, 0%, 100%)
-  ); /* Dégradé de couleur entre orange et blanc */
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(2, 0, 77, 0.5), 0 0 10px rgba(255, 165, 0, 0.7);
-
-  transition: transform 0.5s ease-in-out;
-  animation: fadeIn 0.7s ease-in-out, textSlide 1.7s ease-in-out; /* Ajout de l'animation textSlide */
-
-  color: #002d62;
-  font-weight: bold;
-  font-family: Candara;
-}
-
-/* Ajout d'une animation pour le texte */
-.form-container h2 {
-  animation: textFade 1.5s ease-in-out;
-}
-
-@keyframes textFade {
+@keyframes fadeIn {
   0% {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: scale(0.5);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
-.form-container:hover {
-  transform: scale(1.03);
+.custom-signin-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 53%;
+  max-width: 1000px;
+  height: auto;
+  border-radius: 2px;
+  padding: 20px; /* Augmentez l'espace intérieur */
+  background-color: #fff;
+}
+/*my(mech ehdha mbadla esm classe 5atr fama mochkla*/
+.custom-formm-container {
+  justify-content: center; /* Centrage horizontal du contenu */
+  align-items: center;
+
+  flex: 1;
+  text-align: center;
+
+  padding: 0 30px; /* Ajustez les espaces intérieurs */
 }
 
-.error-message {
-  color: #ff0000;
-  margin-top: 5px;
-  font-size: 0.9rem;
+.logo-titlee-container {
+  display: flex; /* Utiliser flexbox pour aligner horizontalement */
+  align-items: center; /* Centrer verticalement les éléments */
+  justify-content: center; /* Centrer horizontalement les éléments */
+  margin-bottom: 30px;
 }
 
-.form-group {
+.app-logo1 {
+  width: 45px;
+  height: 38px;
+}
+
+.custom-title1 {
+  margin-top: 25px;
+  margin-right: 5px;
+  /* margin-left: -7px; Ne pas spécifier de marge gauche pour garder le titre centré */
+}
+
+.custom-subtitle {
+  font-size: 1rem; /* Taille du sous-titre */
+  color: #121477;
+  font-weight: bold;
+  font-family: "Poppins", sans-serif;
+
+  margin-left: 5px;
+}
+
+.subtitle-container {
+  margin-bottom: 40px;
+  text-align: center;
+  margin-top: -30px;
+}
+
+.custom-form {
+  max-width: 400px;
+  margin: 0 auto;
+  margin-left: 30px;
+}
+
+.custom-form-item {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.site-form-item-icon {
+  font-size: 18px; /* Ajustez la taille des icônes */
+  color: #b4b5b9; /* Couleur principale des icônes */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Légère ombre pour ajouter de la profondeur */
+  transition: transform 0.3s ease; /* Transition pour l'effet de survol */
+}
+.custom-submit-butto {
+  width: 355px; /* Largeur fixe */
+  height: 45px; /* Hauteur fixe */
+  border: none;
+  border-radius: 5px; /* Bordures arrondies */
+  padding: 10px;
+  font-size: 20px;
+
+  color: #fff;
+  background-color: #181a8b !important;
+  cursor: pointer;
+  transition: opacity 0.3s; /* Animation d'opacité */
+  margin-bottom: 20px;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+.custom-signin-container
+  .custom-signin-content
+  .custom-form-container
+  .custom-submit-buttonn.loading {
+  opacity: 0.7; /* Réduire l'opacité pendant le chargement */
+}
+
+.custom-signin-container
+  .custom-signin-content
+  .custom-form-container
+  .custom-submit-buttonn:hover {
+  background-color: #1c1e9f;
+  transform: scale(1.05); /* Effet d'agrandissement au survol */
+}
+.custom-forgot-password-container {
+  text-align: right; /* Aligner le texte à droite */
   margin-bottom: 20px;
 }
 
-.form-label {
-  font-size: 1.8rem;
-  margin-bottom: 8px;
+.custom-forgot-password {
+  font-size: 15px; /* Taille de la police */
+  color: #121477; /* Couleur du texte */
+  text-decoration: none; /* Supprimer le soulignement par défaut */
+  transition: color 0.3s; /* Animation de transition pour la couleur */
+  font-family: "Poppins", sans-serif;
+  margin-right: 10px;
+}
+
+.custom-forgot-password:hover {
+  color: #121477;
+  transform: scale(1.1);
+}
+
+.custom-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 5px;
+  margin-left: 5px;
+  background-color: transparent;
+}
+
+.custom-mt-3 {
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+.custom-signup-link {
+  color: #0b3795;
+  font-weight: bold;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+}
+
+.custom-signup-link:hover {
+  color: #0b3795;
+}
+
+.custom-signup-text {
+  font-size: 17px;
+  font-family: "Poppins", sans-serif;
   color: #333;
-  font-weight: bold;
+
+  text-decoration: none; /* Supprime la soulignement par défaut */
 }
 
-.form-input {
-  padding: 17px;
-  font-size: 1.3rem; /* Ajustement de la taille du texte de l'input */
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  color: #333;
-  width: 100%;
-  border-color: #002d62;
-}
-
-.submit-button {
-  background: linear-gradient(to right, #f39c12, #e74c3c);
-  color: #fff;
-  padding: 15px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  cursor: pointer;
-  font-size: 1.4rem;
-  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out; /* Ajout de l'animation pour le bouton */
-  display: inline-block; /* Ajout de cette ligne pour permettre au bouton d'être centré */
-  margin: 20px auto 0;
-  width: 100%;
-  transition: background 0.3s ease-in-out, color 0.3s ease-in-out,
-    transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  box-shadow: 0 5px 15px rgba(211, 92, 1, 0.3);
-}
-.center-button {
-  text-align: center;
-}
-
-.submit-button:hover {
-  background: linear-gradient(to right, #f39c12, #e74c3c);
-  transform: scale(1.05);
-}
-
-.mt-3 {
-  margin-top: 40px;
-  color: #002d62;
-  font-size: 2rem;
-  animation: fadeIn 0.5s ease-in-out;
-  font-weight: bold;
-}
-
-.signup-link {
-  font-size: 1.3rem;
-  color: #1f1e1e;
-}
-p {
-  color: #002d62;
-  font-weight: bold;
-  font-family: Arial, Helvetica, sans-serif;
-}
-h2 {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
-  margin-bottom: 25px;
-  font-weight: bold;
-}
-.password-input {
+.custom-image-container {
   position: relative;
+  width: 47%; /* Largeur du conteneur */
+  height: 100%; /* Hauteur du conteneur */
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  margin-right: -20px;
+  margin-top: -20px;
+  margin-bottom: -13px;
 }
 
-.eye-icon {
+.custom-image-container img {
+  transform: scale(1.1);
+  width: 100%; /* L'image occupe toute la largeur du conteneur */
+  height: 100%; /* L'image occupe toute la hauteur du conteneur */
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+  filter: grayscale(
+    10%
+  ); /* Appliquer un filtre de désaturation pour une touche créative */
+}
+
+.custom-image-container:hover img {
+  filter: grayscale(0%); /* Supprimer le filtre de désaturation au survol */
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.custom-home-button {
   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
+  top: 30px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  color: #0b3795;
+
+  border-radius: 10px;
+  background-color: transparent;
+  font-size: 20px;
+  border-radius: 10px;
+  width: 5.1%;
+  transition: transform 0.3s; /* Ajout d'une transition au survol */
 }
 
-.error-border {
-  border: 2px solid #ff0000;
+.custom-home-button:hover {
+  transform: scale(1.1);
 }
 
-.orange-text {
-  color: orange;
-}
-
-.blue-text {
-  color: blue;
-}
-
-@media screen and (max-width: 480px) {
-  .form-container {
-    border: none;
-    box-shadow: none;
-    background: none;
-  }
-
-  .form-label {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-  }
-
-  .form-input {
-    padding: 10px;
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-
-  .submit-button {
-    padding: 10px;
-    font-size: 1rem;
-  }
-
-  .mt-3 {
-    margin-top: 15px;
-  }
-
-  h2 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-  }
-
-  .eye-icon {
-    right: 6px;
-  }
-}
-
-@media screen and (min-width: 481px) and (max-width: 768px) {
-  .form-container {
-    padding: 20px;
-    max-width: 80%;
-  }
-
-  .form-label {
-    font-size: 1.3rem;
-    margin-bottom: 5px;
-  }
-
-  .form-input {
-    padding: 12px;
-    font-size: 1.1rem;
-    margin-bottom: 12px;
-  }
-
-  .submit-button {
-    padding: 12px;
-    font-size: 1.1rem;
-  }
-
-  .mt-3 {
-    margin-top: 20px;
-  }
-
-  h2 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-  }
-
-  .eye-icon {
-    right: 8px;
-  }
-}
-
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-  .form-container {
-    max-width: 80%;
-  }
-
-  h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-  }
+.custom-home-button:active {
+  color: #eff2f5; /* Couleur du texte lors du clic */
 }

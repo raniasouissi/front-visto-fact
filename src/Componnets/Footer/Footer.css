@@ -9,6 +9,7 @@
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .footer-section {
@@ -22,11 +23,6 @@
   max-width: 140px;
 }
 
-.brand-name {
-  margin-top: 10px;
-  font-size: 28px;
-  color: #f39c12;
-}
 .brand-name .blue {
   color: white;
 }
@@ -68,7 +64,7 @@
 
 .footer-bottom {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 70px;
 }
 
 .footer-bottom p {
@@ -85,14 +81,14 @@
 }
 
 .linkedin {
-  color: #0e76a8 !important;
+  color: #f3f1f0 !important;
 }
 .orange {
-  color: orange;
+  color: rgb(240, 25, 25);
 }
 
 .blue {
-  color: blue;
+  color: rgb(241, 241, 246);
 }
 
 .social-icon:hover {
@@ -100,13 +96,17 @@
 }
 .useful-links a:hover {
   transform: scale(1);
-  color: #f39c12;
+  color: #eed7e9;
 }
 .address-links a:hover {
   transform: scale(1);
-  color: #f39c12;
+  color: #eecee7;
 }
 @media screen and (max-width: 768px) {
+  .footer {
+    width: 100%;
+    height: auto;
+  }
   .footer-container {
     flex-direction: column;
     align-items: center;

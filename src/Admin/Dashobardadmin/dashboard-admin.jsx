@@ -1,117 +1,217 @@
-// Import des bibliothèques nécessaires
 import React, { useState } from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Dropdown, Avatar, Badge, Modal } from "antd";
 import {
-  UserOutlined,
   MoneyCollectOutlined,
+  UserOutlined,
   SettingOutlined,
-  LeftOutlined,
   ToolOutlined,
+  EditOutlined,
+  BellOutlined,
+  DownOutlined,
+  LogoutOutlined,
+  ShopOutlined,
+  DollarCircleOutlined,
+  AppstoreOutlined,
+  FileOutlined,
 } from "@ant-design/icons";
-import FinancierManagement from "../FinanicerMangement/FinancierManagement";
-import ClientManagement from "../ClientManagement/ClientManagement";
+import Taxe from "../Taxe/Taxe";
 import Parametrage from "../Parametrage/Parametrage";
-import Logo1 from "../../assets/images/logo.png"; // Import du logo
-import "./dashboard-admin.css"; // Import des styles CSS
-import Service from "../Service/service";
+import Logo1 from "../../assets/images/vbil2.png";
+import AvatarImage from "../../assets/images/admin1.png";
+import "./dashboard-admin.css";
+import Service from "../Service/Service";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import Users from "../Users/users";
+import Devise from "../Devise/devise";
+import Categorie from "../Catégorie-service/categorie";
 
-const { Sider, Content } = Layout;
+const { Sider, Content, Header } = Layout;
 
-// Composant principal DashboardAdmin
 const DashboardAdmin = () => {
-  // États pour gérer la page actuelle et l'état du menu
   const [currentPage, setCurrentPage] = useState(null);
-  const [menuCollapsed, setMenuCollapsed] = useState(true);
 
-  // Fonction pour gérer l'ouverture et la fermeture du menu
-  const handleMenuCollapse = () => {
-    setMenuCollapsed((prevCollapsed) => !prevCollapsed);
-    const icon = document.querySelector(".collapse-icon");
-    if (icon) {
-      icon.classList.toggle("collapsed-icon", !menuCollapsed);
-      icon.classList.toggle("expanded-icon", menuCollapsed);
-    }
-  };
+  const history = useNavigate();
 
-  // Fonction pour gérer le clic sur les éléments du menu
   const handleMenuClick = (page) => {
     setCurrentPage(page);
   };
 
-  // Retour du JSX
-  return (
-    <Layout
-      className={`dashboard-container ${menuCollapsed ? "collapsed" : ""}`}
-    >
-      <Sider
-        className={`sidebar ${menuCollapsed ? "collapsed" : ""}`}
-        collapsible
-        collapsed={menuCollapsed}
-        trigger={null}
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        Cookies.remove("AuthenticationToken");
+        history("/login");
+      } else {
+        console.error("Erreur lors de la déconnexion");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion", error);
+    }
+  };
+
+  const handleLogoutConfirmation = () => {
+    Modal.confirm({
+      title: "Confirmation",
+      content: "Êtes-vous sûr de vouloir vous déconnecter ?",
+      okText: "Oui",
+      cancelText: "Annuler",
+      onOk: handleLogout,
+    });
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1" icon={<EditOutlined />}>
+        Modifier le profil
+      </Menu.Item>
+      <Menu.Item key="2" icon={<ToolOutlined />}>
+        Autres tâches
+      </Menu.Item>
+      <Menu.Item
+        key="3"
+        icon={<LogoutOutlined />}
+        onClick={handleLogoutConfirmation}
       >
-        {/* Conteneur pour le logo */}
-        <div className={`logo-container ${menuCollapsed ? "collapsed" : ""}`}>
+        Déconnexion
+      </Menu.Item>
+    </Menu>
+  );
+
+  return (
+    <Layout className="dashboard-container">
+      <Sider className="sidebar" collapsible={false} trigger={null}>
+        <div className="logo-title-container">
           <img src={Logo1} alt="Menu Logo" className="sidebar-logo" />
-          {/* Texte sous le logo */}
-          {!menuCollapsed && <span className="app-name">Vbill</span>}
+          <h1 className="app-title">VBill</h1>
         </div>
-        {/* Menu */}
+
         <Menu
-          theme="dark"
           mode="inline"
           selectedKeys={[currentPage]}
-          onClick={() => handleMenuCollapse(false)}
+          style={{ background: "transparent" }}
         >
-          {/* Éléments du menu */}
           <Menu.Item
-            key="Financiers"
-            icon={<MoneyCollectOutlined />}
-            onClick={() => handleMenuClick("Financiers")}
+            key="users"
+            icon={<UserOutlined style={{ color: "white" }} />}
+            onClick={() => handleMenuClick("users")}
+            style={{
+              color: "white",
+              background: currentPage === "users" ? "#6f7173" : "transparent",
+            }}
           >
-            <span className="menu-item-text">Financiers</span>
+            <span className="menu-item-text">Utilisateurs</span>
           </Menu.Item>
-          <Menu.Item
-            key="Clients"
-            icon={<UserOutlined />}
-            onClick={() => handleMenuClick("Clients")}
-          >
-            <span className="menu-item-text">Clients</span>
-          </Menu.Item>
-          <Menu.Item
+          <Menu.SubMenu
             key="Parametrage"
-            icon={<SettingOutlined />}
-            onClick={() => handleMenuClick("Parametrage")}
+            icon={<SettingOutlined style={{ color: "white" }} />}
+            title={<span style={{ color: "white" }}>Parametrage</span>}
+            style={{ background: "transparent", color: "white" }}
           >
-            <span className="menu-item-text">Parametrage</span>
-          </Menu.Item>
-          <Menu.Item
+            <Menu.Item
+              key="parametrage"
+              onClick={() => handleMenuClick("Parametrage")}
+              icon={<FileOutlined />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Parametrage" ? "#7f7d7d" : "transparent",
+                fontSize: "13px",
+              }}
+            >
+              <span className="menu-item-text"> Fiche Entreprise</span>
+            </Menu.Item>
+            <Menu.Item
+              key="taxe"
+              onClick={() => handleMenuClick("Taxe")}
+              icon={<MoneyCollectOutlined />}
+              style={{
+                color: "white",
+                background: currentPage === "Taxe" ? "#6f7173" : "transparent",
+              }}
+            >
+              <span className="menu-item-text">Taxe</span>
+            </Menu.Item>
+            <Menu.Item
+              key="devise"
+              onClick={() => handleMenuClick("Devise")}
+              icon={<DollarCircleOutlined />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Devise" ? "#6f7173" : "transparent",
+              }}
+            >
+              <span className="menu-item-text">Devise</span>
+            </Menu.Item>
+          </Menu.SubMenu>
+
+          <Menu.SubMenu
             key="Service"
-            icon={<ToolOutlined />}
-            onClick={() => handleMenuClick("Service")}
+            icon={<AppstoreOutlined style={{ color: "white" }} />}
+            title={<span style={{ color: "white" }}>Catalouge</span>}
+            style={{ background: "transparent", color: "white" }}
+            popupClassName="custom-submenu"
           >
-            <span className="menu-item-text">Services</span>
-          </Menu.Item>
+            <Menu.Item
+              key="Service"
+              onClick={() => handleMenuClick("Service")}
+              icon={<ToolOutlined style={{ color: "white" }} />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Service" ? "#7f7d7d" : "transparent",
+              }}
+            >
+              <span className="menu-item-text">Service</span>
+            </Menu.Item>
+            <Menu.Item
+              key="categorie"
+              onClick={() => handleMenuClick("Categorie")}
+              icon={<ShopOutlined />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Categorie" ? "#6f7173" : "transparent",
+              }}
+            >
+              <span className="menu-item-text">Catégorie</span>
+            </Menu.Item>
+          </Menu.SubMenu>
         </Menu>
-        {/* Icône de réduction du menu */}
-        <div
-          className="collapse-icon collapsed-icon"
-          onClick={handleMenuCollapse}
-        >
-          <LeftOutlined />
-        </div>
       </Sider>
-      {/* Contenu principal */}
       <Layout className="site-layout">
+        <Header className="headerad">
+          <div className="right-menu">
+            <Badge count={0}>
+              <BellOutlined className="notification-icon" />
+            </Badge>
+            <Dropdown overlay={menu} trigger={["click"]}>
+              <a
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+              >
+                <Avatar size={44} src={AvatarImage} className="avatar" />{" "}
+                <DownOutlined />
+              </a>
+            </Dropdown>
+          </div>
+        </Header>
         <Content
           className={`content ${
             currentPage ? `${currentPage.toLowerCase()}-page` : ""
           }`}
         >
-          {/* Affichage du contenu en fonction de la page sélectionnée */}
-          {currentPage === "Financiers" && <FinancierManagement />}
-          {currentPage === "Clients" && <ClientManagement />}
+          {currentPage === "users" && <Users />}
           {currentPage === "Parametrage" && <Parametrage />}
+          {currentPage === "Taxe" && <Taxe />}
           {currentPage === "Service" && <Service />}
+          {currentPage === "Devise" && <Devise />}
+          {currentPage === "Categorie" && <Categorie />}
         </Content>
       </Layout>
     </Layout>

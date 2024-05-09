@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FaBars } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import logo1 from "../../assets/images/logo1.png";
+import logo1 from "../../assets/images/vbil2.png";
 import "./Header.css";
-import Logout from "../../auth/logout/logout";
+//import Logout from "../../auth/logout/logout";
 
 const Header = ({ isLoggedIn }) => {
   const location = useLocation();
@@ -12,6 +12,10 @@ const Header = ({ isLoggedIn }) => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false); // Fermer le menu
   };
 
   const isDashboardAdmin = location.pathname === "/dashboard-admin";
@@ -22,32 +26,6 @@ const Header = ({ isLoggedIn }) => {
 
   const headerClass = isDashboardAdmin ? "header dashboard-header" : "header";
 
-  if (isDashboardAdmin) {
-    return (
-      <header className={headerClass} style={{ background: "transparent" }}>
-        <div className="header-container">
-          <Link to="/" className="logo">
-            <div className="logo-container">
-              <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
-            </div>
-            <span className="visto">Visto</span>
-            <span className="fact">Fact</span>
-          </Link>
-
-          <div className="menu-icon" onClick={toggleMenu}>
-            <FaBars />
-          </div>
-
-          <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
-            <li className="nav-item">
-              <Logout />
-            </li>
-          </ul>
-        </div>
-      </header>
-    );
-  }
-
   if (isSetpasswordpage || isResetPassword) {
     return (
       <header className={headerClass}>
@@ -56,15 +34,15 @@ const Header = ({ isLoggedIn }) => {
             <div className="logo-container">
               <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
             </div>
-            <span className="visto">Visto</span>
-            <span className="fact">Fact</span>
+            <span className="v">V</span>
+            <span className="b">Bill</span>
           </Link>
         </div>
       </header>
     );
   }
 
-  if (isLoginPage || isRegisterPage || isSetpasswordpage) {
+  if (isLoginPage || isRegisterPage || isSetpasswordpage || isDashboardAdmin) {
     return null;
   }
 
@@ -75,8 +53,10 @@ const Header = ({ isLoggedIn }) => {
           <div className="logo-container">
             <img src={logo1} alt="Logo Visto Fact" className="app-logo" />
           </div>
-          <span className="visto">Visto</span>
-          <span className="fact">Fact</span>
+          <div className="logoname">
+            <span className="visto">V</span>
+            <span className="fact">Bill</span>
+          </div>
         </Link>
 
         <div className="menu-icon" onClick={toggleMenu}>
@@ -85,14 +65,22 @@ const Header = ({ isLoggedIn }) => {
 
         <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
           <li className="nav-item">
-            <Link to="/devis" className="nav-link bordered-button devis">
+            <Link
+              to="/devis"
+              className="nav-link bordered-button devis"
+              onClick={closeMenu}
+            >
               Devis
             </Link>
           </li>
           {!isLoggedIn && (
             <>
               <li className="nav-item">
-                <Link to="/login" className="nav-link bordered-button connect">
+                <Link
+                  to="/login"
+                  className="nav-link bordered-button connect"
+                  onClick={closeMenu}
+                >
                   Se Connecter
                 </Link>
               </li>
@@ -100,6 +88,7 @@ const Header = ({ isLoggedIn }) => {
                 <Link
                   to="/register"
                   className="nav-link bordered-button register"
+                  onClick={closeMenu}
                 >
                   Inscription
                 </Link>

@@ -1,97 +1,117 @@
-/* Styles généraux */
-.dashboard-container {
-  height: 100vh;
-  display: flex;
-  background-color: #f0f3f6; /* Couleur de fond inspirante */
-}
-
-/* Sidebar */
+/* Styles pour la barre latérale */
 .sidebar {
-  background-color: #ffffff; /* Couleur de fond de la barre latérale */
-  padding: 24px 0;
-  width: 250px;
-  transition: width 0.3s ease; /* Animation de transition pour la largeur */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  background-color: #0f1926 !important; /* Couleur de fond de la barre latérale */
+  height: auto;
+  overflow-y: auto;
 }
 
-.sidebar.collapsed {
-  width: 80px; /* Largeur réduite lorsque le menu est collapsé */
-}
-/* Ajoutez ces styles à votre fichier dashboard-admin.css */
-
-/* Logo container */
-.logo-container {
+/* Styles pour le conteneur du logo et du titre */
+.logo-title-container {
+  margin-top: -5px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 16px 0;
+  justify-content: center;
+  padding: 16px;
+  margin-left: -80px; /* Décalage vers la gauche pour aligner avec la barre latérale */
+  margin-bottom: 30px; /* Espacement en bas du conteneur */
+  border-bottom: 2px solid #f4f5f8;
+  border-radius: 1px; /* Bords arrondis */
 }
 
-/* Logo */
+/* Styles pour le logo */
 .sidebar-logo {
-  width: 80px;
-  height: 100px;
-  margin-bottom: 2px;
+  width: 40px;
+  height: 35px;
+  margin-left: 10px;
 }
 
-/* Nom de l'application */
-.app-name {
-  font-size: 18px;
-  color: #fff;
-  margin-top: 2px;
-  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
-  font-weight: bold;
-}
-
-.menu-item-text:hover {
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.05
-  ); /* Couleur de fond transparente lors du survol */
-  transition: background-color 0.3s; /* Animation de transition */
-}
-
-.collapse-icon {
-  position: absolute;
-  bottom: 24px;
-  left: 16px; /* Position du bouton de collapse */
-  color: #1890ff; /* Couleur de l'icône */
-  cursor: pointer;
-  transition: left 0.3s ease; /* Animation de transition pour le positionnement */
-}
-
-.collapse-icon:hover {
-  color: #40a9ff; /* Couleur de l'icône lors du survol */
-}
-
-/* Content */
-.site-layout {
-  background-color: #f0f3f6; /* Couleur de fond du contenu principal */
-  padding: 24px;
-  flex: 1;
+/* Styles pour le titre */
+.app-title {
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 .content {
   padding: 24px;
-  min-height: calc(100vh - 112px);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  min-height: calc(
+    100vh - 112px
+  ); /* Hauteur du contenu - hauteur de la barre latérale */
 }
 
-/* Menu */
-.ant-menu-dark .ant-menu-item-selected,
-.ant-menu-dark .ant-menu-item:hover {
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.05
-  ); /* Couleur de fond transparente lors du survol ou de la sélection */
+/* Styles pour les éléments du menu */
+.menu-item-text {
+  margin-left: 10px; /* Ajouter un espacement entre l'icône et le texte du menu */
 }
 
-/* Hover effect on menu items */
-.ant-menu-dark .ant-menu-item {
-  transition: background-color 0.3s;
+/* Styles pour le bouton de réduction */
+.ant-layout-sider-trigger {
+  background-color: transparent; /* Fond transparent */
+}
+
+/* Styles pour les icônes des éléments du menu */
+.anticon svg {
+  font-size: 20px; /* Taille de l'icône */
+}
+
+/* Styles pour le texte des éléments du menu */
+.menu-item-text {
+  margin-left: 5px; /* Espacement entre l'icône et le texte du menu */
+}
+
+/* Styles pour la barre de navigation */
+.headerad {
+  background-color: transparent; /* Couleur de fond de la barre de navigation */
+
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 54px;
+  margin-left: -20px;
+  margin-bottom: 20px;
+}
+
+/* Styles pour les éléments de la barre de navigation */
+.right-menu {
+  display: flex;
+  align-items: center;
+}
+
+.right-menu a {
+  color: #00132d;
+  margin-left: 20px;
+}
+
+.right-menu a:hover {
+  color: #b6b7b8; /* Couleur de l'icône lors du survol */
+}
+
+.notification-icon {
+  font-size: 30px;
+  color: #00132d;
+  margin-right: -5px;
+  transition: color 0.3s ease; /* Animation de transition de couleur */
+}
+
+.notification-icon:hover {
+  color: #00132d; /* Couleur de l'icône lors du survol */
+}
+
+/* Styles pour l'avatar */
+.avatar {
+  margin-right: 10px;
+  border: 1px solid #00132d; /* Bordure autour de l'avatar */
+  border-radius: 50%; /* Pour rendre l'avatar rond */
+  overflow: hidden; /* Pour cacher les parties de l'image qui dépassent de l'avatar */
+  width: 50%;
+}
+
+/* Styles pour le nom d'utilisateur */
+.username {
+  color: #fff;
+  font-size: 16px;
+  margin-right: 5px;
+  text-decoration: none;
 }

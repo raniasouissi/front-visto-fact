@@ -1,317 +1,121 @@
-/* signup.css */
-
-body {
-  margin: 0;
-  font-family: "Arial", sans-serif;
-  background-color: #f7f4f4;
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligner le formulaire en haut */
+  background-color: #f0f2f5; /* Changer la couleur de fond */
+  min-height: 100vh; /* Occupera au moins toute la hauteur de la fenêtre */
+  margin: 0; /* Supprimer les marges par défaut */
+  padding: 40px; /* Ajouter un peu d'espace intérieur */
 }
 
-.signup-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  background: linear-gradient(to right, rgb(243, 240, 240), hsl(0, 0%, 100%));
-  color: #002d62;
-  font-weight: bold;
-  font-family: Candara;
+.signup-card {
+  width: 70%; /* Augmenter la largeur de la carte */
+  height: 680px; /* Définir une hauteur fixe pour la carte */
+  padding: 20px; /* Augmenter la marge intérieure pour plus d'espace */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  margin: auto; /* Centrer la carte horizontalement */
 }
 
 .signup-form {
-  border-radius: 15px;
-  border: 1px solid #ffffff;
-  box-shadow: 0 4px 8px rgb(177, 116, 3);
-  padding: 20px;
-  background: linear-gradient(to right, rgb(243, 240, 240), hsl(0, 0%, 100%));
-  margin-top: 20px;
-  transition: all 0.3s ease;
+  margin-right: 15px;
+  margin-left: -20px;
+  margin-top: -10px;
+}
+.headerb {
+  margin-top: 10px;
+  text-align: center; /* Centrer le contenu */
+  margin-top: 20px; /* Ajouter un peu d'espace en bas */
+  margin-right: 20px;
 }
 
-.signup-form:hover {
-  transform: scale(1.01);
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 750px;
-}
-
-.form-row {
-  display: flex;
-  justify-content: space-between;
+.welcome-text {
+  font-size: 33px;
+  color: #121477; /* Bleu foncé */
+  font-weight: bold;
+  font-family: "Poppins", sans-serif;
   margin-bottom: 10px;
-  flex-wrap: wrap;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Ombre portée pour un effet 3D */
 }
 
-.form-group {
-  flex-basis: calc(50% - 10px);
-  margin-bottom: 10px;
+.subtitle {
+  font-size: 19px;
+  color: #454444;
+
+  font-family: "Poppins", sans-serif;
+  line-height: 1.5;
+  animation: fadeIn 1s ease-in-out; /* Animation de fondu */
 }
 
-.label-container {
-  display: flex;
-  justify-content: space-between;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #323131;
-  font-size: 1.1rem;
-}
-
-.input-container {
-  position: relative;
-  border: 2px solid #222223;
-  border-radius: 8px;
-}
-
-input {
-  width: 100%;
-  padding: 18px;
-  border: none;
-  border-radius: 8px;
-  border: 2px solid #7d7b7b;
-  font-size: 1.3rem;
-  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-input:focus {
-  border-color: #022847;
-  outline: 0;
-  box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
-}
-
-.eye-icon {
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #d98e10;
-}
-
-.button-container {
-  position: relative;
-  text-align: center;
-}
-
-.signup-button {
-  padding: 15px;
-  background-color: #e6d2b3;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1.3rem;
-  transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
-  display: inline-block;
-  width: 100%;
-}
-
-.signup-button:hover {
-  transform: scale(1.05);
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.login-link {
-  color: #222324;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.text-fade-in {
-  font-size: 1.9rem;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #002d62;
-  font-weight: bold;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.text-fade-in .orange-text {
-  color: #f39c12;
-  animation: textFadeIn 1.5s ease-in-out;
-  font-size: 2rem;
-}
-
-.text-fade-in .blue-text {
-  color: #002d62;
-  animation: textFadeIn 1.7s ease-in-out;
-  font-weight: bold;
-  font-size: 2rem;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center; /* Alignement vertical */
-}
-
-.checkbox-input {
-  display: none; /* Masquer la véritable checkbox */
-}
-
-.checkbox-label {
-  position: relative;
-  padding-left: 30px; /* Espace pour l'icône personnalisée */
-  cursor: pointer;
-  font-size: 16px;
-  color: #333;
-}
-
-.checkbox-label:before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #333;
-  background-color: #fff;
-  border-radius: 4px;
-}
-
-.checkbox-input:checked + .checkbox-label:before {
-  background-color: #4caf50; /* Couleur de fond lorsque la checkbox est cochée */
-  border: 2px solid #4caf50; /* Couleur de bordure lorsque la checkbox est cochée */
-}
-
-.checkbox-input:checked + .checkbox-label:after {
-  content: "\2713"; /* Code unicode pour la coche (vérification) */
-  position: absolute;
-  left: 5px;
-  top: 1px;
-  font-size: 18px;
-  color: #fff; /* Couleur de l'icône lorsque la checkbox est cochée */
-}
-@keyframes textFadeIn {
-  0% {
+@keyframes fadeIn {
+  from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-20px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.email-input {
-  border: 1px solid #ccc;
-  padding: 8px;
-  transition: border-color 0.3s;
-}
+.button-signup {
+  height: 40px;
+  border-radius: 3px;
+  background-color: #1444ac;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: -10px;
 
-.email-input.error-border {
-  border-color: #ff0000; /* Rouge */
-}
-
-.success-message {
-  color: #008000; /* Vert */
-  margin-top: 5px;
-}
-
-.back-button {
-  text-decoration: none;
-  color: #062a78;
-  font-weight: bold;
-  font-size: 1.8rem;
-  display: block;
-  margin-left: 20px;
-  position: absolute;
-  top: 20px;
-  left: 20px;
-}
-
-.back-button:hover {
-  color: #f39c12;
-}
-
-.loading-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  margin-left: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #d98e10;
-  z-index: 1000;
 }
 
-.loading-container p {
-  margin-left: 10px;
-  font-weight: bold;
+.button-signup:hover {
+  background-color: #0a3297 !important; /* Nouvelle couleur au survol */
 }
 
-.error-message {
-  color: #ff6347 !important;
-  font-size: 14px;
-  margin-top: 5px;
-  font-weight: bold;
-  background-color: #ffe2e2;
-  padding: 10px;
-  border-radius: 8px;
+.mt-4 {
+  text-align: center;
+  margin-right: -70px;
 }
 
-.success-message {
-  color: #4caf50;
+.signin-t {
+  font-size: 17px;
+  color: #454444; /* Bleu clair */
+  font-family: "Poppins", sans-serif;
+}
+
+.signin-link {
+  color: #0a579f;
+
+  transition: color 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+.signin-link:hover {
+  color: #3182ce;
+}
+.custom-input::placeholder {
+  color: #a3a2a2;
+  font-size: 19px;
+}
+
+/* style.css */
+.placeholder-style::placeholder {
+  color: #a3a2a2;
+  font-weight: normal; /* Style de fonte normal */
+  font-size: 17px;
+}
+.icon-style {
+  color: #868687;
   font-size: 16px;
   margin-top: 10px;
-  font-weight: bold;
-  background-color: #e6ffe6;
-  padding: 15px;
-  border-radius: 8px;
-}
-
-@media screen and (max-width: 600px) {
-  .signup-container {
-    overflow-x: hidden;
-    padding: 10px; /* Ajout de la marge intérieure pour un meilleur espacement */
-  }
-
-  .signup-form {
-    border: none;
-    box-shadow: none;
-    background: none;
-    transition: all 0.3s ease;
-    width: 100%;
-    padding: 10px; /* Ajout de la marge intérieure */
-  }
-
-  h2 {
-    font-size: 1.7rem;
-    margin-bottom: 10px;
-  }
-
-  .form-group {
-    margin-bottom: 1rem; /* Ajout de la marge inférieure */
-  }
-
-  label {
-    font-size: 1rem;
-    margin-bottom: 5px;
-    display: block;
-  }
-
-  input {
-    margin-bottom: 20px;
-    padding: 0px;
-    font-size: 1.1rem;
-    height: 40px;
-    box-sizing: border-box;
-    width: 100%;
-  }
-
-  .signup-button {
-    font-size: 1.5rem;
-    padding: 12px;
-  }
+  margin-right: 5px;
 }

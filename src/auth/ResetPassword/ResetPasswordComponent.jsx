@@ -1,89 +1,96 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
 import { RiEyeFill, RiEyeOffFill } from "react-icons/ri";
+import { Form, Input, Button, Typography, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserOutlined } from "@ant-design/icons";
 
+import emailImage from "../../assets/images/reee.jpg";
+import codeImage from "../../assets/images/vr4.jpg";
+import successImage from "../../assets/images/vrm.jpg";
 import "./ResetPasswordComponent.css";
-import { FaArrowLeft } from "react-icons/fa";
 
-const ResetPasswordComponent = () => {
+const { Title, Paragraph } = Typography;
+
+const ResetPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [step, setStep] = useState(1);
   const [error, setError] = useState(null);
-  const [emailError, setEmailError] = useState("");
-  const [codeError, setCodeError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [countdown, setCountdown] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(59);
-  const [codeExpired, setCodeExpired] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [canResendCode, setCanResendCode] = useState(true); // Défaut: peut renvoyer le code
+  const [resendTimer, setResendTimer] = useState(60); // Initialiser le timer à 60 secondes
   const history = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
+
+  const codeInputsRef = useRef([]);
 
   useEffect(() => {
-    if (countdown && timeLeft === 0) {
-      setCodeExpired(true);
-      clearInterval(countdown);
-    }
-  }, [countdown, timeLeft]);
+    let intervalId;
 
-  const updateCode = (newValue, index) => {
-    const newCode = [...code];
-    newCode[index] = newValue;
-    return newCode;
+    if (resendTimer > 0 && !canResendCode) {
+      intervalId = setInterval(() => {
+        setResendTimer((prevTimer) => {
+          if (prevTimer === 1) {
+            clearInterval(intervalId);
+            setCanResendCode(true);
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [resendTimer, canResendCode]);
+  const handleCodeKeyDown = (index, event) => {
+    const key = event.key;
+
+    if (key === "Backspace" && index > 0) {
+      event.preventDefault();
+      const newCode = [...code];
+      newCode[index] = ""; // Effacer le contenu du champ
+      setCode(newCode);
+      codeInputsRef.current[index - 1].focus(); // Déplacer le focus vers le champ précédent
+    } else if (key === "Delete" && index < code.length - 1) {
+      event.preventDefault();
+      const newCode = [...code];
+      newCode[index] = ""; // Effacer le contenu du champ
+      setCode(newCode);
+      codeInputsRef.current[index + 1].focus(); // Déplacer le focus vers le champ suivant
+    } else if (key.match(/[0-9]/)) {
+      // Gérer l'entrée de chiffres
+      const newCode = [...code];
+      newCode[index] = key;
+      setCode(newCode);
+      // Déplacer le focus vers le champ suivant s'il existe
+      if (index < code.length - 1) {
+        codeInputsRef.current[index + 1].focus();
+      }
+    } else if (key === "ArrowLeft" && index > 0) {
+      // Gérer le déplacement vers la gauche
+      event.preventDefault(); // Empêcher le déplacement du curseur du navigateur
+      codeInputsRef.current[index - 1].focus();
+    } else if (key === "ArrowRight" && index < code.length - 1) {
+      // Gérer le déplacement vers la droite
+      event.preventDefault(); // Empêcher le déplacement du curseur du navigateur
+      codeInputsRef.current[index + 1].focus();
+    }
   };
 
-  const handleInputChange = (event, setState, setErrorState) => {
-    const value = event.target.value;
-    setState(value);
-    setErrorState("");
-
-    if (setState === setEmail) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      setEmailError(
-        emailRegex.test(value)
-          ? ""
-          : "Veuillez entrer une adresse e-mail valide."
-      );
-    }
-
-    if (setState === setCode) {
-      setCodeError(
-        value.length === 6 && /^\d+$/.test(value)
-          ? ""
-          : "Veuillez entrer un code à 6 chiffres."
-      );
-    }
-
-    if (setState === setNewPassword) {
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      setPasswordError(
-        passwordRegex.test(value)
-          ? ""
-          : "Le mot de passe doit faire au moins 8 caractères, contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
-      );
-    }
-
-    if (setState === setConfirmNewPassword) {
-      setPasswordError(
-        value === newPassword ? "" : "Les mots de passe ne correspondent pas."
-      );
+  const handleInputChange = (index, value) => {
+    // Vérifier si la valeur entrée est un seul chiffre ou une chaîne vide
+    if (/^[0-9]?$/.test(value)) {
+      const newCode = [...code];
+      newCode[index] = value;
+      setCode(newCode);
+      setError(""); // Réinitialiser l'erreur lorsqu'un champ est modifié
     }
   };
 
   const sendResetEmail = async () => {
     try {
-      if (!email || emailError) {
-        setEmailError("Veuillez entrer une adresse e-mail valide.");
-        return;
-      }
-
       setLoading(true);
-
       const response = await axios.post(
         "http://localhost:5000/api/auth/send-password-reset-email",
         { email }
@@ -94,31 +101,49 @@ const ResetPasswordComponent = () => {
         "Email de réinitialisation du mot de passe envoyé avec succès"
       ) {
         setError(null);
-        setEmailError("");
         setStep(2);
-        startCountdown();
-        setCode(["", "", "", "", "", ""]); // Réinitialiser le formulaire de code
+        setCanResendCode(false);
+        setResendTimer(60);
+        message.success("Email de réinitialisation envoyé avec succès");
       } else {
-        setError(response.data.message);
+        throw new Error(response.data.message);
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Something went wrong.";
-      setError(errorMessage);
+      console.error(error.message || "Quelque chose s'est mal passé.");
+      setError(error.message || "Quelque chose s'est mal passé.");
+
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
     } finally {
       setLoading(false);
     }
   };
 
+  const resendVerificationCode = async () => {
+    try {
+      setLoading(true);
+      await axios.post(
+        "http://localhost:5000/api/auth/resend-password-reset-code",
+        { email }
+      );
+      message.success("Nouveau code envoyé avec succès");
+      setCanResendCode(false);
+      setResendTimer(60);
+      setCode(Array(code.length).fill(""));
+    } catch (error) {
+      console.error(error.message || "Quelque chose s'est mal passé.");
+      setError(error.message || "Quelque chose s'est mal passé.");
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
+    } finally {
+      setLoading(false);
+    }
+  };
   const verifyCode = async () => {
     try {
-      if (code.some((value) => value.length !== 1) || codeError) {
-        setCodeError("Veuillez entrer un code à 6 chiffres.");
-        return;
-      }
-
       setLoading(true);
-
       const fullCode = code.join("");
       const response = await axios.post(
         "http://localhost:5000/api/auth/verify-reset-code",
@@ -127,16 +152,21 @@ const ResetPasswordComponent = () => {
 
       if (response.data.success) {
         setError(null);
-        setCodeError("");
         setStep(3);
-        resetCountdown();
+        message.success("Code envoyé avec succès");
       } else {
         setError(response.data.message);
+        setTimeout(() => {
+          setError(null);
+        }, 3000); // Supprimer le message d'erreur après 3 secondes
       }
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Something went wrong.";
+        error.response?.data?.message || "Quelque chose s'est mal passé.";
       setError(errorMessage);
+      setTimeout(() => {
+        setError(null);
+      }, 3000); // Supprimer le message d'erreur après 3 secondes
     } finally {
       setLoading(false);
     }
@@ -145,11 +175,6 @@ const ResetPasswordComponent = () => {
   const resetPassword = async () => {
     try {
       setLoading(true);
-
-      if (passwordError || !newPassword || !confirmNewPassword) {
-        setPasswordError("Veuillez corriger les erreurs dans le formulaire.");
-        return;
-      }
 
       const response = await axios.post(
         "http://localhost:5000/api/auth/reset-password",
@@ -160,7 +185,7 @@ const ResetPasswordComponent = () => {
         response.data.message === "Réinitialisation du mot de passe réussie"
       ) {
         setError(null);
-        setPasswordError("");
+        message.success("Réinitialisation du mot de passe réussie");
         history("/login");
       } else {
         setError(response.data.message);
@@ -174,235 +199,346 @@ const ResetPasswordComponent = () => {
     }
   };
 
-  const startCountdown = () => {
-    resetCountdown();
-    const newCountdown = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
-    setCountdown(newCountdown);
-  };
-
-  const stopCountdown = () => {
-    clearInterval(countdown);
-  };
-
-  const resetCountdown = () => {
-    setTimeLeft(59);
-    setCodeExpired(false);
-  };
-
-  const goToStep1 = () => {
-    stopCountdown();
-    setStep(1);
-  };
-
-  // Ajoutez cette fonction pour gérer le passage au champ suivant
-  const handleCodeKeyDown = (index, event) => {
-    const key = event.key;
-    const isDigit = /^[0-9]$/.test(key); // Vérifiez si la touche est un chiffre
-
-    if (isDigit) {
-      const newValue = parseInt(key, 10); // Convertir la touche en nombre entier
-      const newCode = [...code];
-      newCode[index] = newValue.toString(); // Mettez à jour la valeur du champ de code
-
-      setCode(newCode); // Mettez à jour l'état du code
-
-      // Déplacez automatiquement le focus vers le champ suivant s'il y en a un
-      if (index < codeRefs.length - 1) {
-        codeRefs[index + 1].current.focus();
-      }
-    } else if (key === "Backspace") {
-      // Si l'utilisateur appuie sur la touche "Backspace", supprimez le chiffre
-      const newCode = [...code];
-      newCode[index] = ""; // Effacez la valeur du champ de code
-
-      setCode(newCode); // Mettez à jour l'état du code
-
-      // Déplacez automatiquement le focus vers le champ précédent s'il y en a un
-      if (index > 0) {
-        codeRefs[index - 1].current.focus();
-      }
-    } else if (key === "ArrowLeft" && index > 0) {
-      // Si l'utilisateur appuie sur la touche "Flèche gauche", déplacez le focus vers le champ précédent
-      codeRefs[index - 1].current.focus();
-    } else if (key === "ArrowRight" && index < codeRefs.length - 1) {
-      // Si l'utilisateur appuie sur la touche "Flèche droite", déplacez le focus vers le champ suivant
-      codeRefs[index + 1].current.focus();
-    }
-  };
-  const togglePasswordVisibility = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
-  };
-
-  // Ajoutez cette référence pour les champs de code
-  const codeRefs = Array.from({ length: 6 }, () => useRef(null));
-
   return (
-    <div className="reset-password-container">
-      <Link to="/login" className="back-button">
-        <FaArrowLeft />
-      </Link>
-      <div className="spacer" />
-      <div className="form-container">
-        <h2>Réinitialisation du Mot de Passe</h2>
+    <div className="reset-password-page">
+      <div className={`reset-pass step-${step}`}>
+        <div className="image-container">
+          {step === 1 && (
+            <img
+              src={emailImage}
+              alt="Reset Password"
+              className="reset-image"
+            />
+          )}
+          {step === 2 && (
+            <img
+              src={codeImage}
+              alt="Verification Code"
+              className="reset-image"
+            />
+          )}
+          {step === 3 && (
+            <img src={successImage} alt="Success" className="reset-image" />
+          )}
+        </div>
+        <div className="reset-form-container">
+          {step === 1 && (
+            <Title className="forgot-password-title">
+              Mot <span>de</span> passe <span>oublié ?</span>
+            </Title>
+          )}
 
-        {error && <p className="error-message">{error}</p>}
-
-        {step === 1 && (
-          <form>
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                Email:
-              </label>
-              <input
-                type="email"
-                id="email"
-                className={`form-input ${emailError && "error-border"}`}
-                placeholder="Entrez votre email"
-                value={email}
-                onChange={(e) => handleInputChange(e, setEmail, setEmailError)}
-              />
-              {emailError && <p className="error-message">{emailError}</p>}
-            </div>
-            <button
-              type="button"
-              onClick={sendResetEmail}
-              className="submit-button"
-              disabled={loading}
-            >
-              {loading
-                ? "Envoi en cours..."
-                : "Envoyer l'e-mail de réinitialisation"}
-            </button>
-          </form>
-        )}
-
-        {step === 2 && (
-          <>
-            <hr />
-            <p>
-              Merci de vérifier dans vos e-mails que vous avez reçu un message
-              avec votre code. Celui-ci est composé de 6 chiffres.{" "}
-              <span className="time-left">
-                Temps restant : {timeLeft} secondes.
-              </span>
-            </p>
-            <form>
-              <div className="form-group">
-                <label htmlFor="code" className="form-label">
-                  Code de Vérification:
-                </label>
-                <div className="code-input-container">
-                  {code.map((value, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      value={value}
-                      onChange={(e) =>
-                        handleInputChange(
-                          e,
-                          (val) => setCode(updateCode(val, index)),
-                          setCodeError
-                        )
-                      }
-                      maxLength="1"
-                      onKeyDown={(e) => handleCodeKeyDown(index, e)}
-                      ref={codeRefs[index]}
-                    />
-                  ))}
-                </div>
-                {codeError && <p className="error-message">{codeError}</p>}
-              </div>
-              <button
-                type="button"
-                onClick={verifyCode}
-                className="submit-button"
-                disabled={loading}
-              >
-                {loading ? "Vérification en cours..." : "Vérifier le Code"}
-              </button>
-              {codeExpired && (
-                <div className="code-expired-message">
-                  <p>Le code a expiré.</p>
-                  <button type="button" onClick={goToStep1}>
-                    Renvoyer le code de vérification
-                  </button>
-                </div>
+          {step === 1 && (
+            <>
+              {error && (
+                <Paragraph className="error-message">{error}</Paragraph>
               )}
-            </form>
-          </>
-        )}
+              <Form onFinish={sendResetEmail} className="reset-form">
+                <Paragraph className="reset-info">
+                  Entrez votre adresse e-mail pour recevoir un lien de
+                  réinitialisation.
+                </Paragraph>
+                <Form.Item
+                  name="email"
+                  className="form-item"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez entrer votre email",
+                    },
+                    {
+                      type: "email",
+                      message: "Veuillez entrer un email valide",
+                    },
+                  ]}
+                >
+                  <Input
+                    prefix={
+                      <UserOutlined
+                        className="site-form-item-icon"
+                        style={{ marginRight: 10 }}
+                      />
+                    }
+                    type="email"
+                    placeholder="Entrez votre email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      border: "none", // Retirer toutes les bordures
+                      borderRadius: 0, // Retirer le rayon de bordure
+                      borderBottom: "2px solid #D1D1D4", // Ajouter uniquement la bordure du bas par défaut
+                      padding: "10px 0", // Ajuster le padding
+                      fontSize: 20, // Réduire légèrement la taille de la police
+                      width: "420px", // Augmenter la largeur du champ
+                      marginBottom: 15,
+                      marginLeft: -38,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
 
-        {step === 3 && (
-          <>
-            <hr />
-            <p>
-              Le code est valide. Vous pouvez maintenant réinitialiser votre mot
-              de passe.
-            </p>
-            <form>
-              <div className="form-group">
-                <label htmlFor="newPassword" className="form-label">
-                  Nouveau Mot de Passe:
-                </label>
-                <div className="password-input">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="newPassword"
-                    className={`form-input ${passwordError && "error-border"}`}
-                    placeholder="Entrez votre nouveau mot de passe"
-                    value={newPassword}
-                    onChange={(e) =>
-                      handleInputChange(e, setNewPassword, setPasswordError)
-                    }
+                      e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                      e.target.style.borderBottomColor = "#0a579f"; // Changer la couleur de la bordure du bas en cas de focus
+                    }}
                   />
-                  <span className="eye-icon" onClick={togglePasswordVisibility}>
-                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    className="reset-button"
+                  >
+                    {loading
+                      ? "Envoi en cours..."
+                      : "Envoyer l'e-mail de réinitialisation"}
+                  </Button>
+                </Form.Item>
+                <div className="custom-mt-2">
+                  <span className="custom-reset-text">
+                    Se souvenir du mot de passe ?{" "}
+                    <Link to="/login" className="custom-reset-link">
+                      Connectez-vous ici
+                    </Link>
                   </span>
                 </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="confirmNewPassword" className="form-label">
-                  Confirmer le Nouveau Mot de Passe:
-                </label>
-                <div className="password-input">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="newPassword"
-                    className={`form-input ${passwordError && "error-border"}`}
-                    placeholder="Entrez votre nouveau mot de passe"
-                    value={newPassword}
-                    onChange={(e) =>
-                      handleInputChange(e, setNewPassword, setPasswordError)
-                    }
-                  />
-                  <span className="eye-icon" onClick={togglePasswordVisibility}>
-                    {showPassword ? <RiEyeFill /> : <RiEyeOffFill />}
+              </Form>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Form onFinish={verifyCode} className="reset-form">
+                <Form.Item
+                  style={{ marginLeft: 10 }}
+                  className="verification-code"
+                >
+                  <span
+                    style={{
+                      color: "#333",
+                      fontWeight: "bold",
+                      fontSize: "18px",
+                      fontFamily: "Poppins",
+                      marginBottom: "30px", // Ajouter une marge inférieure pour séparer le label des champs d'entrée
+                    }}
+                  >
+                    Entrez le code de vérification
                   </span>
-                </div>
-                {passwordError && (
-                  <p className="error-message">{passwordError}</p>
+                  <Paragraph className="verification-info">
+                    Un code de vérification a été envoyé à votre adresse e-mail.
+                    Temps restant :
+                    <span className="resend-timer">
+                      {" "}
+                      {resendTimer} secondes.
+                    </span>
+                  </Paragraph>
+                  <div className="verification-input-container">
+                    {code.map((value, index) => (
+                      <Input
+                        key={index}
+                        value={value}
+                        maxLength={1}
+                        className="verification-input"
+                        onKeyDown={(e) => handleCodeKeyDown(index, e)}
+                        onChange={(e) =>
+                          handleInputChange(index, e.target.value)
+                        }
+                        ref={(inputRef) =>
+                          (codeInputsRef.current[index] = inputRef)
+                        }
+                        required // Ajoutez simplement cet attribut pour le rendre obligatoire
+                      />
+                    ))}
+                  </div>
+                </Form.Item>
+
+                <Form.Item style={{ marginLeft: 13 }}>
+                  <Button
+                    className="verif-b"
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    disabled={loading}
+                    style={{
+                      width: "180px",
+                      height: "40px",
+                      borderRadius: "3px",
+                      backgroundColor: "#74787e",
+                      color: "white",
+                      border: "none",
+                      fontSize: "17px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                      padding: "10px",
+                      alignItems: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {loading ? "Vérification en cours..." : "Vérifier le Code"}
+                  </Button>
+                </Form.Item>
+
+                {canResendCode && (
+                  <span
+                    className="resend-code-button"
+                    onClick={resendVerificationCode}
+                    disabled={!canResendCode || loading} // Désactiver le bouton lors du chargement
+                  >
+                    Renvoyer le Code de vérification
+                  </span>
                 )}
-              </div>
-              <button
-                type="button"
-                onClick={resetPassword}
-                disabled={
-                  !!passwordError || !newPassword || !confirmNewPassword
-                }
-                className="submit-button"
-              >
-                {loading
-                  ? "Réinitialisation en cours..."
-                  : "Réinitialiser le Mot de Passe"}
-              </button>
-            </form>
-          </>
-        )}
+
+                {!canResendCode && (
+                  <Paragraph className="resend-code-message">
+                    Vous devez attendre la fin du délai pour renvoyer le code.
+                  </Paragraph>
+                )}
+
+                {error && <div className="error-message">{error}</div>}
+              </Form>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <Paragraph className="reset-message">
+                Le code est valide. Vous pouvez maintenant réinitialiser votre
+                mot de passe.
+              </Paragraph>
+              <Form onFinish={resetPassword} className="reset-form">
+                <Form.Item
+                  name="newPassword"
+                  className="form-item"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez entrer un nouveau mot de passe",
+                    },
+                    {
+                      min: 8,
+                      message:
+                        "Le mot de passe doit faire au moins 8 caractères",
+                    },
+                    {
+                      pattern:
+                        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message:
+                        "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
+                    },
+                  ]}
+                >
+                  <Input.Password
+                    placeholder="Entrez votre nouveau mot de passe"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <RiEyeFill style={{ color: "#b4b5b9" }} />
+                      ) : (
+                        <RiEyeOffFill style={{ color: "#b4b5b9" }} />
+                      )
+                    }
+                    style={{
+                      border: "none", // Retirer toutes les bordures
+                      borderRadius: 0, // Retirer le rayon de bordure
+                      borderBottom: "2px solid #a6a6aa", // Ajouter uniquement la bordure du bas par défaut
+                      padding: "10px 0", // Ajuster le padding
+                      fontSize: 18, // Réduire légèrement la taille de la police
+                      width: "370px", // Augmenter la largeur du champ
+                      marginBottom: 0,
+                      marginLeft: 15,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
+
+                      e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="confirmNewPassword"
+                  className="form-item"
+                  dependencies={["newPassword"]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez confirmer votre nouveau mot de passe",
+                    },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value || getFieldValue("newPassword") === value) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          "Les mots de passe ne correspondent pas"
+                        );
+                      },
+                    }),
+                  ]}
+                >
+                  <Input.Password
+                    placeholder="Confirmez votre nouveau mot de passe"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    iconRender={(visible) =>
+                      visible ? (
+                        <RiEyeFill style={{ color: "#b4b5b9" }} />
+                      ) : (
+                        <RiEyeOffFill style={{ color: "#b4b5b9" }} />
+                      )
+                    }
+                    style={{
+                      border: "none", // Retirer toutes les bordures
+                      borderRadius: 0, // Retirer le rayon de bordure
+                      borderBottom: "2px solid #a6a6aa", // Ajouter uniquement la bordure du bas par défaut
+                      padding: "10px 0", // Ajuster le padding
+                      fontSize: 18, // Réduire légèrement la taille de la police
+                      width: "370px", // Augmenter la largeur du champ
+                      marginBottom: 20,
+                      marginLeft: 15,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
+
+                      e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                    }}
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    disabled={loading}
+                    className="reset-buttonp"
+                    style={{
+                      width: "280px",
+                      height: "40px",
+                      borderRadius: "3px",
+                      backgroundColor: "#74787e",
+                      color: "white",
+                      border: "none",
+                      fontSize: "17px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s ease",
+                      padding: "10px",
+                      alignItems: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      marginLeft: 70,
+                    }}
+                  >
+                    {loading
+                      ? "Réinitialisation en cours..."
+                      : "Réinitialiser le Mot de Passe"}
+                  </Button>
+                </Form.Item>
+              </Form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default ResetPasswordComponent;
+export default ResetPasswordPage;

@@ -1,50 +1,26 @@
 import React, { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import "./signin.css";
-import { FaArrowLeft } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-//import Cookies from "js-cookie";
+import { Form, Input, Button, Typography, message } from "antd";
 
-const Signin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [requiredFieldsError, setRequiredFieldsError] = useState("");
-  const [loginError, setLoginError] = useState("");
+import { FaArrowLeft } from "react-icons/fa";
+
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useNavigate, Link } from "react-router-dom";
+import "./signin.css";
+import "./mediasigin.css";
+import signinImage from "../../assets/images/pm.jpg";
+import appLogo from "../../assets/images/vbil2.png";
+
+const { Title, Text } = Typography;
+
+const CustomSignin = () => {
+  const [loading, setLoading] = useState(false);
   const history = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validation des champs
-    if (!email || !password) {
-      setRequiredFieldsError("Veuillez remplir tous les champs");
-      return;
-    } else {
-      setRequiredFieldsError("");
-    }
-
-    if (!email.includes("@")) {
-      setEmailError("Adresse e-mail invalide");
-      return;
-    } else {
-      setEmailError("");
-    }
-
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!password.match(passwordRegex)) {
-      setPasswordError(
-        "Le mot de passe doit faire au moins 8 caractères, contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
-      );
-      return;
-    } else {
-      setPasswordError("");
-    }
+  const onFinish = async (values) => {
+    const { email, password } = values;
 
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
@@ -53,17 +29,18 @@ const Signin = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        setLoginError(data.message || "Erreur lors de la connexion");
+        message.error(data.message || "Erreur lors de la connexion");
+        setLoading(false);
         return;
       }
 
-      const data = await response.json();
-
       if (!data.token || !data.user) {
         console.error("Champs manquants dans la réponse :", data);
-        setLoginError("Erreur lors de la connexion");
+        message.error("Erreur lors de la connexion");
+        setLoading(false);
         return;
       }
 
@@ -87,92 +64,160 @@ const Signin = () => {
         default:
           break;
       }
+
+      message.success("Connexion réussie !");
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
-      setLoginError("Erreur lors de la connexion");
+      message.error("Erreur lors de la connexion");
+      setLoading(false);
     }
   };
 
   return (
-    <div className="signin-container">
-      <Link to="/" className="back-button">
+    <div className="custom-signin-container">
+      <Link to="/" className="custom-home-button">
         <FaArrowLeft />
       </Link>
 
-      <div className="form-container">
-        <h2>
-          Bienvenue sur <span className="visto">Visto</span>
-          <span className="fact">Fact</span>
-        </h2>
-
-        <form onSubmit={handleSubmit}>
-          {requiredFieldsError && (
-            <p className="error-message">{requiredFieldsError}</p>
-          )}
-          {loginError && <p className="error-message">{loginError}</p>}
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="email"
-              className={`form-input ${emailError && "error-border"}`}
-              placeholder="Entrez votre email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+      <div className="custom-signin-content">
+        <div className="custom-form-container">
+          <div className="logo-titlee-container">
+            <img
+              src={appLogo}
+              alt="Logo de l'application"
+              className="app-logo1"
             />
-            {emailError && <p className="error-message">{emailError}</p>}
+            <Title level={2} className="custom-title1">
+              <span className="visto">V</span>
+              <span className="fact">Bill</span>
+            </Title>
           </div>
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Mot de Passe
-            </label>
+          <div className="subtitle-container">
+            <Text className="custom-subtitle">
+              Connectez-vous à votre compte
+            </Text>
+          </div>{" "}
+          <Form
+            name="custom-signin"
+            onFinish={onFinish}
+            initialValues={{ remember: true }}
+            size="large"
+            className="custom-form"
+          >
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "Veuillez entrer votre email" },
+                { type: "email", message: "Adresse e-mail invalide" },
+              ]}
+              className="custom-form-item"
+              hasFeedback
+            >
+              <Input
+                prefix={
+                  <UserOutlined
+                    className="site-form-item-icon"
+                    style={{ marginRight: 10 }}
+                  />
+                } // Ajouter un espace à droite de l'icône
+                placeholder="Adresse e-mail"
+                style={{
+                  border: "none", // Retirer toutes les bordures
+                  borderRadius: 0, // Retirer le rayon de bordure
+                  borderBottom: "2px solid #D1D1D4", // Ajouter uniquement la bordure du bas par défaut
+                  padding: "10px 0", // Ajuster le padding
+                  fontSize: 16, // Réduire légèrement la taille de la police
+                  width: "340px", // Augmenter la largeur du champ
+                  marginBottom: 5,
+                }}
+                onFocus={(e) => {
+                  e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
 
-            <div className="password-input">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                className={`form-input ${passwordError && "error-border"}`}
-                placeholder="Entrez votre mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                  e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                  e.target.style.borderBottomColor = "#0a579f"; // Changer la couleur de la bordure du bas en cas de focus
+                }}
               />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez entrer votre mot de passe",
+                },
+                {
+                  min: 8,
+                  message: "Le mot de passe doit faire au moins 8 caractères",
+                },
+                {
+                  pattern:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                  message:
+                    "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
+                },
+              ]}
+              className="custom-form-item"
+            >
+              <Input.Password
+                prefix={
+                  <LockOutlined
+                    className="site-form-item-icon"
+                    style={{ marginRight: 10 }}
+                  />
+                }
+                placeholder=" Mot de passe"
+                style={{
+                  border: "none", // Retirer toutes les bordures
+                  borderRadius: 0, // Retirer le rayon de bordure
+                  borderBottom: "2px solid #D1D1D4", // Ajouter uniquement la bordure du bas par défaut
+                  padding: "10px 0", // Ajuster le padding
+                  fontSize: 16, // Réduire légèrement la taille de la police
+                  width: "340px", // Augmenter la largeur du champ
+                  marginBottom: 0,
+                }}
+                onFocus={(e) => {
+                  e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
 
-              <span
-                className="eye-icon"
-                onClick={() => setShowPassword(!showPassword)}
+                  e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                }}
+              />
+            </Form.Item>
+            <div className="custom-forgot-password-container">
+              <Link to="/reset-password" className="custom-forgot-password">
+                Mot de passe oublié ?
+              </Link>
+            </div>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className={`custom-submit-butto ${loading ? "loading" : ""}`}
+                loading={loading}
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                Connexion
+              </Button>
+            </Form.Item>
+
+            <div className="custom-mt-3">
+              <span className="custom-signup-text">
+                Pas encore de compte?{" "}
+                <Link to="/register" className="custom-signup-link">
+                  Inscrivez-vous ici
+                </Link>
               </span>
             </div>
-            {passwordError && <p className="error-message">{passwordError}</p>}
-          </div>
-          <div className="mt-3">
-            <p>
-              <Link to="/reset-password" className="forgot-password-link">
-                Mot de passe oublié? Réinitialisez-le ici
-              </Link>
-            </p>
-          </div>
-          <div className="center-button">
-            <button type="submit" className="submit-button">
-              Connexion
-            </button>
-          </div>
-        </form>
-        <div className="mt-3">
-          <p>
-            Vous n&apos;avez pas de compte?{" "}
-            <Link to="/register" className="signup-link">
-              Inscrivez-vous ici
-            </Link>
-          </p>
+          </Form>
+        </div>
+        <div className="custom-image-container">
+          <img
+            src={signinImage}
+            alt="Image de connexion"
+            className="custom-signin-image"
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default Signin;
+export default CustomSignin;
