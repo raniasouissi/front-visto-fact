@@ -74,7 +74,7 @@ const Taxe = () => {
       })
       .catch((error) => {
         if (error.response && error.response.status === 500) {
-          message.error("Une TVA avec cette valeur existe déjà.");
+          message.error("Erreur lors de l'ajout . Veuillez réessayer.");
         } else {
           message.error(
             `Erreur lors de ${
@@ -145,6 +145,7 @@ const Taxe = () => {
               setEditItem(null);
             }}
             icon={<PlusOutlined />}
+            style={{ backgroundColor: "#0a0a85", color: "white" }}
           >
             Ajouter
           </Button>

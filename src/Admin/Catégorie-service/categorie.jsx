@@ -78,7 +78,7 @@ const Categorie = () => {
     <div>
       <Button
         type="primary"
-        style={{ float: "right", marginBottom: 16 }}
+        style={{ float: "right", marginBottom: 16, backgroundColor: "#0a0a85" }}
         onClick={() => {
           setModalVisible(true);
           setEditItem(null);

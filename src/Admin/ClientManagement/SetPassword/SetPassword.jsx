@@ -7,13 +7,20 @@ import "./SetPassword.css"; // Importation du fichier CSS
 function SetPassword() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [newPassword, setNewPassword] = useState(""); // Nouvel état pour le mot de passe
+  const [confirmNewPassword, setConfirmNewPassword] = useState(""); // Nouvel état pour la confirmation du mot de passe
   const [passwordError, setPasswordError] = useState("");
   const { token } = useParams();
   const history = useNavigate();
 
-  const handleResetPasswordSubmit = async (values) => {
+  const handleResetPasswordSubmit = async () => {
     setLoading(true);
+
     try {
+      if (newPassword !== confirmNewPassword) {
+        throw new Error("Les mots de passe ne correspondent pas");
+      }
+
       const response = await fetch(
         `http://localhost:5000/api/users/set-password/${token}`,
         {
@@ -22,7 +29,7 @@ function SetPassword() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            newPassword: values.newPassword,
+            newPassword: newPassword,
           }),
         }
       );
@@ -30,18 +37,21 @@ function SetPassword() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message);
+      } else {
+        message.success("Mot de passe réinitialisé avec succès");
+        setTimeout(() => {
+          history("/login");
+        }, 3000);
       }
-
-      message.success("Mot de passe réinitialisé avec succès");
-      setTimeout(() => {
-        history("/login"); // Redirection vers la page de connexion
-      }, 3000);
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage(
         error.message ||
           "Une erreur est survenue lors de la réinitialisation du mot de passe. Veuillez réessayer."
       );
+      setTimeout(() => {
+        history("/login");
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -56,6 +66,17 @@ function SetPassword() {
       passwordRegex.test(value)
         ? ""
         : "Le mot de passe doit faire au moins 8 caractères, contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
+    );
+    setNewPassword(value); // Mettre à jour le nouvel état du mot de passe
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const value = e.target.value;
+    setConfirmNewPassword(value); // Mettre à jour le nouvel état de la confirmation du mot de passe
+
+    // Vérifier si les mots de passe correspondent et mettre à jour l'état de l'erreur
+    setPasswordError(
+      newPassword !== value ? "Les mots de passe ne correspondent pas" : ""
     );
   };
 
@@ -85,6 +106,8 @@ function SetPassword() {
           </Col>
           <Col xs={24} sm={24} md={12}>
             <Form onFinish={handleResetPasswordSubmit}>
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
+
               <p className="form-title">
                 Veuillez saisir votre nouveau mot de passe :
               </p>
@@ -115,26 +138,17 @@ function SetPassword() {
                 rules={[
                   {
                     required: true,
-                    message: "Veuillez confirmer votre nouveau mot de passe!",
+                    message: "Veuillez confirmer votre nouveau mot de passe",
                   },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue("newPassword") === value) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error("Les mots de passe ne correspondent pas!")
-                      );
-                    },
-                  }),
                 ]}
               >
                 <Input.Password
+                  onChange={handleConfirmPasswordChange}
                   placeholder="Confirmer le mot de passe"
                   className="input-field"
                 />
               </Form.Item>
-              {errorMessage && <p className="error-message">{errorMessage}</p>}
+
               <Form.Item>
                 <button
                   type="submit"

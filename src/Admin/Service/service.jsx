@@ -10,10 +10,9 @@ import {
   Select,
   InputNumber,
   Table,
-  Popconfirm,
   message,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 const { Option } = Select;
@@ -29,6 +28,7 @@ const ServiceList = () => {
   const [devise, setDevise] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDevise, setSelectedDevise] = useState(null);
+  const [editingService, setEditingService] = useState(null);
 
   // Fonction de gestionnaire de changement de devise
   const handleDeviseChange = (value) => {
@@ -99,25 +99,71 @@ const ServiceList = () => {
   const handleCancel = () => {
     setModalVisible(false);
     form.resetFields();
+    setSelectedDevise(null); // Réinitialiser selectedDevise à null
+    setEditingService(null); // Réinitialiser editingServiceId à null
   };
 
   const onFinish = async (values) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/services",
-        values
-      );
-      if (response.status === 201) {
+      let response;
+      if (editingService) {
+        // Si un service est en cours d'édition, mettre à jour ce service
+        response = await axios.put(
+          `http://localhost:5000/api/services/${editingService._id}`,
+          values
+        );
+      } else {
+        // Sinon, créer un nouveau service
+        response = await axios.post(
+          "http://localhost:5000/api/services",
+          values
+        );
+      }
+
+      if (response.status === 201 || response.status === 200) {
         form.resetFields();
-        message.success("Service créé avec succès !");
+        setSelectedDevise(null);
+        setEditingService(null);
+        message.success(
+          editingService
+            ? "Service mis à jour avec succès !"
+            : "Service créé avec succès !"
+        );
         setModalVisible(false);
         fetchServices();
       } else {
-        throw new Error("Échec de la création du service.");
+        throw new Error(
+          `Échec de ${
+            editingService ? "la mise à jour" : "la création"
+          } du service.`
+        );
       }
     } catch (error) {
-      console.error("Erreur lors de la création du service :", error);
+      console.error(
+        `Erreur lors de ${
+          editingService ? "la mise à jour" : "la création"
+        } du service :`,
+        error
+      );
     }
+  };
+
+  const handleEdit = async (record) => {
+    setEditingService(record); // Enregistrer le service en cours d'édition dans l'état local
+    setModalVisible(true); // Afficher le modal
+    form.setFieldsValue({
+      // Pré-remplir les champs du formulaire avec les détails du service en cours d'édition
+      reference: record.reference,
+      libelle: record.libelle,
+      clientId: record.client?._id,
+      categoriesId: record.categories?._id,
+      quantite: record.quantite,
+      prix_unitaire: record.prix_unitaire,
+      montant_HT: record.montant_HT,
+      tvaId: record.tva?._id,
+      deviseId: record.devise?._id,
+      montant_TTC: record.montant_TTC,
+    });
   };
 
   const calculateTTC = (montantHT, tvaId) => {
@@ -143,9 +189,19 @@ const ServiceList = () => {
     });
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/services/${id}`);
+      message.success("Service supprimé avec succès !");
+      fetchServices(); // Fetch updated list after deletion
+    } catch (error) {
+      console.error("Erreur lors de la suppression du service :", error);
+    }
+  };
+
   const columns = [
     {
-      title: "Ref",
+      title: "Reference",
       dataIndex: "reference",
       key: "reference",
     },
@@ -153,6 +209,17 @@ const ServiceList = () => {
       title: "Désignation",
       dataIndex: "libelle",
       key: "libelle",
+    },
+
+    {
+      title: "Client",
+      dataIndex: ["client", "name"],
+      key: "client_name",
+    },
+    {
+      title: "Catégorie",
+      dataIndex: ["categories", "titre"],
+      key: "categories_titre",
     },
     {
       title: "Quantité",
@@ -170,16 +237,11 @@ const ServiceList = () => {
       key: "montant_HT",
     },
     {
-      title: "Client",
-      dataIndex: ["client", "name"],
-      key: "client_name",
+      title: "Montant TTC",
+      dataIndex: "montant_TTC",
+      key: "montant_TTC",
     },
-    {
-      title: "TVA",
-      dataIndex: "tva",
-      key: "tva_rate",
-      render: (tva) => <span>{tva ? tva.rate + "%" : ""}</span>,
-    },
+
     {
       title: "Devise",
       dataIndex: "devise",
@@ -187,13 +249,14 @@ const ServiceList = () => {
       render: (devise) => `${devise.name} (${devise.symbole})`,
     },
     {
-      title: "Catégories",
-      dataIndex: ["categories", "titre"],
-      key: "categories_titre",
+      title: "TVA",
+      dataIndex: "tva",
+      key: "tva_rate",
+      render: (tva) => <span>{tva ? tva.rate + "%" : ""}</span>,
     },
+
     {
       title: "Actions",
-      dataIndex: "_id",
       key: "actions",
       render: (_, record) => (
         <>
@@ -203,39 +266,17 @@ const ServiceList = () => {
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
             />
-            <Popconfirm
-              title="Êtes-vous sûr de vouloir supprimer ce service ?"
-              onConfirm={() => handleDelete(record._id)}
-              okText="Oui"
-              cancelText="Non"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>{" "}
+            <Button
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record._id)}
+            />
           </Space>
         </>
       ),
     },
   ];
-
-  const handleEdit = (record) => {
-    console.log("Modification du service :", record);
-  };
-
-  const handleDelete = async (serviceId) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/services/${serviceId}`
-      );
-      if (response.status === 200) {
-        fetchServices();
-        message.success("Service supprimé avec succès !");
-      } else {
-        throw new Error("Échec de la suppression du service.");
-      }
-    } catch (error) {
-      console.error("Erreur lors de la suppression du service :", error);
-    }
-  };
 
   return (
     <>
@@ -258,7 +299,9 @@ const ServiceList = () => {
               textAlign: "center",
             }}
           >
-            Ajouter un nouveau service
+            {editingService
+              ? "Modifier un service"
+              : "Ajouter un nouveau service"}
           </div>
         }
         visible={modalVisible}
@@ -273,7 +316,9 @@ const ServiceList = () => {
             style={{ backgroundColor: "#0a0a85" }}
             onClick={() => form.submit()}
           >
-            Ajouter
+            {editingService
+              ? "Modifier le service"
+              : "Ajouter un nouveau service"}
           </Button>,
         ]}
         width={800}
@@ -283,6 +328,7 @@ const ServiceList = () => {
           layout="vertical"
           onFinish={onFinish}
           style={{ marginTop: 10 }}
+          initialValues={editingService || {}} // Pré-remplir le formulaire avec les détails du service en cours d'édition
         >
           <Row gutter={[16, 16]}>
             <Col span={12}>
@@ -343,7 +389,7 @@ const ServiceList = () => {
             <Col span={12}>
               <Form.Item
                 name="categoriesId"
-                label="Catégories"
+                label="Catégorie"
                 rules={[
                   {
                     required: true,
@@ -388,11 +434,11 @@ const ServiceList = () => {
             <Col span={12}>
               <Form.Item
                 name="prix_unitaire"
-                label={`Prix unitaire ${
+                label={
                   selectedDevise
-                    ? `(${selectedDevise.name} - ${selectedDevise.symbole})`
-                    : ""
-                }`}
+                    ? `Prix unitaire (${selectedDevise.name} - ${selectedDevise.symbole})`
+                    : "Prix unitaire"
+                }
                 rules={[
                   {
                     required: true,
@@ -501,7 +547,6 @@ const ServiceList = () => {
                 <Select
                   placeholder="Sélectionnez une devise"
                   onChange={handleDeviseChange}
-                  defaultValue="663520018fd0c36ddc4fbdb4"
                 >
                   {devise.map((dev) => (
                     <Option key={dev._id} value={dev._id}>

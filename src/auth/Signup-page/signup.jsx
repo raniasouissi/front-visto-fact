@@ -290,7 +290,7 @@ const Signup = () => {
             <Row gutter={[16, 16]}>
               <Col span={12}>
                 <Form.Item
-                  style={{ marginTop: -10 }}
+                  style={{ marginTop: 4 }}
                   name="namecompany"
                   className="form-item"
                   rules={[
@@ -328,7 +328,7 @@ const Signup = () => {
               </Col>
               <Col span={12}>
                 <Form.Item
-                  style={{ marginLeft: 55 }}
+                  style={{ marginLeft: 55, marginTop: 5 }}
                   name="phonenumber"
                   rules={[
                     {
@@ -538,26 +538,30 @@ const Signup = () => {
               )}
             </Row>
 
-            <Form.Item style={{ marginLeft: 50, marginBottom: -25 }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                style={{
-                  width: "120px", // Ajustez la largeur selon vos besoins
-                  height: "40px", // Ajustez la hauteur selon vos besoins
-                  fontSize: "16px",
-                  fontFamily: "Poppins",
-                  borderRadius: "4px",
-                  marginTop: "10px",
-                  background: "linear-gradient(to right, #0f116c, #0f116c)", // Dégradé de couleur
-                  border: "none", // Retirer la bordure
-                  cursor: "pointer",
-                  transition: "background-color 0.3s",
-                }}
-              >
-                S&apos;inscrire
-              </Button>
+            <Form.Item style={{ marginBottom: 20, marginRight: 50 }}>
+              <Row justify="end">
+                <Col>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    style={{
+                      width: "120px", // Ajustez la largeur selon vos besoins
+                      height: "40px", // Ajustez la hauteur selon vos besoins
+                      fontSize: "16px",
+                      fontFamily: "Poppins",
+                      borderRadius: "4px",
+                      marginTop: "10px",
+                      background: "linear-gradient(to right, #0f116c, #0f116c)", // Dégradé de couleur
+                      border: "none", // Retirer la bordure
+                      cursor: "pointer",
+                      transition: "background-color 0.3s",
+                    }}
+                  >
+                    S&apos;inscrire
+                  </Button>
+                </Col>
+              </Row>
             </Form.Item>
 
             <div className="mt-4">

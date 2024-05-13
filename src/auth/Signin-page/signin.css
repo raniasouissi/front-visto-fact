@@ -97,7 +97,7 @@
   transition: transform 0.3s ease; /* Transition pour l'effet de survol */
 }
 .custom-submit-butto {
-  width: 355px; /* Largeur fixe */
+  width: 100%; /* Largeur fixe */
   height: 45px; /* Hauteur fixe */
   border: none;
   border-radius: 5px; /* Bordures arrondies */

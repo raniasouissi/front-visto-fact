@@ -61,6 +61,7 @@ const Users = () => {
   const [countryCode, setCountryCode] = useState("");
 
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [matriculeFiscaleFilter, setMatriculeFiscaleFilter] = useState("all");
 
   // Mise à jour de la valeur du pays lors de la sélection dans la liste déroulante
   const handleCountryChange = (selectedOption) => {
@@ -72,17 +73,28 @@ const Users = () => {
 
   useEffect(() => {
     fetchUsers(activeTab);
-  }, [activeTab]);
+  }, [activeTab, matriculeFiscaleFilter]);
+  // Regrouper les dépendances
 
   const fetchUsers = async (type, searchQuery = "") => {
     try {
       let data = [];
       if (type === "clients") {
         data = await apiusers.fetchClients(searchQuery);
+
+        let filteredClients = data;
+
+        if (matriculeFiscaleFilter === "with") {
+          filteredClients = data.filter((client) => !!client.matriculeFiscale);
+        } else if (matriculeFiscaleFilter === "without") {
+          filteredClients = data.filter((client) => !client.matriculeFiscale);
+        }
+
+        setUsers(filteredClients);
       } else if (type === "financiers") {
         data = await apiusers.fetchFinanciers(searchQuery);
+        setUsers(data);
       }
-      setUsers(data);
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
     }
@@ -95,7 +107,6 @@ const Users = () => {
   const handleSearch = (value) => {
     fetchUsers(activeTab, value);
   };
-
   const handleDeleteUser = async (userId) => {
     try {
       if (activeTab === "clients") {
@@ -141,7 +152,7 @@ const Users = () => {
       };
 
       // Formater le numéro de téléphone
-      const formattedPhoneNumber = `+${countryCode} ${values.phonenumber}`;
+      const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
 
       // Vérifier si le code de pays est répété dans le numéro de téléphone
       const phoneNumberWithoutRepeatedCountryCode =
@@ -150,8 +161,8 @@ const Users = () => {
       // Ajouter un espace entre le code de pays et le numéro
       const phoneNumberWithSpace =
         phoneNumberWithoutRepeatedCountryCode.replace(
-          `+${countryCode}`,
-          `+${countryCode} `
+          `${countryCode}`,
+          `${countryCode} `
         );
 
       // Mettre à jour la valeur du numéro de téléphone dans les données utilisateur
@@ -195,9 +206,6 @@ const Users = () => {
         ...values,
         pays: null,
       });
-      if (!values.matriculeFiscale) {
-        delete values.matriculeFiscale;
-      }
 
       const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
 
@@ -215,6 +223,9 @@ const Users = () => {
       // Mettre à jour la valeur du numéro de téléphone dans les valeurs
       values.phonenumber = phoneNumberWithSpace;
       values.pays = selectedCountry ? selectedCountry.label : "";
+      if (!values.matriculeFiscale) {
+        delete values.matriculeFiscale;
+      }
 
       if (userType === "client") {
         await apiusers.addClient(values);
@@ -338,10 +349,10 @@ const Users = () => {
         tabBarExtraContent={
           <div style={{ display: "flex", alignItems: "center" }}>
             <Input
-              prefix={<SearchOutlined />}
+              prefix={<SearchOutlined style={{ color: "#5e5e62" }} />}
               placeholder="Rechercher ..."
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 200, marginRight: 8 }}
+              style={{ width: 400, marginRight: 8, height: 35 }}
             />
             <Button
               type="primary"
@@ -351,6 +362,7 @@ const Users = () => {
                 setEditingUser(null);
               }}
               icon={<PlusOutlined />}
+              style={{ backgroundColor: "#0a0a85" }}
             >
               Ajouter un utilisateur
             </Button>
@@ -358,6 +370,15 @@ const Users = () => {
         }
       >
         <TabPane tab="Clients" key="clients">
+          <Select
+            defaultValue="all"
+            style={{ width: 180, marginBottom: 16 }}
+            onChange={setMatriculeFiscaleFilter}
+          >
+            <Option value="all">Tous</Option>
+            <Option value="with">Client morale</Option>
+            <Option value="without">Client physique</Option>
+          </Select>
           <Table dataSource={users} columns={columns} />
         </TabPane>
         <TabPane tab="Financiers" key="financiers">

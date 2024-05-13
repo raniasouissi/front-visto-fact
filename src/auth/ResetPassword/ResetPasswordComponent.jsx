@@ -287,6 +287,18 @@ const ResetPasswordPage = () => {
                     htmlType="submit"
                     loading={loading}
                     className="reset-button"
+                    style={{
+                      background: "linear-gradient(to right, #0f12a4, #121477)",
+                      color: "#fff",
+                      border: "none",
+                      padding: "12px",
+                      borderRadius: "4px",
+                      width: "100%",
+                      fontSize: "16px",
+                      cursor: "pointer",
+                      transition: "background-color 0.3s",
+                      fontFamily: "Poppins",
+                    }}
                   >
                     {loading
                       ? "Envoi en cours..."

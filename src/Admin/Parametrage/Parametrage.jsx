@@ -164,12 +164,16 @@ const Parametrage = () => {
       // Ajouter un espace entre le code de pays et le numéro
       const phoneNumberWithSpace =
         phoneNumberWithoutRepeatedCountryCode.replace(
-          `+${countryCode}`,
-          `+${countryCode} `
+          `${countryCode}`,
+          `${countryCode} `
         );
 
-      // Mettre à jour la valeur du numéro de téléphone dans les valeurs
-      values.phonenumber = phoneNumberWithSpace;
+      // Vérifier si l'ID du paramétrage sélectionné correspond à l'ID de l'objet actuellement modifié
+      if (selectedParametrage && selectedParametrage._id === values._id) {
+        // Mettre à jour la valeur du numéro de téléphone dans les valeurs
+        values.phonenumber = phoneNumberWithSpace;
+      }
+
       values.pays = selectedCountry ? selectedCountry.label : "";
       const response = await axios.put(
         `http://localhost:5000/api/parametrage/${selectedParametrage._id}`,
@@ -291,6 +295,7 @@ const Parametrage = () => {
                 setIsAdding(true);
               }}
               icon={<PlusOutlined />}
+              style={{ backgroundColor: "#0a0a85" }}
             >
               Ajouter
             </Button>
