@@ -17,6 +17,7 @@ import VerificationPage from "./auth/Verif-email/VerificationPage";
 import SetPassword from "./Admin/ClientManagement/SetPassword/SetPassword";
 
 import "./App.css";
+import Facture from "./Admin/Facture/facture";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // État d'authentification
@@ -42,6 +43,7 @@ const App = () => {
             />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/fact" element={<Facture />} />
             <Route path="/dashboard-admin" element={<DashboardAdmin />} />
             <Route path="/dashboard-client" element={<DashboardClient />} />
             <Route

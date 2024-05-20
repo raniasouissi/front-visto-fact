@@ -84,7 +84,7 @@ const Devise = () => {
     <div>
       <Button
         type="primary"
-        style={{ float: "right", marginBottom: 16, backgroundColor: "#0a0a85" }}
+        style={{ float: "right", marginBottom: 16, backgroundColor: "#022452" }}
         onClick={() => {
           setModalVisible(true);
           setEditItem(null);

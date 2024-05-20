@@ -1,0 +1,88 @@
+/* YourComponent.css */
+
+.ant-modal-title {
+  color: #282727;
+  padding: 5px;
+  border-bottom: 1px solid #2b2a2a;
+}
+
+.ant-modal {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ant-form-item-label {
+  min-width: 120px;
+  text-align: left;
+  padding-right: 8px;
+}
+
+.ant-form-item-control {
+  flex: 1;
+}
+
+.ant-btn-primary {
+  background-color: #001529;
+  border-color: #001529;
+}
+
+.ant-btn-primary:hover {
+  background-color: #004c99;
+  border-color: #004c99;
+}
+
+.ant-select-selector,
+.ant-input,
+.ant-picker {
+  border-radius: 4px;
+}
+
+.custom-table {
+  border-collapse: collapse;
+  width: 80%;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+  text-align: left;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #f2f2f2;
+}
+
+.custom-table tbody td button {
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.create-butto {
+  color: #fff;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: normal;
+
+  border-radius: 5px;
+}

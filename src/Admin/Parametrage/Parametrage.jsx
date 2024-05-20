@@ -282,10 +282,10 @@ const Parametrage = () => {
         tabBarExtraContent={
           <div style={{ display: "flex", alignItems: "center" }}>
             <Input
-              prefix={<SearchOutlined />}
+              prefix={<SearchOutlined style={{ color: "#777778" }} />}
               placeholder="Rechercher ..."
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 200, marginRight: 8 }}
+              style={{ width: 400, marginRight: 8 }}
             />
 
             <Button
@@ -295,7 +295,7 @@ const Parametrage = () => {
                 setIsAdding(true);
               }}
               icon={<PlusOutlined />}
-              style={{ backgroundColor: "#0a0a85" }}
+              style={{ backgroundColor: "#022452" }}
             >
               Ajouter
             </Button>
@@ -674,7 +674,7 @@ const Parametrage = () => {
               type="primary"
               htmlType="submit"
               style={{
-                background: "linear-gradient(to right, #0f12a4, #121477)",
+                background: "linear-gradient(to right,#022452, #022452)",
                 color: "#fff",
                 border: "none",
                 padding: "12px",

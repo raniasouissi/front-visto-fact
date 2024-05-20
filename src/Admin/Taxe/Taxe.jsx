@@ -145,9 +145,9 @@ const Taxe = () => {
               setEditItem(null);
             }}
             icon={<PlusOutlined />}
-            style={{ backgroundColor: "#0a0a85", color: "white" }}
+            style={{ backgroundColor: "#022452", color: "white" }}
           >
-            Ajouter
+            Ajouter taxe
           </Button>
         }
       >
@@ -195,8 +195,7 @@ const Taxe = () => {
                 title: "Valeur",
                 dataIndex: "value",
                 key: "value",
-                render: (value) => parseFloat(value).toFixed(3),
-              }, // Rendu personnalisé pour afficher trois décimales
+              },
 
               {
                 title: "Action",

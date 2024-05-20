@@ -9,7 +9,12 @@ import {
   Space,
   Popconfirm,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import axios from "axios";
 
 const Categorie = () => {
@@ -17,17 +22,26 @@ const Categorie = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editItem, setEditItem] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [searchQuery]);
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/categorie");
+      let url = "http://localhost:5000/api/categorie";
+      if (searchQuery) {
+        url += `/search/${searchQuery}`;
+      }
+      const response = await axios.get(url);
       setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Erreur lors de la récupération des catégories :", error);
     }
   };
 
@@ -76,17 +90,29 @@ const Categorie = () => {
 
   return (
     <div>
-      <Button
-        type="primary"
-        style={{ float: "right", marginBottom: 16, backgroundColor: "#0a0a85" }}
-        onClick={() => {
-          setModalVisible(true);
-          setEditItem(null);
-        }}
-        icon={<PlusOutlined />}
-      >
-        Ajouter une catégorie
-      </Button>
+      <div style={{ float: "right" }}>
+        <Input
+          prefix={<SearchOutlined style={{ color: "#777778" }} />}
+          placeholder="Rechercher ..."
+          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: 400, marginBottom: 16, marginRight: 15 }}
+        />
+
+        <Button
+          type="primary"
+          style={{
+            marginBottom: 16,
+            backgroundColor: "#022452",
+          }}
+          onClick={() => {
+            setModalVisible(true);
+            setEditItem(null);
+          }}
+          icon={<PlusOutlined />}
+        >
+          Ajouter une catégorie
+        </Button>
+      </div>
       <Table
         dataSource={categories}
         columns={[

@@ -11,12 +11,16 @@ import {
   Col,
   Select,
   Checkbox,
+  Avatar,
+  Upload,
 } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
   EditOutlined,
   DeleteOutlined,
+  UserOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import apiusers from "./apiusers";
 import "react-phone-input-2/lib/style.css";
@@ -62,6 +66,16 @@ const Users = () => {
 
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [matriculeFiscaleFilter, setMatriculeFiscaleFilter] = useState("all");
+  const [uploadedFile, setUploadedFile] = useState(null); // État local pour stocker l'image
+
+  const handleImageChange = (info) => {
+    if (info.file.status === "done") {
+      // Récupérer le nom de fichier de l'image téléchargée
+      const uploadedFileName = info.file.response.filename;
+      // Mettre à jour l'état avec le nom du fichier de l'image téléchargée
+      setUploadedFile(uploadedFileName);
+    }
+  };
 
   // Mise à jour de la valeur du pays lors de la sélection dans la liste déroulante
   const handleCountryChange = (selectedOption) => {
@@ -90,7 +104,14 @@ const Users = () => {
           filteredClients = data.filter((client) => !client.matriculeFiscale);
         }
 
-        setUsers(filteredClients);
+        // Inclure le chemin de l'image dans les données du client
+        const usersWithImage = filteredClients.map((client) => ({
+          ...client,
+          imagePath: `http://localhost:5000/uploads/${client.image}`, // Ajouter le chemin de l'image
+        }));
+
+        setUsers(usersWithImage);
+        console.log("image", usersWithImage);
       } else if (type === "financiers") {
         data = await apiusers.fetchFinanciers(searchQuery);
         setUsers(data);
@@ -123,7 +144,7 @@ const Users = () => {
       );
     }
   };
-  // Dans votre composant
+
   const handleEditUser = (record) => {
     setUserType(activeTab === "clients" ? "client" : "financier");
     setEditingUser(record);
@@ -138,6 +159,10 @@ const Users = () => {
     setSelectedCountry({
       label: record.pays,
     });
+
+    setUploadedFile({
+      image: record.image,
+    });
   };
 
   const handleUpdateUser = async () => {
@@ -147,31 +172,38 @@ const Users = () => {
 
       // Construction des données utilisateur à mettre à jour
       const userDataToUpdate = {
-        ...editingUser, // Conserver les anciennes valeurs de l'utilisateur
-        ...values, // Mettre à jour avec les nouvelles valeurs du formulaire
+        ...editingUser,
+        ...values,
+        ...values,
+        image: uploadedFile.name,
       };
 
       // Formater le numéro de téléphone
       const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
-
-      // Vérifier si le code de pays est répété dans le numéro de téléphone
       const phoneNumberWithoutRepeatedCountryCode =
         formattedPhoneNumber.replace(new RegExp(`\\+${countryCode} `), "+");
-
-      // Ajouter un espace entre le code de pays et le numéro
       const phoneNumberWithSpace =
         phoneNumberWithoutRepeatedCountryCode.replace(
           `${countryCode}`,
           `${countryCode} `
         );
 
-      // Mettre à jour la valeur du numéro de téléphone dans les données utilisateur
-      userDataToUpdate.phonenumber = phoneNumberWithSpace;
+      // Vérifier si le numéro de téléphone a été modifié
+      if (
+        editingUser.phonenumber !== phoneNumberWithSpace ||
+        (editingUser.phonenumber === "" && phoneNumberWithSpace !== "")
+      ) {
+        userDataToUpdate.phonenumber = phoneNumberWithSpace;
+      }
       userDataToUpdate.pays = selectedCountry ? selectedCountry.label : "";
 
       // Envoyer une requête de mise à jour à l'API
       if (activeTab === "clients") {
-        await apiusers.updateClient(editingUser._id, userDataToUpdate);
+        await apiusers.updateClient(
+          editingUser._id,
+          userDataToUpdate,
+          uploadedFile
+        );
       } else if (activeTab === "financiers") {
         await apiusers.updateFinancier(editingUser._id, userDataToUpdate);
       }
@@ -249,6 +281,32 @@ const Users = () => {
 
   const columns = [
     {
+      title: "Logo",
+      dataIndex: "image",
+      key: "image",
+      render: (imagePath) => {
+        console.log("Chemin de l'image :", imagePath); // Ajout du console.log pour vérifier le chemin de l'image
+        return (
+          <>
+            {imagePath ? (
+              <Avatar
+                src={`http://localhost:5000/uploads/${imagePath}`}
+                alt="Client"
+                style={{ width: 70, height: 70 }}
+              />
+            ) : (
+              <Avatar
+                icon={<UserOutlined />}
+                alt="N/A"
+                style={{ width: 70, height: 70 }}
+              />
+            )}
+          </>
+        );
+      },
+    },
+
+    {
       title: "Référence",
       dataIndex: "reference",
       key: "reference",
@@ -278,6 +336,7 @@ const Users = () => {
       key: "type",
       render: (text) => text || "N/A",
     },
+
     {
       title: "Actions",
       key: "actions",
@@ -362,7 +421,7 @@ const Users = () => {
                 setEditingUser(null);
               }}
               icon={<PlusOutlined />}
-              style={{ backgroundColor: "#0a0a85" }}
+              style={{ backgroundColor: "#022452" }}
             >
               Ajouter un utilisateur
             </Button>
@@ -421,6 +480,23 @@ const Users = () => {
                 <Option value="client">Client</Option>
                 <Option value="financier">Financier</Option>
               </Select>
+            )}
+
+            {editingUser && userType === "client" && (
+              <Form.Item name="image" label="Image">
+                <Upload
+                  beforeUpload={() => false}
+                  listType="picture"
+                  onChange={handleImageChange}
+                >
+                  <Button icon={<UploadOutlined />}>Choisir une image</Button>
+                </Upload>
+                {editingUser.image && (
+                  <Avatar
+                    src={`http://localhost:5000/uploads/${editingUser.image}`}
+                  />
+                )}
+              </Form.Item>
             )}
           </Form.Item>
           <Row gutter={16}>
@@ -754,7 +830,7 @@ const Users = () => {
               type="primary"
               htmlType="submit"
               style={{
-                background: "linear-gradient(to right, #0f116c, #0f116c)",
+                background: "linear-gradient(to right, #022452,#022452)",
                 color: "#fff",
                 border: "none",
                 padding: "12px",

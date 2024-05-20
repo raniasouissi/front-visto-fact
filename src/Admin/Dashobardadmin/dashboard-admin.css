@@ -1,6 +1,8 @@
-/* Styles pour la barre latérale */
 .sidebar {
-  background-color: #0f1926 !important; /* Couleur de fond de la barre latérale */
+  width: 300px; /* Largeur de la barre latérale */
+  background-color: #061931 !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
   height: auto;
   overflow-y: auto;
 }
@@ -13,8 +15,8 @@
   justify-content: center;
   padding: 16px;
   margin-left: -80px; /* Décalage vers la gauche pour aligner avec la barre latérale */
-  margin-bottom: 30px; /* Espacement en bas du conteneur */
-  border-bottom: 2px solid #f4f5f8;
+  margin-bottom: 20px; /* Espacement en bas du conteneur  border-bottom: 1px solid #a99b9b; */
+
   border-radius: 1px; /* Bords arrondis */
 }
 
@@ -23,11 +25,12 @@
   width: 40px;
   height: 35px;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 /* Styles pour le titre */
 .app-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: #ffffff;
   margin: 0;
   font-family: "Poppins", sans-serif;

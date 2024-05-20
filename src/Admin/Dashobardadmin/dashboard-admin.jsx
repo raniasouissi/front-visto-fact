@@ -13,6 +13,7 @@ import {
   DollarCircleOutlined,
   AppstoreOutlined,
   FileOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
 import Taxe from "../Taxe/Taxe";
 import Parametrage from "../Parametrage/Parametrage";
@@ -25,6 +26,7 @@ import Cookies from "js-cookie";
 import Users from "../Users/users";
 import Devise from "../Devise/devise";
 import Categorie from "../Catégorie-service/categorie";
+import Facture from "../Facture/facture";
 
 const { Sider, Content, Header } = Layout;
 
@@ -100,17 +102,102 @@ const DashboardAdmin = () => {
             icon={<UserOutlined style={{ color: "white" }} />}
             onClick={() => handleMenuClick("users")}
             style={{
+              marginLeft: -10,
               color: "white",
-              background: currentPage === "users" ? "#6f7173" : "transparent",
+              fontSize: 15,
+              borderBottom: "1px solid #a99b9b",
+              borderRadius: "1",
+              width: "110%",
+
+              background: currentPage === "users" ? "#a99b9b" : "transparent",
             }}
           >
             <span className="menu-item-text">Utilisateurs</span>
           </Menu.Item>
+
+          <Menu.SubMenu
+            key="Service"
+            icon={
+              <AppstoreOutlined style={{ color: "white", marginRight: 6 }} />
+            }
+            title={
+              <span style={{ color: "white", fontSize: 14 }}>Catalouge</span>
+            }
+            style={{
+              marginLeft: -15,
+              color: "white",
+              fontSize: 15,
+              borderBottom: "1px solid #a99b9b",
+              borderRadius: "1",
+              width: "110%",
+            }}
+            popupClassName="custom-submenu"
+          >
+            <Menu.Item
+              key="Service"
+              onClick={() => handleMenuClick("Service")}
+              icon={<ToolOutlined style={{ color: "white" }} />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Service" ? "#6f7173" : "transparent",
+                fontSize: 15,
+                marginBottom: 5,
+                width: "110%",
+              }}
+            >
+              <span className="menu-item-text">Services</span>
+            </Menu.Item>
+            <Menu.Item
+              key="categorie"
+              onClick={() => handleMenuClick("Categorie")}
+              icon={<ShopOutlined />}
+              style={{
+                color: "white",
+                background:
+                  currentPage === "Categorie" ? "#6f7173" : "transparent",
+                marginBottom: 10,
+                fontSize: 14,
+                width: "110%",
+              }}
+            >
+              <span className="menu-item-text">Catégories</span>
+            </Menu.Item>
+          </Menu.SubMenu>
+
+          <Menu.Item
+            key="Facture"
+            icon={<AccountBookOutlined style={{ color: "white" }} />}
+            onClick={() => handleMenuClick("Facture")}
+            style={{
+              marginLeft: -10,
+              color: "white",
+              fontSize: 15,
+              borderBottom: "1px solid #a99b9b",
+              borderRadius: "1",
+              width: "110%",
+
+              background: currentPage === "Facture" ? "#a99b9b" : "transparent",
+            }}
+          >
+            <span className="menu-item-text">Factures</span>
+          </Menu.Item>
           <Menu.SubMenu
             key="Parametrage"
-            icon={<SettingOutlined style={{ color: "white" }} />}
-            title={<span style={{ color: "white" }}>Parametrage</span>}
-            style={{ background: "transparent", color: "white" }}
+            icon={
+              <SettingOutlined style={{ color: "white", marginRight: 5 }} />
+            }
+            title={
+              <span style={{ color: "white", fontSize: 14 }}>Parametrage</span>
+            }
+            style={{
+              marginLeft: -15,
+              color: "white",
+              fontSize: 15,
+              borderBottom: "1px solid #a99b9b",
+              borderRadius: "1",
+              width: "110%",
+            }}
           >
             <Menu.Item
               key="parametrage"
@@ -121,6 +208,7 @@ const DashboardAdmin = () => {
                 background:
                   currentPage === "Parametrage" ? "#7f7d7d" : "transparent",
                 fontSize: "13px",
+                width: "110%",
               }}
             >
               <span className="menu-item-text"> Fiche Entreprise</span>
@@ -131,7 +219,9 @@ const DashboardAdmin = () => {
               icon={<MoneyCollectOutlined />}
               style={{
                 color: "white",
+                marginBottom: 5,
                 background: currentPage === "Taxe" ? "#6f7173" : "transparent",
+                width: "110%",
               }}
             >
               <span className="menu-item-text">Taxe</span>
@@ -144,42 +234,11 @@ const DashboardAdmin = () => {
                 color: "white",
                 background:
                   currentPage === "Devise" ? "#6f7173" : "transparent",
+                marginBottom: 15,
+                width: "110%",
               }}
             >
               <span className="menu-item-text">Devise</span>
-            </Menu.Item>
-          </Menu.SubMenu>
-
-          <Menu.SubMenu
-            key="Service"
-            icon={<AppstoreOutlined style={{ color: "white" }} />}
-            title={<span style={{ color: "white" }}>Catalouge</span>}
-            style={{ background: "transparent", color: "white" }}
-            popupClassName="custom-submenu"
-          >
-            <Menu.Item
-              key="Service"
-              onClick={() => handleMenuClick("Service")}
-              icon={<ToolOutlined style={{ color: "white" }} />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Service" ? "#7f7d7d" : "transparent",
-              }}
-            >
-              <span className="menu-item-text">Service</span>
-            </Menu.Item>
-            <Menu.Item
-              key="categorie"
-              onClick={() => handleMenuClick("Categorie")}
-              icon={<ShopOutlined />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Categorie" ? "#6f7173" : "transparent",
-              }}
-            >
-              <span className="menu-item-text">Catégorie</span>
             </Menu.Item>
           </Menu.SubMenu>
         </Menu>
@@ -212,6 +271,7 @@ const DashboardAdmin = () => {
           {currentPage === "Service" && <Service />}
           {currentPage === "Devise" && <Devise />}
           {currentPage === "Categorie" && <Categorie />}
+          {currentPage === "Facture" && <Facture />}
         </Content>
       </Layout>
     </Layout>
