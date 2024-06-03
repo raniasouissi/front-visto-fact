@@ -14,8 +14,9 @@ import "./Footer.css";
 const Footer = () => {
   const location = useLocation();
   const isAdminPage = location.pathname === "/dashboard-admin";
+  const isDashboardFinancier = location.pathname === "/dashboard-financier";
 
-  if (isAdminPage) {
+  if (isAdminPage || isDashboardFinancier) {
     return null; // Si c'est la page d'administration, ne rien afficher
   }
 

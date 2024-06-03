@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Typography, message } from "antd";
+import { Form, Input, Button, Typography, message, Modal } from "antd";
 
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -16,6 +16,22 @@ const CustomSignin = () => {
   const [loading, setLoading] = useState(false);
   const history = useNavigate();
 
+  const showSuccessModal = (userName) => {
+    Modal.success({
+      title: "Connexion réussie !",
+      content: `Bienvenue, ${userName} !`,
+
+      style: {
+        color: "#52c41a", // Couleur du texte
+      },
+    });
+
+    // Fermer le modal après 3 secondes
+    setTimeout(() => {
+      Modal.destroyAll(); // Ferme tous les modaux
+    }, 2000);
+  };
+
   const onFinish = async (values) => {
     const { email, password } = values;
 
@@ -27,6 +43,7 @@ const CustomSignin = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -47,13 +64,22 @@ const CustomSignin = () => {
       console.log("Utilisateur connecté :", data.user);
       console.log("Token d'authentification :", data.token);
 
-      // Enregistrez le token dans les cookies
-      document.cookie = `AuthenticationToken=${data.token}; path=/`;
+      // Stocker le token dans le sessionStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("UserEmail", data.user.email);
+      localStorage.setItem("Username", data.user.name);
+      localStorage.setItem("role", data.user.roles);
+      localStorage.setItem("id", data.user._id);
 
-      // Utilisez history.push correctement
+      const currentTime = Date.now();
+      const expireTime = currentTime + 3 * 60 * 60 * 1000;
+      localStorage.setItem("expireTime", expireTime);
+
+      showSuccessModal(data.user.name);
+
       switch (data.user.roles[0]) {
         case "admin":
-          history("/dashboard-admin");
+          history("/dashboard");
           break;
         case "client":
           history("/dashboard-client");
@@ -65,7 +91,7 @@ const CustomSignin = () => {
           break;
       }
 
-      message.success("Connexion réussie !");
+      setLoading(false);
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
       message.error("Erreur lors de la connexion");

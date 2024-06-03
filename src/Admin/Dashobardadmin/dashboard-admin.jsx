@@ -1,19 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Menu, Dropdown, Avatar, Badge, Modal } from "antd";
 import {
-  MoneyCollectOutlined,
   UserOutlined,
   SettingOutlined,
-  ToolOutlined,
   EditOutlined,
   BellOutlined,
-  DownOutlined,
   LogoutOutlined,
-  ShopOutlined,
-  DollarCircleOutlined,
   AppstoreOutlined,
-  FileOutlined,
   AccountBookOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import Taxe from "../Taxe/Taxe";
 import Parametrage from "../Parametrage/Parametrage";
@@ -39,8 +34,38 @@ const DashboardAdmin = () => {
     setCurrentPage(page);
   };
 
+  const token = localStorage.getItem("token");
+  function checkTokenExpiration() {
+    const expireTime = localStorage.getItem("expireTime");
+
+    if (!token || !expireTime) {
+      return null;
+    }
+
+    const currentTime = Date.now();
+    if (currentTime > parseInt(expireTime, 10)) {
+      // Le token a expiré
+      localStorage.removeItem(token);
+      localStorage.removeItem(expireTime);
+      return null;
+    }
+
+    return token;
+  }
+  useEffect(() => {
+    checkTokenExpiration();
+
+    // Vérifiez l'expiration du token toutes les minutes
+    const interval = setInterval(() => {
+      checkTokenExpiration();
+    }, 60 * 1000); // Toutes les minutes
+
+    return () => clearInterval(interval); // Nettoyage de l'intervalle lors du démontage
+  }, []);
+
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("token");
       const response = await fetch("http://localhost:5000/api/auth/logout", {
         method: "POST",
         credentials: "include",
@@ -66,16 +91,63 @@ const DashboardAdmin = () => {
     });
   };
 
+  console.log("token", token);
+  const email = localStorage.getItem("UserEmail");
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("Username");
+  console.log("email", email);
+
   const menu = (
-    <Menu>
-      <Menu.Item key="1" icon={<EditOutlined />}>
-        Modifier le profil
-      </Menu.Item>
-      <Menu.Item key="2" icon={<ToolOutlined />}>
-        Autres tâches
+    <Menu style={{ width: "240px" }}>
+      <Menu.Item
+        key="0"
+        style={{ padding: "16px", borderBottom: "1px solid #d9d9d9" }}
+      >
+        <div style={{ display: "flex", alignItems: "center", marginTop: -10 }}>
+          <Avatar
+            size={35}
+            style={{
+              backgroundColor: "#1890ff",
+              marginRight: "7px",
+              marginLeft: -10,
+            }}
+          >
+            {name.charAt(0).toUpperCase()}
+          </Avatar>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span
+              style={{ fontWeight: "bold", fontSize: "16px", color: "#333" }}
+            >
+              {name.charAt(0).toUpperCase() + name.slice(1)}
+            </span>
+
+            <span style={{ fontSize: "14px", color: "#666" }}>{role}</span>
+            <span style={{ fontSize: "14px", color: "#999" }}>{email}</span>
+          </div>
+        </div>
       </Menu.Item>
       <Menu.Item
-        key="3"
+        key="1"
+        style={{
+          fontSize: "14px",
+          padding: "16px",
+          color: "#2f3030",
+
+          marginBottom: -20,
+          fontFamily: "Poppins, sans-serif",
+        }}
+        icon={<EditOutlined style={{ color: "#666" }} />}
+      >
+        Modifier le profil
+      </Menu.Item>
+      <Menu.Item
+        key="2"
+        style={{
+          fontSize: "14px",
+          fontFamily: "Poppins, sans-serif",
+          padding: "16px",
+          color: "#ff4d4f",
+        }}
         icon={<LogoutOutlined />}
         onClick={handleLogoutConfirmation}
       >
@@ -84,198 +156,272 @@ const DashboardAdmin = () => {
     </Menu>
   );
 
-  return (
-    <Layout className="dashboard-container">
-      <Sider className="sidebar" collapsible={false} trigger={null}>
-        <div className="logo-title-container">
-          <img src={Logo1} alt="Menu Logo" className="sidebar-logo" />
-          <h1 className="app-title">VBill</h1>
-        </div>
-
-        <Menu
-          mode="inline"
-          selectedKeys={[currentPage]}
-          style={{ background: "transparent" }}
-        >
-          <Menu.Item
-            key="users"
-            icon={<UserOutlined style={{ color: "white" }} />}
-            onClick={() => handleMenuClick("users")}
-            style={{
-              marginLeft: -10,
-              color: "white",
-              fontSize: 15,
-              borderBottom: "1px solid #a99b9b",
-              borderRadius: "1",
-              width: "110%",
-
-              background: currentPage === "users" ? "#a99b9b" : "transparent",
-            }}
+  {
+    if (token !== null) {
+      return (
+        <Layout className="dashboard-container">
+          <Sider
+            className="sidebar"
+            collapsible={false}
+            trigger={null}
+            width={250}
           >
-            <span className="menu-item-text">Utilisateurs</span>
-          </Menu.Item>
+            <div className="logo-title-container">
+              <img src={Logo1} alt="Menu Logo" className="sidebar-logo" />
+              <h1 className="app-title">
+                <span className="v">V</span>
+                <span className="b">Bill</span>
+              </h1>
+            </div>
 
-          <Menu.SubMenu
-            key="Service"
-            icon={
-              <AppstoreOutlined style={{ color: "white", marginRight: 6 }} />
-            }
-            title={
-              <span style={{ color: "white", fontSize: 14 }}>Catalouge</span>
-            }
-            style={{
-              marginLeft: -15,
-              color: "white",
-              fontSize: 15,
-              borderBottom: "1px solid #a99b9b",
-              borderRadius: "1",
-              width: "110%",
-            }}
-            popupClassName="custom-submenu"
-          >
-            <Menu.Item
-              key="Service"
-              onClick={() => handleMenuClick("Service")}
-              icon={<ToolOutlined style={{ color: "white" }} />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Service" ? "#6f7173" : "transparent",
-                fontSize: 15,
-                marginBottom: 5,
-                width: "110%",
-              }}
+            <Menu
+              mode="inline"
+              selectedKeys={[currentPage]}
+              style={{ background: "white", marginTop: "-15px" }}
+              className="sidebar-menu" // Ajouter une classe pour cibler tous les éléments du menu
             >
-              <span className="menu-item-text">Services</span>
-            </Menu.Item>
-            <Menu.Item
-              key="categorie"
-              onClick={() => handleMenuClick("Categorie")}
-              icon={<ShopOutlined />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Categorie" ? "#6f7173" : "transparent",
-                marginBottom: 10,
-                fontSize: 14,
-                width: "110%",
-              }}
-            >
-              <span className="menu-item-text">Catégories</span>
-            </Menu.Item>
-          </Menu.SubMenu>
-
-          <Menu.Item
-            key="Facture"
-            icon={<AccountBookOutlined style={{ color: "white" }} />}
-            onClick={() => handleMenuClick("Facture")}
-            style={{
-              marginLeft: -10,
-              color: "white",
-              fontSize: 15,
-              borderBottom: "1px solid #a99b9b",
-              borderRadius: "1",
-              width: "110%",
-
-              background: currentPage === "Facture" ? "#a99b9b" : "transparent",
-            }}
-          >
-            <span className="menu-item-text">Factures</span>
-          </Menu.Item>
-          <Menu.SubMenu
-            key="Parametrage"
-            icon={
-              <SettingOutlined style={{ color: "white", marginRight: 5 }} />
-            }
-            title={
-              <span style={{ color: "white", fontSize: 14 }}>Parametrage</span>
-            }
-            style={{
-              marginLeft: -15,
-              color: "white",
-              fontSize: 15,
-              borderBottom: "1px solid #a99b9b",
-              borderRadius: "1",
-              width: "110%",
-            }}
-          >
-            <Menu.Item
-              key="parametrage"
-              onClick={() => handleMenuClick("Parametrage")}
-              icon={<FileOutlined />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Parametrage" ? "#7f7d7d" : "transparent",
-                fontSize: "13px",
-                width: "110%",
-              }}
-            >
-              <span className="menu-item-text"> Fiche Entreprise</span>
-            </Menu.Item>
-            <Menu.Item
-              key="taxe"
-              onClick={() => handleMenuClick("Taxe")}
-              icon={<MoneyCollectOutlined />}
-              style={{
-                color: "white",
-                marginBottom: 5,
-                background: currentPage === "Taxe" ? "#6f7173" : "transparent",
-                width: "110%",
-              }}
-            >
-              <span className="menu-item-text">Taxe</span>
-            </Menu.Item>
-            <Menu.Item
-              key="devise"
-              onClick={() => handleMenuClick("Devise")}
-              icon={<DollarCircleOutlined />}
-              style={{
-                color: "white",
-                background:
-                  currentPage === "Devise" ? "#6f7173" : "transparent",
-                marginBottom: 15,
-                width: "110%",
-              }}
-            >
-              <span className="menu-item-text">Devise</span>
-            </Menu.Item>
-          </Menu.SubMenu>
-        </Menu>
-      </Sider>
-      <Layout className="site-layout">
-        <Header className="headerad">
-          <div className="right-menu">
-            <Badge count={0}>
-              <BellOutlined className="notification-icon" />
-            </Badge>
-            <Dropdown overlay={menu} trigger={["click"]}>
-              <a
-                className="ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
+              <Menu.Item
+                key="dashboard"
+                icon={<DashboardOutlined style={{ color: "#333333" }} />}
+                onClick={() => handleMenuClick("dashboard")}
+                className={currentPage === "dashboard" ? "active" : ""}
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: "bold",
+                  color: "#19191a",
+                  fontSize: "14px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginLeft: -34,
+                  borderBottom: "1px solid #ccc",
+                  lineHeight: "50px",
+                  marginBottom: "10px",
+                  width: "auto",
+                }}
               >
-                <Avatar size={44} src={AvatarImage} className="avatar" />{" "}
-                <DownOutlined />
-              </a>
-            </Dropdown>
-          </div>
-        </Header>
-        <Content
-          className={`content ${
-            currentPage ? `${currentPage.toLowerCase()}-page` : ""
-          }`}
-        >
-          {currentPage === "users" && <Users />}
-          {currentPage === "Parametrage" && <Parametrage />}
-          {currentPage === "Taxe" && <Taxe />}
-          {currentPage === "Service" && <Service />}
-          {currentPage === "Devise" && <Devise />}
-          {currentPage === "Categorie" && <Categorie />}
-          {currentPage === "Facture" && <Facture />}
-        </Content>
-      </Layout>
-    </Layout>
-  );
+                Tableau de bord
+              </Menu.Item>
+              <Menu.Item
+                key="users"
+                icon={<UserOutlined style={{ color: "#333333" }} />}
+                onClick={() => handleMenuClick("users")}
+                className={currentPage === "users" ? "active" : ""}
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: "bold",
+                  color: "#19191a",
+                  fontSize: "14px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginLeft: -34,
+                  borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                  lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                  marginBottom: "10px",
+                  width: "auto",
+                }}
+              >
+                Utilisateurs
+              </Menu.Item>
+
+              <Menu.SubMenu
+                style={{
+                  marginLeft: -40,
+                  borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                  lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                  marginBottom: "10px",
+                  background: "white ",
+                }}
+                key="Service"
+                icon={<AppstoreOutlined style={{ color: "#333333" }} />}
+                title={
+                  <span
+                    style={{
+                      fontFamily: "Poppins, sans-serif",
+                      fontWeight: "bold",
+                      color: "#19191a",
+                      fontSize: "14px",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                      width: "auto",
+                      borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                      lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                    }}
+                  >
+                    Catalogue
+                  </span>
+                }
+                className={
+                  currentPage === "Service" || currentPage === "Categorie"
+                    ? "active"
+                    : ""
+                }
+              >
+                <Menu.Item
+                  key="Service"
+                  onClick={() => handleMenuClick("Service")}
+                  style={{
+                    letterSpacing: "1px",
+
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "14px",
+                    color: "#333333",
+                    width: "auto",
+                    borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                    lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                  }}
+                >
+                  Services
+                </Menu.Item>
+                <Menu.Item
+                  key="Categorie"
+                  onClick={() => handleMenuClick("Categorie")}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "14px",
+                    color: "#333333",
+                    marginBottom: "10px",
+
+                    letterSpacing: "1px",
+                  }}
+                >
+                  Catégories
+                </Menu.Item>
+              </Menu.SubMenu>
+
+              <Menu.Item
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: "bold",
+                  color: "#19191a",
+                  fontSize: "14px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginLeft: -35,
+                  borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                  lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                  marginBottom: "10px",
+                  width: "auto",
+                }}
+                key="Facture"
+                icon={<AccountBookOutlined style={{ color: "#333333" }} />}
+                onClick={() => handleMenuClick("Facture")}
+                className={currentPage === "Facture" ? "active" : ""}
+              >
+                Factures
+              </Menu.Item>
+              <Menu.SubMenu
+                style={{
+                  marginLeft: -40,
+                  borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                  lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                  marginBottom: "10px",
+                  width: "auto",
+                }}
+                key="Parametrage"
+                icon={<SettingOutlined style={{ color: "#333333" }} />}
+                title={
+                  <span
+                    style={{
+                      fontFamily: "Poppins, sans-serif",
+                      fontWeight: "bold",
+                      color: "#19191a",
+                      fontSize: "14px",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                    }}
+                  >
+                    Paramétrage
+                  </span>
+                }
+                className={
+                  currentPage === "Parametrage" ||
+                  currentPage === "Taxe" ||
+                  currentPage === "Devise"
+                    ? "active"
+                    : ""
+                }
+              >
+                <Menu.Item
+                  key="Parametrage"
+                  onClick={() => handleMenuClick("Parametrage")}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "14px",
+                    color: "#333333",
+                    letterSpacing: "1px",
+                    borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                    lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                    marginBottom: "10px",
+                    width: "auto",
+                  }}
+                >
+                  Fiche Entreprise
+                </Menu.Item>
+                <Menu.Item
+                  key="Taxe"
+                  onClick={() => handleMenuClick("Taxe")}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "14px",
+                    color: "#333333",
+                    letterSpacing: "1px",
+                    borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                    lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                    marginBottom: "10px",
+                    width: "auto",
+                  }}
+                >
+                  Taxe
+                </Menu.Item>
+                <Menu.Item
+                  key="Devise"
+                  onClick={() => handleMenuClick("Devise")}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "14px",
+                    color: "#333333",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  Devise
+                </Menu.Item>
+              </Menu.SubMenu>
+            </Menu>
+          </Sider>
+          <Layout className="site-layout">
+            <Header className="headerad">
+              <div className="right-menu">
+                <Badge count={0}>
+                  <BellOutlined className="notification-icon" />
+                </Badge>
+                <Dropdown overlay={menu} trigger={["click"]}>
+                  <a
+                    className="ant-dropdown-link"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <Avatar size={44} src={AvatarImage} className="avatar" />{" "}
+                  </a>
+                </Dropdown>
+              </div>
+            </Header>
+            <Content
+              className={`content ${currentPage && currentPage.toLowerCase()}`}
+            >
+              {currentPage === "users" && <Users />}
+              {currentPage === "Parametrage" && <Parametrage />}
+              {currentPage === "Taxe" && <Taxe />}
+              {currentPage === "Service" && <Service />}
+              {currentPage === "Devise" && <Devise />}
+              {currentPage === "Categorie" && <Categorie />}
+              {currentPage === "Facture" && <Facture />}
+            </Content>
+          </Layout>
+        </Layout>
+      );
+    } else {
+      history("/login");
+    }
+  }
 };
 
 export default DashboardAdmin;

@@ -12,6 +12,8 @@ import {
   Table,
   message,
   Popconfirm,
+  Badge,
+  Switch,
 } from "antd";
 import {
   PlusOutlined,
@@ -35,6 +37,13 @@ const Service = () => {
   const [editingService, setEditingService] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [ServiceStatusFilter, setServiceStatusFilter] = useState("all");
+  const [status, setStatus] = useState(null);
+
+  const handleServiceStatusChange = (value) => {
+    setServiceStatusFilter(value);
+  };
+
   // Fonction de gestionnaire de changement de devise
   const handleDeviseChange = (value) => {
     if (value) {
@@ -48,20 +57,32 @@ const Service = () => {
     setSearchQuery(value);
   };
 
-  const fetchServices = async () => {
+  const fetchServices = () => {
     setLoading(true);
-    try {
-      let url = "http://localhost:5000/api/services";
-      if (searchQuery) {
-        url += `/search/${searchQuery}`;
-      }
-      const response = await axios.get(url);
-      setServices(response.data);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des services :", error);
-    } finally {
-      setLoading(false);
+    let url = "http://localhost:5000/api/services";
+    if (searchQuery) {
+      url += `/search/${searchQuery}`;
     }
+    axios
+      .get(url)
+      .then((response) => {
+        // Filtrer les éléments où e.categories n'est pas nul
+        const filteredServices = response.data.filter(
+          (e) => e.categories != null
+        );
+
+        // Mettre à jour l'état services avec les éléments filtrés
+        setServices(filteredServices);
+
+        // Pour débogage : afficher les éléments filtrés
+        console.log(filteredServices);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des services :", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const fetchDevise = async () => {
@@ -76,7 +97,11 @@ const Service = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/categorie");
-      setCategories(response.data);
+      // Filtrer les catégories avec le statut "true"
+      const filteredCategories = response.data.filter(
+        (category) => category.status === true
+      );
+      setCategories(filteredCategories);
     } catch (error) {
       console.error("Erreur lors de la récupération des catégories :", error);
     }
@@ -151,6 +176,7 @@ const Service = () => {
 
       prix_unitaire: record.prix_unitaire,
       deviseId: record.devise?._id,
+      status: record.status, // Ajoutez cette ligne pour pré-remplir le champ de statut
     });
   };
 
@@ -165,6 +191,15 @@ const Service = () => {
   };
 
   const columns = [
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 80,
+      render: (status) => (
+        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
+      ),
+    },
     {
       title: "Reference",
       dataIndex: "reference",
@@ -205,6 +240,12 @@ const Service = () => {
               type="link"
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
+              style={{
+                backgroundColor: "#1890ff", // Couleur de fond bleue
+                border: "none", // Supprimer la bordure
+                borderRadius: "40%", // Coins arrondis
+                color: "white",
+              }}
             />
             <Popconfirm
               title="Voulez-vous vraiment supprimer ce service ?"
@@ -224,20 +265,56 @@ const Service = () => {
     <>
       <div style={{ float: "right", alignItems: "center" }}>
         <Input
-          prefix={<SearchOutlined style={{ color: "#777778" }} />}
+          prefix={<SearchOutlined style={{ color: "#8f8fa1" }} />}
           placeholder="Rechercher ..."
           onChange={(e) => handleSearch(e.target.value)}
-          style={{ width: 400, marginRight: 8 }}
+          style={{
+            width: 250,
+            marginRight: 8,
+            height: 35,
+            borderRadius: 10, // Ajoute des coins arrondis pour un aspect plus moderne
+            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", // Ajoute une ombre subtile
+          }}
         />
 
         <Button
           type="primary"
           onClick={() => setModalVisible(true)}
           icon={<PlusOutlined />}
-          style={{ float: "right", backgroundColor: "#022452" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: 35,
+            paddingLeft: 10,
+            paddingRight: 5,
+            borderRadius: 5,
+            width: "175px",
+            backgroundColor: "#232492", // Couleur de fond personnalisée
+            border: "none",
+            float: "right",
+            color: "#fff", // Couleur du texte
+          }}
         >
-          Nouveau service
+          <span style={{ fontWeight: "bold", fontSize: 14 }}>
+            Nouveau Service
+          </span>
         </Button>
+      </div>
+
+      <div style={{ marginTop: 40 }}>
+        <Select
+          defaultValue="all"
+          style={{
+            width: 150,
+            backgroundColor: "#f0f2f5",
+            fontFamily: "Arial, sans-serif",
+          }}
+          onChange={handleServiceStatusChange}
+        >
+          <Option value="all">Tous</Option>
+          <Option value="activated">Activé</Option>
+          <Option value="inactivated">Désactivé</Option>
+        </Select>
       </div>
 
       <Modal
@@ -381,14 +458,51 @@ const Service = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Row>
+            <Col span={24}>
+              {editingService && (
+                <Form.Item
+                  name="status"
+                  label="Statut"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez sélectionner le statut!",
+                    },
+                  ]}
+                >
+                  <Switch
+                    checked={status}
+                    onChange={(checked) => setStatus(checked)}
+                    checkedChildren="Activé"
+                    unCheckedChildren="Désactivé"
+                    checkedColor="#52c41a"
+                    unCheckedColor="#f5222d"
+                    style={{ fontSize: 16 }}
+                  />
+                </Form.Item>
+              )}
+            </Col>
+          </Row>
         </Form>
       </Modal>
 
       <Table
-        style={{ marginTop: "80px" }}
         columns={columns}
-        dataSource={services}
+        dataSource={services.filter(
+          (item) =>
+            ServiceStatusFilter === "all" ||
+            item.status === (ServiceStatusFilter === "activated")
+        )}
         loading={loading}
+        bordered
+        pagination={{ pageSize: 10 }}
+        style={{
+          marginTop: "30px",
+          borderRadius: 8,
+          border: "1px solid #e8e8e8",
+        }}
       />
     </>
   );

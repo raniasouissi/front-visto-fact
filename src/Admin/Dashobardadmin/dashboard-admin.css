@@ -1,7 +1,7 @@
 .sidebar {
-  width: 300px; /* Largeur de la barre latérale */
-  background-color: #061931 !important;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  background-color: white !important; /* Blanc légèrement teinté */
+
+  border: 1px solid #b3bfd1; /* Bordure bleue */
 
   height: auto;
   overflow-y: auto;
@@ -15,9 +15,12 @@
   justify-content: center;
   padding: 16px;
   margin-left: -80px; /* Décalage vers la gauche pour aligner avec la barre latérale */
-  margin-bottom: 20px; /* Espacement en bas du conteneur  border-bottom: 1px solid #a99b9b; */
 
   border-radius: 1px; /* Bords arrondis */
+}
+.sidebar-menu {
+  padding: 20px;
+  background-color: #fff;
 }
 
 /* Styles pour le logo */
@@ -31,12 +34,13 @@
 /* Styles pour le titre */
 .app-title {
   font-size: 2.2rem;
-  color: #ffffff;
+  color: #171717;
   margin: 0;
   font-family: "Poppins", sans-serif;
 }
 
 .content {
+  background-color: white; /* Blanc légèrement teinté */
   padding: 24px;
   min-height: calc(
     100vh - 112px
@@ -50,7 +54,7 @@
 
 /* Styles pour le bouton de réduction */
 .ant-layout-sider-trigger {
-  background-color: transparent; /* Fond transparent */
+  background-color: white; /* Blanc légèrement teinté */
 }
 
 /* Styles pour les icônes des éléments du menu */
@@ -61,19 +65,20 @@
 /* Styles pour le texte des éléments du menu */
 .menu-item-text {
   margin-left: 5px; /* Espacement entre l'icône et le texte du menu */
+  background-color: white !important;
 }
 
 /* Styles pour la barre de navigation */
 .headerad {
-  background-color: transparent; /* Couleur de fond de la barre de navigation */
+  background-color: white !important; /* Blanc légèrement teinté */
 
+  border: 1px solid #c8daf5;
   padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   height: 54px;
   margin-left: -20px;
-  margin-bottom: 20px;
 }
 
 /* Styles pour les éléments de la barre de navigation */
@@ -105,7 +110,7 @@
 /* Styles pour l'avatar */
 .avatar {
   margin-right: 10px;
-  border: 1px solid #00132d; /* Bordure autour de l'avatar */
+  border: 2px solid #a5a5a8; /* Bordure autour de l'avatar */
   border-radius: 50%; /* Pour rendre l'avatar rond */
   overflow: hidden; /* Pour cacher les parties de l'image qui dépassent de l'avatar */
   width: 50%;

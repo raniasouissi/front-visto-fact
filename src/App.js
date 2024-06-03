@@ -18,6 +18,7 @@ import SetPassword from "./Admin/ClientManagement/SetPassword/SetPassword";
 
 import "./App.css";
 import Facture from "./Admin/Facture/facture";
+import ModifierProfil from "./Financier/modiferprofil";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // État d'authentification
@@ -44,13 +45,17 @@ const App = () => {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/fact" element={<Facture />} />
-            <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+            <Route path="/dashboard" element={<DashboardAdmin />} />
             <Route path="/dashboard-client" element={<DashboardClient />} />
             <Route
               path="/dashboard-financier"
               element={<DashboardFinancier />}
             />
             <Route path="/verification" element={<VerificationPage />} />
+            <Route
+              path="/dashboard/modiferprofil"
+              element={<ModifierProfil />}
+            />
             <Route path="/set-password/:token" element={<SetPassword />} />
           </Routes>
         </main>

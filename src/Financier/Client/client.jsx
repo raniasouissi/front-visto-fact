@@ -13,8 +13,6 @@ import {
   Checkbox,
   Avatar,
   Space,
-  Badge,
-  Switch,
   Upload,
 } from "antd";
 import {
@@ -25,7 +23,7 @@ import {
   UserOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import apiusers from "./apiusers";
+import apiusers from "../../Admin/Users/apiusers";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
 
@@ -54,7 +52,7 @@ const countryOptions = countryList().getData();
 const { TabPane } = Tabs;
 const { Option } = Select;
 
-const Users = () => {
+const client = () => {
   const [activeTab, setActiveTab] = useState("clients");
   const [users, setUsers] = useState([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -69,19 +67,10 @@ const Users = () => {
 
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [matriculeFiscaleFilter, setMatriculeFiscaleFilter] = useState("all");
-  const [ClientStatusFilter, setClientStatusFilter] = useState("all");
-  const [status, setStatus] = useState(null);
-  const [FinancierStatusFilter, setFinancierStatusFilter] = useState("all");
-  const [statusf, setStatusf] = useState(null);
+
   const [imageP, setImage] = useState();
   const [imageName, setImageName] = useState("");
-  const handleClientStatusChange = (value) => {
-    setClientStatusFilter(value);
-  };
 
-  const handlFinancierStatusChange = (value) => {
-    setFinancierStatusFilter(value);
-  };
   /* const handleImageChange = (info) => {
     if (info.file.status === "done") {
       // Récupérer le nom de fichier de l'image téléchargée
@@ -136,9 +125,6 @@ const Users = () => {
 
         setUsers(usersWithImage);
         console.log("image", usersWithImage);
-      } else if (type === "financiers") {
-        data = await apiusers.fetchFinanciers(searchQuery);
-        setUsers(data);
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -156,8 +142,6 @@ const Users = () => {
     try {
       if (activeTab === "clients") {
         await apiusers.deleteClient(userId);
-      } else if (activeTab === "financiers") {
-        await apiusers.deleteFinancier(userId);
       }
       fetchUsers(activeTab); // Re-fetch les utilisateurs après la suppression
       message.success("Utilisateur supprimé avec succès !");
@@ -170,17 +154,17 @@ const Users = () => {
   };
 
   const handleEditUser = (record) => {
-    setUserType(activeTab === "clients" ? "client" : "financier");
+    setUserType("client"); // Définit le type d'utilisateur sur "client"
     setEditingUser(record);
     setDrawerVisible(true);
     setImageName(record.image.toString());
 
-    // Définir les valeurs du formulaire
+    // Définit les valeurs du formulaire avec les données de l'utilisateur
     form.setFieldsValue({
       ...record,
     });
 
-    // Définir le pays sélectionné dans l'état selectedCountry
+    // Définit le pays sélectionné dans l'état selectedCountry
     setSelectedCountry({
       label: record.pays,
     });
@@ -197,10 +181,9 @@ const Users = () => {
       const userDataToUpdate = {
         ...editingUser,
         ...values,
-
         image: imageName,
       };
-      //console.log("upload", uploadedFile.image);
+
       // Formater le numéro de téléphone
       const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
       const phoneNumberWithoutRepeatedCountryCode =
@@ -221,11 +204,7 @@ const Users = () => {
       userDataToUpdate.pays = selectedCountry ? selectedCountry.label : "";
 
       // Envoyer une requête de mise à jour à l'API
-      if (activeTab === "clients") {
-        await apiusers.updateClient(editingUser._id, userDataToUpdate, imageP);
-      } else if (activeTab === "financiers") {
-        await apiusers.updateFinancier(editingUser._id, userDataToUpdate);
-      }
+      await apiusers.updateClient(editingUser._id, userDataToUpdate, imageP);
 
       // Afficher un message de succès
       message.success("Utilisateur mis à jour avec succès !");
@@ -258,9 +237,8 @@ const Users = () => {
         pays: null,
       });
 
+      // Formater le numéro de téléphone
       const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
-
-      // Vérifier si le code de pays est répété dans le numéro de téléphone
       const phoneNumberWithoutRepeatedCountryCode =
         formattedPhoneNumber.replace(new RegExp(`\\+${countryCode} `), "+");
 
@@ -278,11 +256,10 @@ const Users = () => {
         delete values.matriculeFiscale;
       }
 
-      if (userType === "client") {
-        await apiusers.addClient(values);
-      } else if (userType === "financier") {
-        await apiusers.addFinancier(values);
-      }
+      // Ajouter un client
+      await apiusers.addClient(values);
+
+      // Afficher un message de succès
       message.success("Utilisateur ajouté avec succès !");
       setDrawerVisible(false);
       setTimeout(() => {
@@ -299,15 +276,6 @@ const Users = () => {
   };
 
   const columns = [
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: 80,
-      render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
-      ),
-    },
     {
       title: "Logo",
       dataIndex: "image",
@@ -394,58 +362,6 @@ const Users = () => {
     },
   ];
 
-  const financiersColumns = [
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: 80,
-      render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
-      ),
-    },
-    { title: "Nom", dataIndex: "name", key: "name" },
-    { title: "Email", dataIndex: "email", key: "email" },
-
-    { title: "Téléphone", dataIndex: "phonenumber", key: "phonenumber" },
-
-    { title: "Adresse", dataIndex: "address", key: "address" },
-    { title: "Pays", dataIndex: "pays", key: "pays" },
-
-    {
-      title: "Actions",
-      key: "actions",
-      render: (text, record) => (
-        <div>
-          <Space size="middle">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => handleEditUser(record)}
-              style={{
-                backgroundColor: "#1890ff", // Couleur de fond bleue
-                border: "none", // Supprimer la bordure
-                borderRadius: "40%", // Coins arrondis
-              }}
-            ></Button>
-            <Popconfirm
-              title="Êtes-vous sûr de vouloir supprimer ce financier ?"
-              onConfirm={() => handleDeleteUser(record._id)}
-              okText="Oui"
-              cancelText="Non"
-            >
-              <Button
-                type="danger"
-                icon={<DeleteOutlined />}
-                className="delete-icon"
-              ></Button>
-            </Popconfirm>
-          </Space>
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div>
       <Tabs
@@ -489,7 +405,7 @@ const Users = () => {
               <UserAddOutlined style={{ fontSize: 18 }} />{" "}
               {/* Icône modifiée */}
               <span style={{ fontWeight: "bold", fontSize: 14 }}>
-                Ajouter Utilisateur
+                Ajouter Client
               </span>
             </Button>
           </div>
@@ -535,26 +451,8 @@ const Users = () => {
             <Option value="without">Client physique</Option>
           </Select>
 
-          <Select
-            defaultValue="all"
-            style={{
-              width: 150,
-              backgroundColor: "#f0f2f5",
-              fontFamily: "Arial, sans-serif",
-            }}
-            onChange={handleClientStatusChange}
-          >
-            <Option value="all">Tous Status</Option>
-            <Option value="activated">Activé</Option>
-            <Option value="inactivated">Désactivé</Option>
-          </Select>
-
           <Table
-            dataSource={users.filter(
-              (item) =>
-                ClientStatusFilter === "all" ||
-                item.status === (ClientStatusFilter === "activated")
-            )}
+            dataSource={users}
             columns={columns}
             bordered
             pagination={{ pageSize: 10 }}
@@ -564,58 +462,9 @@ const Users = () => {
             }}
           />
         </TabPane>
-        <TabPane
-          tab={
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  fontSize: 16,
-                  color: "#3a3838",
-                }}
-              >
-                Financiers
-              </span>
-            </div>
-          }
-          key="financiers"
-        >
-          <Select
-            defaultValue="all"
-            style={{
-              width: 150,
-              backgroundColor: "#f0f2f5",
-              fontFamily: "Arial, sans-serif",
-            }}
-            onChange={handlFinancierStatusChange}
-          >
-            <Option value="all">Tous </Option>
-            <Option value="activated">Activé</Option>
-            <Option value="inactivated">Désactivé</Option>
-          </Select>
-          <Table
-            dataSource={users.filter(
-              (item) =>
-                FinancierStatusFilter === "all" ||
-                item.status === (FinancierStatusFilter === "activated")
-            )}
-            columns={financiersColumns}
-            bordered
-            pagination={{ pageSize: 10 }}
-            style={{
-              marginTop: 20,
-              borderRadius: 8,
-              border: "1px solid #e8e8e8",
-            }}
-          />
-        </TabPane>
       </Tabs>
       <Drawer
-        title={
-          editingUser
-            ? `Modifier un ${userType === "client" ? "client" : "financier"}`
-            : `Ajouter un ${userType === "client" ? "client" : "financier"}`
-        }
+        title={editingUser ? "Modifier un client" : "Ajouter un client"}
         placement="right"
         width={720}
         visible={drawerVisible}
@@ -631,23 +480,6 @@ const Users = () => {
           layout="vertical"
         >
           <Form.Item style={{ width: 200 }}>
-            {!editingUser && (
-              <Select
-                defaultValue="client"
-                onChange={(value) => setUserType(value)}
-                style={{
-                  width: "300px",
-                  fontSize: "16px",
-                  borderRadius: "2px",
-                  fontFamily: "Poppins",
-                  color: "#121477",
-                }}
-              >
-                <Option value="client">Client</Option>
-                <Option value="financier">Financier</Option>
-              </Select>
-            )}
-
             {editingUser && userType === "client" && (
               <Form.Item name="uploadedFile" label="Image">
                 <Upload
@@ -990,61 +822,6 @@ const Users = () => {
             </Row>
           )}
 
-          <Row>
-            <Col span={24}>
-              {editingUser && userType === "client" && (
-                <Form.Item
-                  name="status"
-                  label="Statut"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner le statut!",
-                    },
-                  ]}
-                  initialValue={false}
-                >
-                  <Switch
-                    checked={status}
-                    onChange={(checked) => setStatus(checked)}
-                    checkedChildren="Activé"
-                    unCheckedChildren="Désactivé"
-                    checkedColor="#52c41a" // Vert pour Activé
-                    unCheckedColor="#f5222d" // Rouge pour Désactivé
-                    style={{ fontSize: 16 }}
-                  />
-                </Form.Item>
-              )}
-            </Col>
-          </Row>
-
-          <Row>
-            <Col span={24}>
-              {editingUser && userType === "financier" && (
-                <Form.Item
-                  name="status"
-                  label="Statut"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner le statut!",
-                    },
-                  ]}
-                  initialValue={false}
-                >
-                  <Switch
-                    checked={statusf}
-                    onChange={(checked) => setStatusf(checked)}
-                    checkedChildren="Activé"
-                    unCheckedChildren="Désactivé"
-                    checkedColor="#52c41a" // Vert pour Activé
-                    unCheckedColor="#f5222d" // Rouge pour Désactivé
-                    style={{ fontSize: 16 }}
-                  />
-                </Form.Item>
-              )}
-            </Col>
-          </Row>
           <Form.Item>
             <Button
               type="primary"
@@ -1079,4 +856,4 @@ CountryOption.propTypes = {
   }).isRequired,
 };
 
-export default Users;
+export default client;

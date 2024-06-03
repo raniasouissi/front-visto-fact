@@ -12,6 +12,9 @@ import {
   Tabs,
   Row,
   Col,
+  Badge,
+  Select,
+  Switch,
 } from "antd";
 import {
   EditOutlined,
@@ -28,6 +31,7 @@ import PropTypes from "prop-types"; // Importer PropTypes depuis react
 import ReactSelect, { components } from "react-select";
 import countryList from "react-select-country-list";
 
+const { Option } = Select;
 const CountryOption = (props) => {
   return (
     <components.Option {...props}>
@@ -54,6 +58,12 @@ const Parametrage = () => {
   const [countryCode, setCountryCode] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [parametreStatusFilter, setParametreStatusFilter] = useState("all");
+  const [status, setStatus] = useState(null);
+
+  const handleParametreStatusChange = (value) => {
+    setParametreStatusFilter(value);
+  };
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -154,6 +164,7 @@ const Parametrage = () => {
   const handleUpdateParametrage = async (values) => {
     try {
       await form.validateFields();
+      values.status = status;
 
       const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
 
@@ -208,6 +219,8 @@ const Parametrage = () => {
     setIsAdding(false);
     setVisibleDrawer(true);
     setSelectedCountry(true);
+    setStatus(record.status); // Mettre à jour le statut local avec le statut du paramétrage sélectionné
+
     // Définir les valeurs du formulaire
     form.setFieldsValue({
       ...record,
@@ -223,21 +236,31 @@ const Parametrage = () => {
     setVisibleDrawer(false);
     setSelectedParametrage(null);
     setIsAdding(false);
+    setSelectedCountry(true);
 
     form.resetFields();
   };
   const columns = [
     {
-      title: "Matricule Fiscale",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 80,
+      render: (status) => (
+        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
+      ),
+    },
+    {
+      title: "M.F",
       dataIndex: "matriculefiscal",
       key: "matriculefiscal",
     },
     {
-      title: "Nom de l'entreprise",
+      title: "Entreprise",
       dataIndex: "nomEntreprise",
       key: "nomEntreprise",
     },
-    { title: "Identreprise", dataIndex: "identreprise", key: "identreprise" },
+
     {
       title: "Numéro de Téléphone",
       dataIndex: "phonenumber",
@@ -257,17 +280,27 @@ const Parametrage = () => {
       key: "actions",
       render: (text, record) => (
         <Space size="middle">
-          <EditOutlined
-            className="action-icon edit-icon"
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
             onClick={() => showDrawer(record)}
-          />
+            style={{
+              backgroundColor: "#1890ff", // Couleur de fond bleue
+              border: "none", // Supprimer la bordure
+              borderRadius: "40%", // Coins arrondis
+            }}
+          ></Button>
           <Popconfirm
             title="Êtes-vous sûr de vouloir supprimer ce paramétrage ?"
             onConfirm={() => handleDeleteParametrage(record._id)}
             okText="Oui"
             cancelText="Non"
           >
-            <DeleteOutlined className="action-icon delete-icon" />
+            <Button
+              type="danger"
+              icon={<DeleteOutlined />}
+              className="delete-icon"
+            ></Button>
           </Popconfirm>
         </Space>
       ),
@@ -282,10 +315,16 @@ const Parametrage = () => {
         tabBarExtraContent={
           <div style={{ display: "flex", alignItems: "center" }}>
             <Input
-              prefix={<SearchOutlined style={{ color: "#777778" }} />}
+              prefix={<SearchOutlined style={{ color: "#8f8fa1" }} />}
               placeholder="Rechercher ..."
               onChange={(e) => handleSearch(e.target.value)}
-              style={{ width: 400, marginRight: 8 }}
+              style={{
+                width: 250,
+                marginRight: 8,
+                height: 35,
+                borderRadius: 10, // Ajoute des coins arrondis pour un aspect plus moderne
+                boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", // Ajoute une ombre subtile
+              }}
             />
 
             <Button
@@ -294,23 +333,72 @@ const Parametrage = () => {
                 setVisibleDrawer(true);
                 setIsAdding(true);
               }}
-              icon={<PlusOutlined />}
-              style={{ backgroundColor: "#022452" }}
+              icon={<PlusOutlined style={{ fontSize: 18 }} />}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                height: 35,
+                paddingLeft: 10,
+                paddingRight: 5,
+                borderRadius: 5,
+                width: "190px",
+                backgroundColor: "#232492", // Couleur de fond personnalisée
+                border: "none",
+
+                color: "#fff", // Couleur du texte
+              }}
             >
-              Ajouter
+              <span style={{ fontWeight: "bold", fontSize: 14, marginTop: -3 }}>
+                Ajouter Paramétrage
+              </span>
             </Button>
           </div>
         }
       >
-        <TabPane tab="Fiche Entreprise" key="1">
-          <Table
-            dataSource={parametrages}
-            columns={columns}
-            pagination={{
-              pageSize: 12,
-              showTotal: (total) => `Total ${total} paramétrages`,
+        <TabPane
+          tab={
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span
+                style={{
+                  fontFamily: "Poppins",
+                  fontSize: 15,
+                  color: "#342f2f",
+                }}
+              >
+                Fiche Entreprise
+              </span>
+            </div>
+          }
+          key="1"
+        >
+          <Select
+            defaultValue="all"
+            style={{
+              width: 150,
+              marginBottom: 20,
+              backgroundColor: "#f0f2f5",
+              fontFamily: "Arial, sans-serif",
             }}
-            style={{ width: "100%" }}
+            onChange={handleParametreStatusChange}
+          >
+            <Option value="all">Tous</Option>
+            <Option value="activated">Activé</Option>
+            <Option value="inactivated">Désactivé</Option>
+          </Select>
+
+          <Table
+            dataSource={parametrages.filter(
+              (item) =>
+                parametreStatusFilter === "all" ||
+                item.status === (parametreStatusFilter === "activated")
+            )}
+            columns={columns}
+            bordered
+            pagination={{ pageSize: 10 }}
+            style={{
+              borderRadius: 8,
+              border: "1px solid #e8e8e8",
+            }}
           />
         </TabPane>
       </Tabs>
@@ -604,68 +692,44 @@ const Parametrage = () => {
             </Col>
           </Row>
           {!isAdding && (
-            <Row gutter={16}>
+            // Dans le retour de votre composant Parametrage
+            <Row>
               <Col span={24}>
                 <Form.Item
-                  style={{ marginLeft: 5 }}
-                  name="identreprise"
+                  name="status"
+                  label="Statut"
                   rules={[
                     {
                       required: true,
-                      message: "Veuillez saisir l'identreprise",
+                      message: "Veuillez sélectionner le statut!",
                     },
                   ]}
+                  initialValue={false}
                 >
-                  <Input
-                    placeholder="Identreprise"
-                    className="custom-input"
-                    style={{
-                      border: "none", // Retirer toutes les bordures
-                      borderRadius: 0, // Retirer le rayon de bordure
-                      borderBottom: "2px solid #9e9ea3",
-                      padding: "10px 0", // Ajuster le padding
-                      fontSize: 20, // Réduire légèrement la taille de la police
-                      width: "270px", // Augmenter la largeur du champ
-                      marginBottom: 10,
-                      color: "#5f5e5e",
-                      fontfamily: "Poppins",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
-
-                      e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
-                      e.target.style.borderBottomColor = "#0a579f"; // Changer la couleur de la bordure du bas en cas de focus
-                    }}
+                  <Switch
+                    checked={status}
+                    onChange={(checked) => setStatus(checked)}
+                    checkedChildren="Activé"
+                    unCheckedChildren="Désactivé"
+                    checkedColor="#52c41a" // Vert pour Activé
+                    unCheckedColor="#f5222d" // Rouge pour Désactivé
+                    style={{ fontSize: 16 }}
                   />
                 </Form.Item>
               </Col>
             </Row>
           )}
-          <Form.Item
-            style={{
-              textAlign: "center",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            {/* Bouton Annuler */}
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Button
-              style={{
-                background: "#fff",
-                color: "#0f12a4",
-                border: "1px solid #c8c8cb",
-                padding: "12px",
-                borderRadius: "4px",
-                width: "50%", // Ajustez la largeur selon votre besoin
-                height: "40px",
-                fontSize: "16px",
-                cursor: "pointer",
-                transition: "background-color 0.3s",
-                fontFamily: "Poppins",
-
-                marginTop: 10,
-              }}
               onClick={onCloseDrawer}
+              style={{
+                marginRight: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "90px",
+                height: "28px",
+              }}
             >
               Annuler
             </Button>
@@ -674,24 +738,16 @@ const Parametrage = () => {
               type="primary"
               htmlType="submit"
               style={{
-                background: "linear-gradient(to right,#022452, #022452)",
-                color: "#fff",
-                border: "none",
-                padding: "12px",
-                borderRadius: "4px",
-                width: "50%", // Ajustez la largeur selon votre besoin
-                height: "40px",
-                fontSize: "16px",
-                cursor: "pointer",
-                transition: "background-color 0.3s",
-                fontFamily: "Poppins",
-
-                marginTop: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "90px",
+                height: "28px",
               }}
             >
               {isAdding ? "Ajouter" : "Modifier"}
             </Button>
-          </Form.Item>
+          </div>
         </Form>
       </Drawer>
     </div>

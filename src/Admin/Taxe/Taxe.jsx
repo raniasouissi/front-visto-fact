@@ -145,15 +145,50 @@ const Taxe = () => {
               setEditItem(null);
             }}
             icon={<PlusOutlined />}
-            style={{ backgroundColor: "#022452", color: "white" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              height: 35,
+              paddingLeft: 10,
+              paddingRight: 5,
+              borderRadius: 5,
+              width: "175px",
+              backgroundColor: "#232492", // Couleur de fond personnalisée
+              border: "none",
+              float: "right",
+              color: "#fff", // Couleur du texte
+            }}
           >
-            Ajouter taxe
+            <span style={{ fontWeight: "bold", fontSize: 14 }}>
+              Ajouter taxe
+            </span>
           </Button>
         }
       >
-        <TabPane tab="TVA" key="tva">
+        <TabPane
+          tab={
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: 17,
+                  color: "#3a3838",
+                }}
+              >
+                TVA
+              </span>
+            </div>
+          }
+          key="tva"
+        >
           {/* Affichez le formulaire de mise à jour TVA */}
           <Table
+            bordered
+            pagination={{ pageSize: 10 }}
+            style={{
+              borderRadius: 8,
+              border: "1px solid #e8e8e8",
+            }}
             dataSource={tvaData}
             columns={[
               {
@@ -168,17 +203,27 @@ const Taxe = () => {
                 key: "action",
                 render: (text, record) => (
                   <Space size="middle">
-                    <EditOutlined
-                      className="action-icon edit-icon"
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
                       onClick={() => handleEdit(record)}
-                    />
+                      style={{
+                        backgroundColor: "#1890ff", // Couleur de fond bleue
+                        border: "none", // Supprimer la bordure
+                        borderRadius: "40%", // Coins arrondis
+                      }}
+                    ></Button>
                     <Popconfirm
-                      title="Êtes-vous sûr de vouloir supprimer cette TVA ?"
+                      title="Êtes-vous sûr de vouloir supprimer  cette TVA  ?"
                       onConfirm={() => handleDeleteTva(record._id)}
                       okText="Oui"
                       cancelText="Non"
                     >
-                      <DeleteOutlined className="action-icon delete-icon" />
+                      <Button
+                        type="danger"
+                        icon={<DeleteOutlined />}
+                        className="delete-icon"
+                      ></Button>
                     </Popconfirm>
                   </Space>
                 ),
@@ -186,9 +231,30 @@ const Taxe = () => {
             ]}
           />
         </TabPane>
-        <TabPane tab="Timbre Fiscal" key="timbre">
-          {/* Affichez le formulaire de mise à jour Timbre */}
+
+        <TabPane
+          tab={
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span
+                style={{
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: 15,
+                  color: "#3a3838",
+                }}
+              >
+                Timbre Fiscal
+              </span>
+            </div>
+          }
+          key="timbre"
+        >
           <Table
+            bordered
+            pagination={{ pageSize: 10 }}
+            style={{
+              borderRadius: 8,
+              border: "1px solid #e8e8e8",
+            }}
             dataSource={timbreData}
             columns={[
               {
@@ -203,17 +269,27 @@ const Taxe = () => {
                 key: "action",
                 render: (text, record) => (
                   <Space size="middle">
-                    <EditOutlined
-                      className="action-icon edit-icon"
+                    <Button
+                      type="primary"
+                      icon={<EditOutlined />}
                       onClick={() => handleEdit(record)}
-                    />
+                      style={{
+                        backgroundColor: "#1890ff", // Couleur de fond bleue
+                        border: "none", // Supprimer la bordure
+                        borderRadius: "40%", // Coins arrondis
+                      }}
+                    ></Button>
                     <Popconfirm
-                      title="Êtes-vous sûr de vouloir supprimer ce timbre ?"
+                      title="Êtes-vous sûr de vouloir supprimer  ce timbre  ?"
                       onConfirm={() => handleDeleteTimbre(record._id)}
                       okText="Oui"
                       cancelText="Non"
                     >
-                      <DeleteOutlined className="action-icon delete-icon" />
+                      <Button
+                        type="danger"
+                        icon={<DeleteOutlined />}
+                        className="delete-icon"
+                      ></Button>
                     </Popconfirm>
                   </Space>
                 ),
@@ -245,6 +321,10 @@ const Taxe = () => {
             Annuler
           </Button>,
           <Button
+            style={{
+              backgroundColor: "#232492", // Couleur de fond personnalisée
+              border: "none",
+            }}
             key="submit"
             type="primary"
             onClick={() => {

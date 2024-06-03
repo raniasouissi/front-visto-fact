@@ -84,16 +84,36 @@ const Devise = () => {
     <div>
       <Button
         type="primary"
-        style={{ float: "right", marginBottom: 16, backgroundColor: "#022452" }}
+        style={{
+          float: "right",
+          marginBottom: 16,
+          display: "flex",
+          alignItems: "center",
+          height: 35,
+          paddingLeft: 10,
+          paddingRight: 5,
+          borderRadius: 5,
+          width: "175px",
+          backgroundColor: "#232492", // Couleur de fond personnalisée
+          border: "none",
+
+          color: "#fff",
+        }}
         onClick={() => {
           setModalVisible(true);
           setEditItem(null);
         }}
-        icon={<PlusOutlined />}
+        icon={<PlusOutlined style={{ fontSize: 18 }} />}
       >
-        Ajouter une devise
+        <span style={{ fontWeight: "bold", fontSize: 14 }}>Ajouter Devise</span>
       </Button>
       <Table
+        bordered
+        pagination={{ pageSize: 10 }}
+        style={{
+          borderRadius: 8,
+          border: "1px solid #e8e8e8",
+        }}
         dataSource={deviseData}
         columns={[
           { title: "Nom", dataIndex: "name", key: "name" },
@@ -104,17 +124,27 @@ const Devise = () => {
             key: "action",
             render: (_, record) => (
               <Space size="middle">
-                <EditOutlined
-                  className="action-icon edit-icon"
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
                   onClick={() => handleEdit(record)}
-                />
+                  style={{
+                    backgroundColor: "#1890ff", // Couleur de fond bleue
+                    border: "none", // Supprimer la bordure
+                    borderRadius: "40%", // Coins arrondis
+                  }}
+                ></Button>
                 <Popconfirm
-                  title="Êtes-vous sûr de vouloir supprimer cette devise ?"
+                  title="Êtes-vous sûr de vouloir supprimer cette devise?"
                   onConfirm={() => handleDelete(record._id)}
                   okText="Oui"
                   cancelText="Non"
                 >
-                  <DeleteOutlined className="action-icon delete-icon" />
+                  <Button
+                    type="danger"
+                    icon={<DeleteOutlined />}
+                    className="delete-icon"
+                  ></Button>
                 </Popconfirm>
               </Space>
             ),
@@ -143,6 +173,10 @@ const Devise = () => {
           <Button
             key="submit"
             type="primary"
+            style={{
+              backgroundColor: "#232492",
+              border: "none",
+            }}
             onClick={() => {
               form
                 .validateFields()

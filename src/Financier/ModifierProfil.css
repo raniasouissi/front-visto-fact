@@ -1,0 +1,56 @@
+.modifier-profil-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ant-form-item-label {
+  text-align: left;
+}
+
+.ant-form-item-control-input {
+  width: 100%;
+}
+
+.avatar-uploader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.update-button {
+  width: 100%;
+}
+
+/* Styles pour les images des pays dans la liste déroulante */
+.ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+}
+
+.ant-select-item-option-content img {
+  margin-right: 10px;
+}
+
+/* Styles pour la disposition des champs dans une grille */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.col {
+  flex: 0 0 50%;
+  max-width: 50%;
+  padding: 0 15px;
+}
+
+/* Styles spécifiques pour les champs de téléphone */
+.react-tel-input {
+  width: 100%;
+}
+
+/* Autres styles personnalisés */

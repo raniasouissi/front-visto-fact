@@ -31,6 +31,12 @@ const Facture = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [factures, setFactures] = useState([]);
   const [updatedServices, setUpdatedServices] = useState([]);
+  const [totalHT, settotalHT] = useState(0);
+  const [totalHTApresRemise, setTotalHTApresRemise] = useState(0);
+  const [totalRemise] = useState(0); // Ajout de l'état pour le total de la remise
+  const [selectedTvaRates, setSelectedTvaRates] = useState({});
+  const [totalTVA, setTotalTVA] = useState(0); // Ajoutez un état pour le total de la TVA
+  const [totalTTC, setTotalTTC] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -75,31 +81,80 @@ const Facture = () => {
     }
   };
 
+  const handleAddService = (value) => {
+    const serviceToAdd = services.find((service) => service._id === value);
+    if (
+      serviceToAdd &&
+      !selectedServices.find((service) => service._id === value)
+    ) {
+      setSelectedServices([...selectedServices, serviceToAdd]);
+
+      const newSelectedTvaRates = {
+        ...selectedTvaRates,
+        [serviceToAdd._id]: serviceToAdd.tva ? serviceToAdd.tva.rate : 0,
+      };
+      setSelectedTvaRates(newSelectedTvaRates);
+
+      const newSubtotalHT = calculateNewSubtotal([
+        ...selectedServices,
+        serviceToAdd,
+      ]);
+      settotalHT(newSubtotalHT);
+
+      const totalHTAfterDiscount = calculateTotalHTApresRemise([
+        ...selectedServices,
+        serviceToAdd,
+      ]);
+      setTotalHTApresRemise(totalHTAfterDiscount);
+
+      form.setFieldsValue({ totalHT: newSubtotalHT });
+      form.setFieldsValue({ totalHTApresRemise: totalHTAfterDiscount });
+    }
+  };
+
   const handleColumnChange = (value, key, dataIndex) => {
-    const updatedServices = selectedServices.map((service) => {
+    const updatedSelectedServices = selectedServices.map((service) => {
       if (service._id === key) {
         const updatedService = {
           ...service,
-          [dataIndex]: dataIndex === "tva" ? value : parseFloat(value),
+          [dataIndex]:
+            dataIndex === "tva" ? findTvaIdByRate(value) : parseFloat(value),
         };
 
         if (
           dataIndex === "quantite" ||
           dataIndex === "prix_unitaire" ||
-          dataIndex === "remise" ||
-          dataIndex === "tva"
+          dataIndex === "remise"
         ) {
           updatedService.montant_ht = calculateMontantHT(updatedService);
         }
-        updatedService.tva = value;
-        handleServiceUpdate(service._id, updatedService);
+
+        handleServiceUpdate(key, updatedService); // Mettre à jour le service
         return updatedService;
       }
       return service;
     });
 
-    setSelectedServices(updatedServices);
-    setUpdatedServices(updatedServices);
+    setSelectedServices(updatedSelectedServices); // Mettre à jour les services sélectionnés
+
+    // Recalculer les totaux
+    const newSubtotalHT = calculateNewSubtotal(updatedSelectedServices);
+    settotalHT(newSubtotalHT);
+
+    const totalHTAfterDiscount = calculateTotalHTApresRemise(
+      updatedSelectedServices
+    );
+    setTotalHTApresRemise(totalHTAfterDiscount);
+
+    // Mettre à jour le formulaire
+    form.setFieldsValue({ totalHT: newSubtotalHT });
+    form.setFieldsValue({ totalHTApresRemise: totalHTAfterDiscount });
+  };
+
+  const findTvaIdByRate = (rate) => {
+    // Rechercher la TVA correspondant au taux de TVA
+    const tva = tvaRates.find((tva) => tva.rate === rate);
+    return tva ? tva._id : null; // Renvoyer l'ID de la TVA si elle est trouvée, sinon null
   };
 
   const handleCreate = async (values) => {
@@ -117,6 +172,17 @@ const Facture = () => {
       totalTTC,
     } = values;
 
+    // Créer un tableau contenant uniquement les services sélectionnés ou modifiés
+    const selectedOrUpdatedServices = selectedServices.concat(updatedServices);
+
+    // Filtrer les services pour ne conserver que ceux qui ont été sélectionnés ou modifiés
+    const selectedAndUpdatedServices = services.filter((service) =>
+      selectedOrUpdatedServices.some(
+        (selectedOrUpdatedService) =>
+          selectedOrUpdatedService._id === service._id
+      )
+    );
+
     // Créer le payload pour la création de la facture
     const payload = {
       clientid,
@@ -124,12 +190,12 @@ const Facture = () => {
       deviseid,
       timbreid,
       totalTTCLettre,
-      totalHT,
+      totalHT: parseFloat(totalHT).toFixed(3), // Formater avec 3 chiffres après la virgule
       totalRemise,
-      totalHTApresRemise,
+      totalHTApresRemise: parseFloat(totalHTApresRemise).toFixed(3), // Formater avec 3 chiffres après la virgule
       totalTVA,
       totalTTC,
-      servicesid: updatedServices.map((service) => service._id), // Utiliser updatedServices ici
+      servicesid: selectedAndUpdatedServices.map((service) => service._id),
     };
 
     try {
@@ -153,6 +219,8 @@ const Facture = () => {
       form.resetFields();
       setSelectedServices([]);
       setUpdatedServices([]);
+      form.setFieldsValue({ totalHT: null });
+      form.setFieldsValue({ totalHTApresRemise: null });
 
       // Afficher un message de succès
       message.success("Facture créée avec succès !");
@@ -171,6 +239,12 @@ const Facture = () => {
         `http://localhost:5000/api/services/${id}`,
         updatedService
       );
+
+      // Mettre à jour les services sélectionnés après la modification d'un service
+      const updatedSelectedServices = selectedServices.map((service) =>
+        service._id === id ? updatedService : service
+      );
+      setSelectedServices(updatedSelectedServices);
     } catch (error) {
       console.error("Erreur lors de la mise à jour du service :", error);
       message.error(
@@ -179,31 +253,55 @@ const Facture = () => {
     }
   };
 
-  // Dans la fonction handleAddService
-  const handleAddService = (value) => {
-    const serviceToAdd = services.find((service) => service._id === value);
-    if (
-      serviceToAdd &&
-      !selectedServices.find((service) => service._id === value)
-    ) {
-      const updatedService = {
-        ...serviceToAdd,
-        montant_ht: calculateMontantHT(serviceToAdd),
-      };
+  const calculateNewSubtotal = (newSelectedServices) => {
+    // Calculer le Sous-Total HT en parcourant les services sélectionnés
+    const totalHT = newSelectedServices.reduce((accumulator, service) => {
+      const montantHT =
+        parseFloat(service.quantite) * parseFloat(service.prix_unitaire);
+      return accumulator + montantHT;
+    }, 0);
 
-      // Assurez-vous que la valeur de la TVA est correctement récupérée et stockée
-      updatedService.tva = serviceToAdd.tva ? serviceToAdd.tva._id : undefined;
+    return totalHT.toFixed(3); // Formater avec 3 chiffres après la virgule
+  };
 
-      setSelectedServices([...selectedServices, updatedService]);
-    }
+  const calculateTotalHTApresRemise = (newSelectedServices) => {
+    // Calculer le Total HT après remise en parcourant les services sélectionnés
+    const totalHTApresRemise = newSelectedServices.reduce(
+      (accumulator, service) => {
+        const montantHT =
+          parseFloat(service.quantite) * parseFloat(service.prix_unitaire);
+        const remise = parseFloat(service.remise) || 0;
+        const montantHTApresRemise = montantHT * (1 - remise / 100); // Appliquer la remise
+        return accumulator + montantHTApresRemise;
+      },
+      0
+    );
+
+    return parseFloat(totalHTApresRemise).toFixed(3);
   };
 
   const calculateMontantHT = (record) => {
     const quantite = record.quantite || 0;
     const prix_unitaire = record.prix_unitaire || 0;
     const remise = record.remise || 0;
-    return (quantite * prix_unitaire * (100 - remise)) / 100;
+    const montantHT = (quantite * prix_unitaire * (100 - remise)) / 100;
+    return parseFloat(montantHT.toFixed(3)); // Renvoie le montant HT avec 3 chiffres après la virgule
   };
+
+  useEffect(() => {
+    // Calculer la remise totale
+    const calculateTotalRemise = () => {
+      const totalHT = parseFloat(form.getFieldValue("totalHT"));
+      const totalHTApresRemise = parseFloat(
+        form.getFieldValue("totalHTApresRemise")
+      );
+      const remise = totalHT - totalHTApresRemise;
+      form.setFieldsValue({ totalRemise: remise.toFixed(3) });
+    };
+
+    // Appeler la fonction pour calculer la remise totale
+    calculateTotalRemise();
+  }, [selectedServices, form]);
 
   const columns = [
     {
@@ -238,11 +336,11 @@ const Facture = () => {
       render: (_, record) => (
         <Select
           onChange={(value) => handleColumnChange(value, record._id, "tva")}
-          style={{ width: "100%" }}
-          value={record.tva ? record.tva : undefined} // Utilisez la clé "tva" pour la valeur sélectionnée
+          style={{ width: "110%" }}
+          value={selectedTvaRates[record._id] || undefined}
         >
           {tvaRates.map((tva) => (
-            <Option key={tva._id} value={tva._id}>
+            <Option key={tva._id} value={tva.rate}>
               {tva.rate}%
             </Option>
           ))}
@@ -255,6 +353,7 @@ const Facture = () => {
       dataIndex: "quantite",
       key: "quantite",
       width: 100,
+      fontSize: 10,
       render: (_, record) => (
         <Input
           type="number"
@@ -270,11 +369,11 @@ const Facture = () => {
       title: "Prix Unitaire",
       dataIndex: "prix_unitaire",
       key: "prix_unitaire",
-      width: 150,
+      width: 180,
       render: (_, record) => (
         <Input
           type="number"
-          defaultValue={record.prix_unitaire}
+          defaultValue={record.prix_unitaire} // Utilisez toFixed(3) pour afficher 3 chiffres après la virgule
           onBlur={(e) =>
             handleColumnChange(
               parseFloat(e.target.value),
@@ -282,7 +381,7 @@ const Facture = () => {
               "prix_unitaire"
             )
           }
-          style={{ width: "100%" }}
+          style={{ width: "100px" }}
         />
       ),
     },
@@ -290,7 +389,8 @@ const Facture = () => {
       title: "Remise(%)",
       dataIndex: "remise",
       key: "remise",
-      width: 100,
+      width: 50,
+
       render: (_, record) => (
         <Input
           type="number"
@@ -298,7 +398,7 @@ const Facture = () => {
           onBlur={(e) =>
             handleColumnChange(e.target.value, record._id, "remise")
           }
-          style={{ width: "100%" }}
+          style={{ width: "80%" }}
         />
       ),
     },
@@ -306,13 +406,13 @@ const Facture = () => {
       title: "Montant HT",
       dataIndex: "montant_ht",
       key: "montant_ht",
-      width: 120,
+
       render: (_, record) => record.montant_ht, // Utilisez la valeur du montant HT du service
     },
     {
       title: "Action",
       key: "action",
-      width: 80,
+      width: 40,
       render: (_, record) => (
         <Popconfirm
           title="Êtes-vous sûr de vouloir supprimer ce service ?"
@@ -320,7 +420,11 @@ const Facture = () => {
           okText="Oui"
           cancelText="Non"
         >
-          <Button type="link" danger style={{ background: "transparent" }}>
+          <Button
+            type="link"
+            danger
+            style={{ background: "transparent", fontSize: 15 }}
+          >
             <DeleteOutlined />
           </Button>
         </Popconfirm>
@@ -336,6 +440,57 @@ const Facture = () => {
     setSelectedServices(updatedSelectedServices);
     message.success("Service supprimé de la table !");
   };
+
+  useEffect(() => {
+    // Calculer le total de la TVA
+    const calculateTotalTVA = () => {
+      let totalTVA = 0;
+      selectedServices.forEach((service) => {
+        // Trouver le taux de TVA correspondant au service
+        const tvaRate = selectedTvaRates[service._id];
+        if (tvaRate) {
+          // Calculer le montant HT du service
+          const montantHT = parseFloat(service.montant_ht);
+          // Calculer la TVA pour ce service
+          const tva = (montantHT * tvaRate) / 100;
+          // Ajouter la TVA au total
+          totalTVA += tva;
+        }
+      });
+      // Mettre à jour l'état du total de la TVA
+      setTotalTVA(totalTVA.toFixed(3));
+      // Mettre à jour le champ correspondant dans le formulaire
+      form.setFieldsValue({ totalTVA: totalTVA.toFixed(3) });
+    };
+
+    // Appeler la fonction pour calculer le total de la TVA
+    calculateTotalTVA();
+  }, [selectedServices, selectedTvaRates, form]);
+
+  // Utilisez useEffect pour recalculer le total TTC lorsque les valeurs pertinentes changent
+  useEffect(() => {
+    const calculateTotalTTC = () => {
+      // Récupérer les valeurs pertinentes du formulaire
+      const totalHTApresRemise =
+        parseFloat(form.getFieldValue("totalHTApresRemise")) || 0;
+      const totalTVA = parseFloat(form.getFieldValue("totalTVA")) || 0;
+      const timbreValue = parseFloat(form.getFieldValue("timbreid")) || 0;
+
+      // Calculer le total TTC en ajoutant le total HT après remise, le total de la TVA et le montant du timbre
+      const totalTTC = totalHTApresRemise + totalTVA + timbreValue;
+
+      // Mettre à jour l'état du total TTC
+      setTotalTTC(totalTTC.toFixed(3)); // Formater avec 3 chiffres après la virgule
+    };
+
+    // Appeler la fonction de calcul à chaque changement des valeurs pertinentes
+    calculateTotalTTC();
+  }, [
+    form.getFieldValue("totalHTApresRemise"),
+    form.getFieldValue("totalTVA"),
+    form.getFieldValue("timbreid"),
+  ]);
+
   const columnsFact = [
     {
       title: "Numéro Facture",
@@ -383,7 +538,7 @@ const Facture = () => {
         columns={columnsFact}
         rowKey="_id"
         pagination={false}
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 20, width: "100%" }}
       />
       <Modal
         title={
@@ -551,58 +706,47 @@ const Facture = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label=" Sous-Total HT"
+                label="Sous-Total HT"
                 name="totalHT"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez saisir le total HT !",
-                  },
-                ]}
-              >
-                <Input type="number" placeholder="Total HT" />
-              </Form.Item>
-
-              <Form.Item
-                label="Remise"
-                name="totalRemise"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez saisir le total remise !",
-                  },
-                ]}
-              >
-                <Input type="number" placeholder="Total Remise" />
-              </Form.Item>
-              <Form.Item
-                label="Total HT "
-                name="totalHTApresRemise"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez saisir le total HT Après Remise !",
-                  },
-                ]}
+                initialValue={totalHT}
               >
                 <Input
                   type="number"
-                  placeholder="Total HT Après Remise
-"
+                  value={totalHT}
+                  style={{ backgroundColor: "#f0f0f0" }}
+                  readOnly
+                />
+              </Form.Item>
+
+              <Form.Item label="Remise" name="totalRemise">
+                <Input
+                  type="number"
+                  value={totalRemise}
+                  readOnly
+                  style={{ backgroundColor: "#f0f0f0" }}
                 />
               </Form.Item>
 
               <Form.Item
-                label="Total TVA"
-                name="totalTVA"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez saisir le total TVA !",
-                  },
-                ]}
+                label="Total HT après Remise"
+                name="totalHTApresRemise"
+                initialValue={totalHTApresRemise}
               >
-                <Input type="number" placeholder="Total TVA" />
+                <Input
+                  type="number"
+                  value={totalHT}
+                  style={{ backgroundColor: "#f0f0f0" }}
+                  readOnly
+                />
+              </Form.Item>
+              <Form.Item label="Total TVA" name="totalTVA">
+                <Input
+                  type="number"
+                  placeholder="Total TVA"
+                  readOnly
+                  value={totalTVA}
+                  style={{ backgroundColor: "#f0f0f0" }}
+                />
               </Form.Item>
 
               <Form.Item
@@ -623,17 +767,13 @@ const Facture = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item
-                label="Total TTC"
-                name="totalTTC"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez saisir le total TTC !",
-                  },
-                ]}
-              >
-                <Input type="number" placeholder="Total TTC" />
+              <Form.Item label="Total TTC" name="totalTTC">
+                <Input
+                  type="number"
+                  placeholder="Total TTC"
+                  value={totalTTC}
+                  readOnly
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -659,6 +799,8 @@ const Facture = () => {
                 form.resetFields(); // Réinitialiser les champs du formulaire
                 setSelectedServices([]); // Réinitialiser les services sélectionnés
                 setUpdatedServices([]); // Réinitialiser les services modifiés
+                form.setFieldsValue({ totalHT: null });
+                form.setFieldsValue({ totalHTApresRemise: null });
               }}
             >
               Annuler
@@ -674,6 +816,9 @@ const Facture = () => {
                   width: "130px",
                   height: "30px",
                   fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 Valider

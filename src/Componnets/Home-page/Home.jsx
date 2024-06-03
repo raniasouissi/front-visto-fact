@@ -24,53 +24,9 @@ import "./Home.css";
 import "./media.css";
 
 function HomePage() {
-  const testimonials = [
-    {
-      id: 1,
-      text: "Vbill a changé la façon dont je gère mes factures. C'est tellement simple et intuitif!",
-      author: "Marie Dupont",
-    },
-    {
-      id: 2,
-      text: "Je recommande Vbill à tous ceux qui cherchent un moyen efficace de gérer leur facturation.",
-      author: "Jean Martin",
-    },
-    {
-      id: 3,
-      text: "Super outil ! Vraiment pratique pour suivre mes factures et mes clients.",
-      author: "Pauline Leroy",
-    },
-    {
-      id: 4,
-      text: "Vbill a révolutionné la gestion de ma petite entreprise. Merci pour cette solution!",
-      author: "Antoine Dubois",
-    },
-    {
-      id: 5,
-      text: "Je suis impressionné par la simplicité d'utilisation de Vbill. Hautement recommandé!",
-      author: "Sophie Lambert",
-    },
-    {
-      id: 6,
-      text: "Grâce à Vbill, je gagne énormément de temps dans la gestion de mes factures.",
-      author: "Pierre Durand",
-    },
-    {
-      id: 7,
-      text: "Excellent service client et outil très performant. Je ne pourrais plus m'en passer!",
-      author: "Camille Martin",
-    },
-    {
-      id: 8,
-      text: "Vbill est de loin le meilleur logiciel de facturation que j'ai utilisé jusqu'à présent.",
-      author: "Nicolas Leclerc",
-    },
-  ];
   const newFeatureSectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  const [activeIndex, setActiveIndex] = useState(null);
 
   const [isTextVisible, setIsTextVisible] = useState(false);
 
@@ -327,30 +283,6 @@ function HomePage() {
                 onClick={toggleTextVisibility}
               />
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="testimonials-section">
-        <div className="testimonials-container">
-          <h2 className="testimonials-title">
-            T<span>é</span>m<span>o</span>ign<span>a</span>ges
-          </h2>
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={testimonial.id}
-                className={`testimonial ${
-                  index === activeIndex ? "active" : ""
-                }`}
-                onClick={() => setActiveIndex(index)}
-              >
-                <div className="testimonial-content">
-                  <p className="testimonial-text">{testimonial.text}</p>
-                  <p className="testimonial-author">- {testimonial.author}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

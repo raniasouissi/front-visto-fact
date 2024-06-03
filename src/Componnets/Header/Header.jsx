@@ -18,7 +18,9 @@ const Header = ({ isLoggedIn }) => {
     setIsMenuOpen(false); // Fermer le menu
   };
 
-  const isDashboardAdmin = location.pathname === "/dashboard-admin";
+  const isDashboardAdmin = location.pathname === "/dashboard";
+
+  const isDashboardFinancier = location.pathname === "/dashboard-financier";
   const isLoginPage = location.pathname === "/login";
   const isRegisterPage = location.pathname === "/register";
   const isSetpasswordpage = location.pathname.startsWith("/set-password");
@@ -42,7 +44,13 @@ const Header = ({ isLoggedIn }) => {
     );
   }
 
-  if (isLoginPage || isRegisterPage || isSetpasswordpage || isDashboardAdmin) {
+  if (
+    isLoginPage ||
+    isRegisterPage ||
+    isSetpasswordpage ||
+    isDashboardAdmin ||
+    isDashboardFinancier
+  ) {
     return null;
   }
 

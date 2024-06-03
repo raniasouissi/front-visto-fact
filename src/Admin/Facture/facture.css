@@ -1,26 +1,31 @@
 /* YourComponent.css */
 
+/* Titre de la modal */
 .ant-modal-title {
   color: #282727;
-  padding: 5px;
+  padding: 10px 16px;
   border-bottom: 1px solid #2b2a2a;
 }
 
+/* Conteneur de la modal */
 .ant-modal {
   border-radius: 10px;
   overflow: hidden;
 }
 
+/* Libellé des champs du formulaire */
 .ant-form-item-label {
   min-width: 120px;
   text-align: left;
   padding-right: 8px;
 }
 
+/* Champ de formulaire */
 .ant-form-item-control {
   flex: 1;
 }
 
+/* Bouton primaire */
 .ant-btn-primary {
   background-color: #001529;
   border-color: #001529;
@@ -31,21 +36,23 @@
   border-color: #004c99;
 }
 
+/* Styles pour les champs de sélection, input et date picker */
 .ant-select-selector,
 .ant-input,
 .ant-picker {
   border-radius: 4px;
 }
 
+/* Styles pour la table */
 .custom-table {
+  width: 100%;
   border-collapse: collapse;
-  width: 80%;
 }
 
 .custom-table th,
 .custom-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
 }
 
 .custom-table th {
@@ -63,6 +70,7 @@
   background-color: #f2f2f2;
 }
 
+/* Styles pour les boutons dans les cellules de la table */
 .custom-table tbody td button {
   background-color: #4caf50;
   border: none;
@@ -76,13 +84,19 @@
   cursor: pointer;
   border-radius: 4px;
 }
-.create-butto {
-  color: #fff;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: normal;
 
+/* Style pour le bouton de création */
+.create-button {
+  color: #fff;
+  background-color: #1890ff;
+  border: none;
+  padding: 10px 20px;
   border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.create-button:hover {
+  background-color: #40a9ff;
 }
