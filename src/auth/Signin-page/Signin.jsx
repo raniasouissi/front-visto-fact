@@ -29,7 +29,7 @@ const CustomSignin = () => {
     // Fermer le modal après 3 secondes
     setTimeout(() => {
       Modal.destroyAll(); // Ferme tous les modaux
-    }, 2000);
+    }, 1000);
   };
 
   const onFinish = async (values) => {
@@ -69,6 +69,7 @@ const CustomSignin = () => {
       localStorage.setItem("UserEmail", data.user.email);
       localStorage.setItem("Username", data.user.name);
       localStorage.setItem("role", data.user.roles);
+      localStorage.setItem("Type", data.user.type);
       localStorage.setItem("id", data.user._id);
 
       const currentTime = Date.now();
@@ -85,7 +86,7 @@ const CustomSignin = () => {
           history("/dashboard-client");
           break;
         case "financier":
-          history("/dashboard-financier");
+          history("/dashboard");
           break;
         default:
           break;

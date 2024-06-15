@@ -18,8 +18,10 @@ import {
 import {
   PlusOutlined,
   EditOutlined,
-  DeleteOutlined,
+  CloseCircleOutlined,
   SearchOutlined,
+  CheckOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
 
@@ -39,6 +41,26 @@ const Service = () => {
 
   const [ServiceStatusFilter, setServiceStatusFilter] = useState("all");
   const [status, setStatus] = useState(null);
+  const [user, setUser] = useState(null);
+
+  const idProfil = localStorage.getItem("id");
+  const role = localStorage.getItem("role");
+
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users/" + idProfil)
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
+
+  useEffect(() => {
+    fetchUser();
+    console.log("user", user);
+  }, [idProfil]);
 
   const handleServiceStatusChange = (value) => {
     setServiceStatusFilter(value);
@@ -63,19 +85,25 @@ const Service = () => {
     if (searchQuery) {
       url += `/search/${searchQuery}`;
     }
+
     axios
       .get(url)
       .then((response) => {
-        // Filtrer les éléments où e.categories n'est pas nul
-        const filteredServices = response.data.filter(
-          (e) => e.categories != null
-        );
+        let services = response.data.filter((e) => e.categories != null);
+
+        // Log avant le filtre
+        console.log("Services avant le filtre :", services);
+
+        // Si le rôle est "financier", filtrer les services avec un statut "true"
+        if (role === "financier") {
+          services = services.filter((service) => service.status === true);
+        }
+
+        // Log après le filtre
+        console.log("Services après le filtre :", services);
 
         // Mettre à jour l'état services avec les éléments filtrés
-        setServices(filteredServices);
-
-        // Pour débogage : afficher les éléments filtrés
-        console.log(filteredServices);
+        setServices(services);
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des services :", error);
@@ -88,7 +116,10 @@ const Service = () => {
   const fetchDevise = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/devise");
-      setDevise(response.data);
+      const filteredDevise = response.data.filter(
+        (devise) => devise.status === true
+      );
+      setDevise(filteredDevise);
     } catch (error) {
       console.error("Erreur lors de la récupération des devises :", error);
     }
@@ -180,26 +211,45 @@ const Service = () => {
     });
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteFin = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/services/${id}`);
-      message.success("Service supprimé avec succès !");
-      fetchServices(); // Fetch updated list after deletion
+      const response = await fetch(`http://localhost:5000/api/services/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: false }),
+      });
+      if (response.ok) {
+        message.success("Les données ont été supprimées avec succès");
+        fetchServices();
+      } else {
+        throw new Error("Échec de la suppression des données");
+      }
     } catch (error) {
-      console.error("Erreur lors de la suppression du service :", error);
+      console.error("Erreur lors de la suppression des données:", error);
+      message.error("Échec de la suppression des données");
     }
   };
 
   const columns = [
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: 80,
-      render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
-      ),
-    },
+    role === "admin"
+      ? {
+          title: "Status",
+          dataIndex: "status",
+          key: "status",
+          width: 80,
+          render: (status) => (
+            <Badge
+              status={status ? "success" : "error"}
+              text={status ? "Actif" : "Inactif"}
+              style={{ fontWeight: "bold" }}
+              icon={status ? <CheckOutlined /> : <StopOutlined />}
+            />
+          ),
+          sorter: (a, b) => a.status - b.status,
+        }
+      : null,
     {
       title: "Reference",
       dataIndex: "reference",
@@ -216,7 +266,11 @@ const Service = () => {
       dataIndex: ["categories", "titre"],
       key: "categories_titre",
     },
-
+    {
+      title: "Unité",
+      dataIndex: "unite",
+      key: "unite",
+    },
     {
       title: "Prix unitaire",
       dataIndex: "prix_unitaire",
@@ -245,21 +299,40 @@ const Service = () => {
                 border: "none", // Supprimer la bordure
                 borderRadius: "40%", // Coins arrondis
                 color: "white",
+                width: "45px",
               }}
             />
-            <Popconfirm
-              title="Voulez-vous vraiment supprimer ce service ?"
-              onConfirm={() => handleDelete(record._id)}
-              okText="Oui"
-              cancelText="Non"
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
+
+            {role === "financier" && (
+              <Popconfirm
+                title="Êtes-vous sûr de vouloir  désactiver ce service ?"
+                onConfirm={() => handleDeleteFin(record._id)}
+                okText="Oui"
+                cancelText="Non"
+              >
+                <Button
+                  type="danger"
+                  icon={<CloseCircleOutlined />}
+                  style={{
+                    backgroundColor: "#f5222d",
+                    color: "#fff",
+                    border: "none",
+                    width: "50px",
+                    borderRadius: "4px",
+                    padding: "8px 16px",
+                    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                    transition:
+                      "background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s",
+                  }}
+                  className="delete-icon"
+                ></Button>
+              </Popconfirm>
+            )}
           </Space>
         </>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <>
@@ -302,19 +375,21 @@ const Service = () => {
       </div>
 
       <div style={{ marginTop: 40 }}>
-        <Select
-          defaultValue="all"
-          style={{
-            width: 150,
-            backgroundColor: "#f0f2f5",
-            fontFamily: "Arial, sans-serif",
-          }}
-          onChange={handleServiceStatusChange}
-        >
-          <Option value="all">Tous</Option>
-          <Option value="activated">Activé</Option>
-          <Option value="inactivated">Désactivé</Option>
-        </Select>
+        {role === "admin" && (
+          <Select
+            defaultValue="all"
+            style={{
+              width: 150,
+              backgroundColor: "#f0f2f5",
+              fontFamily: "Arial, sans-serif",
+            }}
+            onChange={handleServiceStatusChange}
+          >
+            <Option value="all">Tous</Option>
+            <Option value="activated">Activé</Option>
+            <Option value="inactivated">Désactivé</Option>
+          </Select>
+        )}
       </div>
 
       <Modal
@@ -436,6 +511,29 @@ const Service = () => {
           <Row gutter={[16, 16]}>
             <Col span={12}>
               <Form.Item
+                name="unite"
+                label="Unité"
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez sélectionner une unité !",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Sélectionnez une unité"
+                  style={{ width: "100%" }}
+                >
+                  <Option value="heure">Heure</Option>
+                  <Option value="jour">Jour</Option>
+                  <Option value="semaine">Semaine</Option>
+                  <Option value="mois">Mois</Option>
+                  <Option value="année">Année</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
                 name="deviseId"
                 label="Devise"
                 rules={[
@@ -461,7 +559,7 @@ const Service = () => {
 
           <Row>
             <Col span={24}>
-              {editingService && (
+              {editingService && role === "admin" && (
                 <Form.Item
                   name="status"
                   label="Statut"
@@ -499,7 +597,7 @@ const Service = () => {
         bordered
         pagination={{ pageSize: 10 }}
         style={{
-          marginTop: "30px",
+          marginTop: "60px",
           borderRadius: 8,
           border: "1px solid #e8e8e8",
         }}

@@ -3,30 +3,34 @@ import { Layout, Menu, Dropdown, Avatar, Badge, Modal } from "antd";
 import {
   UserOutlined,
   SettingOutlined,
-  EditOutlined,
   BellOutlined,
   LogoutOutlined,
   AppstoreOutlined,
   AccountBookOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
-import Taxe from "../Admin/Taxe/Taxe";
-import Parametrage from "../Admin/Parametrage/Parametrage";
-import Logo1 from "../assets/images/vbil2.png";
-import AvatarImage from "../assets/images/admin1.png";
+import Taxe from "../../Admin/Taxe/Taxe";
+import Parametrage from "../../Admin/Parametrage/Parametrage";
+import Logo1 from "../../assets/images/vbil2.png";
+import AvatarImage from "../../assets/images/admin1.png";
 
-import Service from "../Admin/Service/Service";
+import Service from "../../Admin/Service/Service";
 import { useNavigate } from "react-router-dom";
 
-import Devise from "../Admin/Devise/devise";
-import Categorie from "../Admin/Catégorie-service/categorie";
-import Facture from "../Admin/Facture/facture";
-import Client from "./Client/client";
-import ModifierProfil from "./modiferprofil";
+import Devise from "../../Admin/Devise/devise";
+import Categorie from "../../Admin/Catégorie-service/categorie";
+import Facture from "../../Admin/Facture/facture";
+import Client from "../client.jsx/client";
+import ModifierProfil from "../modiferprofil";
+import Users from "../../Admin/Users/users";
+import axios from "axios";
+import "./DashboardFinancier.css";
 
 const { Sider, Content, Header } = Layout;
 
 const DashboardFinancier = () => {
   const [currentPage, setCurrentPage] = useState(null);
+  const [user, setUser] = useState(null);
 
   const history = useNavigate();
 
@@ -66,6 +70,12 @@ const DashboardFinancier = () => {
   const handleLogout = async () => {
     try {
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("id");
+      localStorage.removeItem("UserEmail");
+      localStorage.removeItem("Username");
+      localStorage.removeItem("type");
+
       const response = await fetch("http://localhost:5000/api/auth/logout", {
         method: "POST",
         credentials: "include",
@@ -92,12 +102,37 @@ const DashboardFinancier = () => {
 
   console.log("token", token);
   const email = localStorage.getItem("UserEmail");
-  const role = localStorage.getItem("role");
   const name = localStorage.getItem("Username");
   console.log("email", email);
 
+  const idProfil = localStorage.getItem("id");
+  const role = localStorage.getItem("role");
+
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users/" + idProfil)
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
+
+  useEffect(() => {
+    fetchUser();
+    console.log("user", user);
+  }, [idProfil]);
+
   const menu = (
-    <Menu style={{ width: "240px" }}>
+    <Menu
+      style={{
+        width: "240px",
+
+        borderRadius: "8px",
+        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+      }}
+    >
       <Menu.Item
         key="0"
         style={{ padding: "16px", borderBottom: "1px solid #d9d9d9" }}
@@ -119,28 +154,32 @@ const DashboardFinancier = () => {
             >
               {name.charAt(0).toUpperCase() + name.slice(1)}
             </span>
-
             <span style={{ fontSize: "14px", color: "#666" }}>{role}</span>
             <span style={{ fontSize: "14px", color: "#999" }}>{email}</span>
           </div>
         </div>
       </Menu.Item>
-      <Menu.Item
-        key="ModifierProfil"
-        icon={<EditOutlined style={{ color: "#333333" }} />}
-        onClick={() => handleMenuClick("ModifierProfil")}
-        className={currentPage === "ModifierProfil" ? "active" : ""}
-        style={{
-          fontSize: "14px",
-          fontFamily: "Poppins, sans-serif",
-          padding: "16px",
-          color: "#3f3c3c",
-          marginTop: -10,
-          marginBottom: -20,
-        }}
-      >
-        Profil
-      </Menu.Item>
+      {role === "financier" && (
+        <Menu.Item
+          key="ModifierProfil"
+          icon={<UserOutlined style={{ color: "#1890ff" }} />}
+          onClick={() => handleMenuClick("ModifierProfil")}
+          className={currentPage === "ModifierProfil" ? "active" : ""}
+          style={{
+            fontSize: "14px",
+            fontFamily: "Poppins, sans-serif",
+            padding: "16px",
+            color: "#1890ff",
+            marginTop: -10,
+            marginBottom: -20,
+            borderRadius: "8px",
+            transition: "background-color 0.3s",
+            cursor: "pointer",
+          }}
+        >
+          Profil
+        </Menu.Item>
+      )}
       <Menu.Item
         key="2"
         style={{
@@ -148,6 +187,9 @@ const DashboardFinancier = () => {
           fontFamily: "Poppins, sans-serif",
           padding: "16px",
           color: "#ff4d4f",
+          borderRadius: "8px",
+          transition: "background-color 0.3s",
+          cursor: "pointer",
         }}
         icon={<LogoutOutlined />}
         onClick={handleLogoutConfirmation}
@@ -181,27 +223,75 @@ const DashboardFinancier = () => {
               style={{ background: "white", marginTop: "-15px" }}
               className="sidebar-menu" // Ajouter une classe pour cibler tous les éléments du menu
             >
-              <Menu.Item
-                key="clients"
-                icon={<UserOutlined style={{ color: "#333333" }} />}
-                onClick={() => handleMenuClick("clients")}
-                className={currentPage === "clients" ? "active" : ""}
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  fontWeight: "bold",
-                  color: "#19191a",
-                  fontSize: "14px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginLeft: -34,
-                  borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
-                  lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
-                  marginBottom: "10px",
-                  width: "auto",
-                }}
-              >
-                Clients
-              </Menu.Item>
+              {role === "admin" && (
+                <Menu.Item
+                  key="dashboard"
+                  icon={<DashboardOutlined style={{ color: "#333333" }} />}
+                  onClick={() => handleMenuClick("dashboard")}
+                  className={currentPage === "dashboard" ? "active" : ""}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    color: "#19191a",
+                    fontSize: "14px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    marginLeft: -34,
+                    borderBottom: "1px solid #ccc",
+                    lineHeight: "50px",
+                    marginBottom: "10px",
+                    width: "auto",
+                  }}
+                >
+                  Tableau de bord
+                </Menu.Item>
+              )}
+              {role === "admin" && (
+                <Menu.Item
+                  key="users"
+                  icon={<UserOutlined style={{ color: "#333333" }} />}
+                  onClick={() => handleMenuClick("users")}
+                  className={currentPage === "users" ? "active" : ""}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    color: "#19191a",
+                    fontSize: "14px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    marginLeft: -34,
+                    borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                    lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                    marginBottom: "10px",
+                    width: "auto",
+                  }}
+                >
+                  Utilisateurs
+                </Menu.Item>
+              )}
+              {role === "financier" && (
+                <Menu.Item
+                  key="clients"
+                  icon={<UserOutlined style={{ color: "#333333" }} />}
+                  onClick={() => handleMenuClick("clients")}
+                  className={currentPage === "clients" ? "active" : ""}
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    color: "#19191a",
+                    fontSize: "14px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    marginLeft: -34,
+                    borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
+                    lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
+                    marginBottom: "10px",
+                    width: "auto",
+                  }}
+                >
+                  Clients
+                </Menu.Item>
+              )}
 
               <Menu.SubMenu
                 style={{
@@ -387,6 +477,7 @@ const DashboardFinancier = () => {
             <Content
               className={`content ${currentPage && currentPage.toLowerCase()}`}
             >
+              {currentPage === "users" && <Users />}
               {currentPage === "clients" && <Client />}
               {currentPage === "Parametrage" && <Parametrage />}
               {currentPage === "Taxe" && <Taxe />}

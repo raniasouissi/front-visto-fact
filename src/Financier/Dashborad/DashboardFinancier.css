@@ -1,0 +1,126 @@
+.sidebar {
+    background-color: white !important; /* Blanc légèrement teinté */
+  
+    border: 1px solid #b3bfd1; /* Bordure bleue */
+  
+    height: auto;
+    overflow-y: auto;
+  }
+  
+  /* Styles pour le conteneur du logo et du titre */
+  .logo-title-container {
+    margin-top: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    margin-left: -80px; /* Décalage vers la gauche pour aligner avec la barre latérale */
+  
+    border-radius: 1px; /* Bords arrondis */
+  }
+  .sidebar-menu {
+    padding: 20px;
+    background-color: #fff;
+  }
+  
+  /* Styles pour le logo */
+  .sidebar-logo {
+    width: 40px;
+    height: 35px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+  
+  /* Styles pour le titre */
+  .app-title {
+    font-size: 2.2rem;
+    color: #171717;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .content {
+    background-color: white; /* Blanc légèrement teinté */
+    padding: 24px;
+    min-height: calc(
+      100vh - 112px
+    ); /* Hauteur du contenu - hauteur de la barre latérale */
+  }
+  
+  /* Styles pour les éléments du menu */
+  .menu-item-text {
+    margin-left: 10px; /* Ajouter un espacement entre l'icône et le texte du menu */
+  }
+  
+  /* Styles pour le bouton de réduction */
+  .ant-layout-sider-trigger {
+    background-color: white; /* Blanc légèrement teinté */
+  }
+  
+  /* Styles pour les icônes des éléments du menu */
+  .anticon svg {
+    font-size: 20px; /* Taille de l'icône */
+  }
+  
+  /* Styles pour le texte des éléments du menu */
+  .menu-item-text {
+    margin-left: 5px; /* Espacement entre l'icône et le texte du menu */
+    background-color: white !important;
+  }
+  
+  /* Styles pour la barre de navigation */
+  .headerad {
+    background-color: white !important; /* Blanc légèrement teinté */
+  
+    border: 1px solid #c8daf5;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 54px;
+    margin-left: -20px;
+  }
+  
+  /* Styles pour les éléments de la barre de navigation */
+  .right-menu {
+    display: flex;
+    align-items: center;
+  }
+  
+  .right-menu a {
+    color: #00132d;
+    margin-left: 20px;
+  }
+  
+  .right-menu a:hover {
+    color: #b6b7b8; /* Couleur de l'icône lors du survol */
+  }
+  
+  .notification-icon {
+    font-size: 30px;
+    color: #00132d;
+    margin-right: -5px;
+    transition: color 0.3s ease; /* Animation de transition de couleur */
+  }
+  
+  .notification-icon:hover {
+    color: #00132d; /* Couleur de l'icône lors du survol */
+  }
+  
+  /* Styles pour l'avatar */
+  .avatar {
+    margin-right: 10px;
+    border: 2px solid #a5a5a8; /* Bordure autour de l'avatar */
+    border-radius: 50%; /* Pour rendre l'avatar rond */
+    overflow: hidden; /* Pour cacher les parties de l'image qui dépassent de l'avatar */
+    width: 50%;
+  }
+  
+  /* Styles pour le nom d'utilisateur */
+  .username {
+    color: #fff;
+    font-size: 16px;
+    margin-right: 5px;
+    text-decoration: none;
+  }
+  

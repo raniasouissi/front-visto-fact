@@ -24,6 +24,8 @@ import {
   DeleteOutlined,
   UserOutlined,
   UploadOutlined,
+  CheckOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import apiusers from "./apiusers";
 import "react-phone-input-2/lib/style.css";
@@ -300,14 +302,21 @@ const Users = () => {
 
   const columns = [
     {
-      title: "Status",
+      title: "Statut",
       dataIndex: "status",
       key: "status",
-      width: 80,
+
       render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
+        <Badge
+          status={status ? "success" : "error"}
+          text={status ? "Actif" : "Inactif"}
+          style={{ fontWeight: "bold" }}
+          icon={status ? <CheckOutlined /> : <StopOutlined />}
+        />
       ),
+      sorter: (a, b) => a.status - b.status,
     },
+
     {
       title: "Logo",
       dataIndex: "image",
@@ -357,6 +366,16 @@ const Users = () => {
       dataIndex: "type",
       key: "type",
       render: (text) => text || "N/A",
+      sorter: (a, b) => {
+        if (a.type && b.type) {
+          // Votre logique de tri ici
+          if (a.type < b.type) return -1;
+          if (a.type > b.type) return 1;
+          return 0;
+        } else {
+          return -1; // Placer les valeurs N/A en premier
+        }
+      },
     },
 
     {
@@ -396,21 +415,29 @@ const Users = () => {
 
   const financiersColumns = [
     {
-      title: "Status",
+      title: "Statut",
       dataIndex: "status",
       key: "status",
-      width: 80,
+
       render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
+        <Badge
+          status={status ? "success" : "error"}
+          text={status ? "Actif" : "Inactif"}
+          style={{ fontWeight: "bold" }}
+          icon={status ? <CheckOutlined /> : <StopOutlined />}
+        />
       ),
+      sorter: (a, b) => a.status - b.status,
     },
+
     { title: "Nom", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
 
     { title: "Téléphone", dataIndex: "phonenumber", key: "phonenumber" },
 
-    { title: "Adresse", dataIndex: "address", key: "address" },
     { title: "Pays", dataIndex: "pays", key: "pays" },
+    { title: "Adresse", dataIndex: "address", key: "address" },
+    { title: "Code Postale", dataIndex: "codepostale", key: "codepostale" },
 
     {
       title: "Actions",
@@ -815,9 +842,7 @@ const Users = () => {
                 />
               </Form.Item>
             </Col>
-          </Row>
 
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 style={{ marginLeft: 5 }}
@@ -839,7 +864,7 @@ const Users = () => {
                 <div
                   style={{
                     borderBottom: "2px solid #9e9ea3",
-                    marginTop: 20,
+                    marginTop: 10,
                     width: 280,
                   }}
                 >
@@ -883,9 +908,10 @@ const Users = () => {
                 </div>
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
-                style={{ marginLeft: 5 }}
+                style={{ marginLeft: 5, marginTop: -5 }}
                 name="address"
                 className="form-item"
                 rules={[
@@ -918,7 +944,43 @@ const Users = () => {
                 />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item
+                style={{ marginLeft: 5 }}
+                name="codepostale"
+                className="form-item"
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez entrer votre code postale",
+                  },
+                ]}
+              >
+                <Input
+                  className="custom-input"
+                  style={{
+                    border: "none", // Retirer toutes les bordures
+                    borderRadius: 0, // Retirer le rayon de bordure
+                    borderBottom: "2px solid #9e9ea3",
+                    padding: "10px 0", // Ajuster le padding
+                    fontSize: 20, // Réduire légèrement la taille de la police
+                    width: "270px", // Augmenter la largeur du champ
+                    marginBottom: 10,
+                    color: "#5f5e5e",
+                    fontfamily: "Poppins",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
+
+                    e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                    e.target.style.borderBottomColor = "#0a579f"; // Changer la couleur de la bordure du bas en cas de focus
+                  }}
+                  placeholder="Code Postale"
+                />
+              </Form.Item>
+            </Col>
           </Row>
+
           {userType === "client" && (
             <Row gutter={[16, 16]}>
               <Col span={12}>

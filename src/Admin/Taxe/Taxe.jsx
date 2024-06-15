@@ -9,19 +9,61 @@ import {
   message,
   Popconfirm,
   Space,
+  Select,
+  Switch,
+  Badge,
 } from "antd";
 import axios from "axios";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  CloseCircleOutlined,
+  EditOutlined,
+  CheckOutlined,
+  StopOutlined
+} from "@ant-design/icons";
+import { Option } from "antd/es/mentions";
 
 const { TabPane } = Tabs;
 
 const Taxe = () => {
   const [tvaData, setTvaData] = useState([]);
   const [timbreData, setTimbreData] = useState([]);
-  const [selectedTaxe, setSelectedTaxe] = useState("tva"); // Utilisez cette variable pour suivre l'onglet sélectionné
+  const [selectedTaxe, setSelectedTaxe] = useState("tva");
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editItem, setEditItem] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [statusT, setStatusT] = useState(null);
+  const [TvaStatusFilter, setTvaStatusFilter] = useState("all");
+  const [TimbreStatusFilter, setTimbreStatusFilter] = useState("all");
+
+  const [user, setUser] = useState(null);
+  const idProfil = localStorage.getItem("id");
+  const role = localStorage.getItem("role");
+
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users/" + idProfil)
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
+
+  useEffect(() => {
+    fetchUser();
+    console.log("user", user);
+  }, [idProfil]);
+
+  const handleTvaStatusChange = (value) => {
+    setTvaStatusFilter(value);
+  };
+
+  const handleTimbreStatusChange = (value) => {
+    setTimbreStatusFilter(value);
+  };
 
   useEffect(() => {
     fetchTvaData();
@@ -31,7 +73,16 @@ const Taxe = () => {
   const fetchTvaData = () => {
     axios
       .get("http://localhost:5000/api/tva")
-      .then((response) => setTvaData(response.data))
+      .then((response) => {
+        // Filtrer les données de TVA pour ne conserver que celles avec un statut true
+        let filteredTva = response.data;
+
+        if (role === "financier") {
+          filteredTva = filteredTva.filter((item) => item.status === true);
+        }
+
+        setTvaData(filteredTva);
+      })
       .catch((error) =>
         console.error("Erreur lors du chargement des données de TVA :", error)
       );
@@ -40,7 +91,18 @@ const Taxe = () => {
   const fetchTimbreData = () => {
     axios
       .get("http://localhost:5000/api/timbre")
-      .then((response) => setTimbreData(response.data))
+      .then((response) => {
+        // Filtrer les données de timbre pour ne conserver que celles avec un statut true
+        let filteredTimbres = response.data;
+
+        if (role === "financier") {
+          filteredTimbres = filteredTimbres.filter(
+            (item) => item.status === true
+          );
+        }
+
+        setTimbreData(filteredTimbres);
+      })
       .catch((error) =>
         console.error(
           "Erreur lors du chargement des données de timbre :",
@@ -48,6 +110,7 @@ const Taxe = () => {
         )
       );
   };
+
   const handleAddOrUpdateTaxe = (values) => {
     const endpoint = selectedTaxe === "tva" ? "tva" : "timbre";
     const url = editItem
@@ -64,17 +127,17 @@ const Taxe = () => {
         );
         setModalVisible(false);
         if (selectedTaxe === "tva") {
-          fetchTvaData(); // Mettre à jour les données de TVA si l'onglet actif est TVA
+          fetchTvaData();
         } else {
-          fetchTimbreData(); // Mettre à jour les données de timbre si l'onglet actif est Timbre
+          fetchTimbreData();
         }
         setTimeout(() => {
-          form.resetFields(); // Réinitialiser le formulaire après 2 secondes
+          form.resetFields();
         }, 2000);
       })
       .catch((error) => {
         if (error.response && error.response.status === 500) {
-          message.error("Erreur lors de l'ajout . Veuillez réessayer.");
+          message.error("Erreur lors de l'ajout. Veuillez réessayer.");
         } else {
           message.error(
             `Erreur lors de ${
@@ -85,29 +148,47 @@ const Taxe = () => {
       });
   };
 
-  const handleDeleteTva = async (id) => {
+  const handleDeleteTvad = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tva/${id}`);
-      fetchTvaData();
-      message.success("TVA supprimée avec succès !");
+      const response = await fetch(`http://localhost:5000/api/tva/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: false }),
+      });
+      if (response.ok) {
+        // Effectuez les actions nécessaires après la suppression réussie
+        fetchTvaData();
+        message.success("Les données ont été supprimées avec succès");
+      } else {
+        throw new Error("Échec de la suppression des données");
+      }
     } catch (error) {
-      console.error("Erreur lors de la suppression de la TVA :", error);
-      message.error(
-        "Erreur lors de la suppression de la TVA. Veuillez réessayer."
-      );
+      console.error("Erreur lors de la suppression des données:", error);
+      message.error("Échec de la suppression des données");
     }
   };
 
-  const handleDeleteTimbre = async (id) => {
+  const handleDeleteTimbred = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/timbre/${id}`);
-      fetchTimbreData();
-      message.success("Timbre supprimé avec succès !");
+      const response = await fetch(`http://localhost:5000/api/timbre/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: false }),
+      });
+      if (response.ok) {
+        // Effectuez les actions nécessaires après la suppression réussie
+        fetchTimbreData();
+        message.success("Les données ont été supprimées avec succès");
+      } else {
+        throw new Error("Échec de la suppression des données");
+      }
     } catch (error) {
-      console.error("Erreur lors de la suppression du timbre :", error);
-      message.error(
-        "Erreur lors de la suppression du timbre. Veuillez réessayer."
-      );
+      console.error("Erreur lors de la suppression des données:", error);
+      message.error("Échec de la suppression des données");
     }
   };
 
@@ -115,14 +196,18 @@ const Taxe = () => {
     setEditItem(record);
     if (record.taxe === "tva") {
       setSelectedTaxe("tva");
+      setStatus(record.status);
+      setStatusT(null);
     } else if (record.taxe === "timbre") {
       setSelectedTaxe("timbre");
+      setStatus(null);
+      setStatusT(record.status);
     }
     setModalVisible(true);
     form.setFieldsValue(record);
 
     setTimeout(() => {
-      form.resetFields(); // Réinitialiser le formulaire après 2 secondes
+      form.resetFields();
     }, 50000);
   };
 
@@ -135,9 +220,9 @@ const Taxe = () => {
   return (
     <div>
       <Tabs
-        defaultActiveKey="1"
-        activeKey={selectedTaxe} // Utilisez l'onglet sélectionné comme clé active
-        onChange={handleTaxeChange} // Gérer le changement d'onglet
+        defaultActiveKey="tva"
+        activeKey={selectedTaxe}
+        onChange={handleTaxeChange}
         tabBarExtraContent={
           <Button
             onClick={() => {
@@ -152,50 +237,66 @@ const Taxe = () => {
               paddingLeft: 10,
               paddingRight: 5,
               borderRadius: 5,
-              width: "175px",
+              width: "190px",
               backgroundColor: "#232492", // Couleur de fond personnalisée
               border: "none",
-              float: "right",
+
               color: "#fff", // Couleur du texte
             }}
           >
-            <span style={{ fontWeight: "bold", fontSize: 14 }}>
+            <span style={{ fontWeight: "bold", fontSize: 14, marginTop: -3 }}>
               Ajouter taxe
             </span>
           </Button>
         }
       >
-        <TabPane
-          tab={
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  fontSize: 17,
-                  color: "#3a3838",
-                }}
-              >
-                TVA
-              </span>
-            </div>
-          }
-          key="tva"
-        >
-          {/* Affichez le formulaire de mise à jour TVA */}
+        <TabPane tab="TVA" key="tva">
+          {role === "admin" && (
+            <Select
+              defaultValue="all"
+              style={{ width: 150, marginBottom: 20 }}
+              onChange={handleTvaStatusChange}
+            >
+              <Option value="all">Tous</Option>
+              <Option value="activated">Activé</Option>
+              <Option value="inactivated">Désactivé</Option>
+            </Select>
+          )}
           <Table
-            bordered
-            pagination={{ pageSize: 10 }}
             style={{
               borderRadius: 8,
               border: "1px solid #e8e8e8",
             }}
-            dataSource={tvaData}
+            bordered
+            pagination={{ pageSize: 10 }}
+            dataSource={tvaData.filter(
+              (item) =>
+                TvaStatusFilter === "all" ||
+                item.status === (TvaStatusFilter === "activated")
+            )}
             columns={[
+              role === "admin"
+                ? {
+                    title: "Status",
+                    dataIndex: "status",
+                    key: "status",
+                    width: 80,
+                    render: (status) => (
+                      <Badge
+                        status={status ? "success" : "error"}
+                        text={status ? "Actif" : "Inactif"}
+                        style={{ fontWeight: "bold" }}
+                        icon={status ? <CheckOutlined /> : <StopOutlined />}
+                      />
+                    ),
+                    sorter: (a, b) => a.status - b.status,
+                  }
+                : null,
               {
                 title: "Taux de TVA",
                 dataIndex: "rate",
                 key: "rate",
-                render: (rate) => `${rate.toFixed(2)}%`, // Affichez avec deux décimales et ajoutez le symbole "%" à la fin
+                render: (rate) => `${rate.toFixed(2)}%`,
               },
               {
                 title: "Action",
@@ -211,52 +312,81 @@ const Taxe = () => {
                         backgroundColor: "#1890ff", // Couleur de fond bleue
                         border: "none", // Supprimer la bordure
                         borderRadius: "40%", // Coins arrondis
+                        width: "45px",
                       }}
                     ></Button>
-                    <Popconfirm
-                      title="Êtes-vous sûr de vouloir supprimer  cette TVA  ?"
-                      onConfirm={() => handleDeleteTva(record._id)}
-                      okText="Oui"
-                      cancelText="Non"
-                    >
-                      <Button
-                        type="danger"
-                        icon={<DeleteOutlined />}
-                        className="delete-icon"
-                      ></Button>
-                    </Popconfirm>
+
+                    {role === "financier" && (
+                      <Popconfirm
+                        title="Êtes-vous sûr de vouloir supprimer cette TVA ?"
+                        onConfirm={() => handleDeleteTvad(record._id)}
+                        okText="Oui"
+                        cancelText="Non"
+                      >
+                        <Button
+                          type="danger"
+                          icon={<CloseCircleOutlined />}
+                          className="delete-icon"
+                          style={{
+                            backgroundColor: "#f5222d",
+                            color: "#fff",
+                            border: "none",
+                            width: "50px",
+                            borderRadius: "4px",
+                            padding: "8px 16px",
+                            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                            transition:
+                              "background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s",
+                          }}
+                        ></Button>
+                      </Popconfirm>
+                    )}
                   </Space>
                 ),
               },
-            ]}
+            ].filter(Boolean)}
           />
         </TabPane>
-
-        <TabPane
-          tab={
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  fontSize: 15,
-                  color: "#3a3838",
-                }}
-              >
-                Timbre Fiscal
-              </span>
-            </div>
-          }
-          key="timbre"
-        >
+        <TabPane tab="Timbre Fiscal" key="timbre">
+          {role === "admin" && (
+            <Select
+              defaultValue="all"
+              style={{ width: 150, marginBottom: 20 }}
+              onChange={handleTimbreStatusChange}
+            >
+              <Option value="all">Tous</Option>
+              <Option value="activated">Activé</Option>
+              <Option value="inactivated">Désactivé</Option>
+            </Select>
+          )}
           <Table
-            bordered
-            pagination={{ pageSize: 10 }}
             style={{
               borderRadius: 8,
               border: "1px solid #e8e8e8",
             }}
-            dataSource={timbreData}
+            bordered
+            pagination={{ pageSize: 10 }}
+            dataSource={timbreData.filter(
+              (item) =>
+                TimbreStatusFilter === "all" ||
+                item.status === (TimbreStatusFilter === "activated")
+            )}
             columns={[
+              role === "admin"
+                ? {
+                    title: "Status",
+                    dataIndex: "status",
+                    key: "status",
+                    width: 80,
+                    render: (status) => (
+                      <Badge
+                        dot
+                        style={{ backgroundColor: status ? "green" : "red" }}
+                      />
+                    ),
+                  }
+                : null,
+
               {
                 title: "Valeur",
                 dataIndex: "value",
@@ -277,24 +407,39 @@ const Taxe = () => {
                         backgroundColor: "#1890ff", // Couleur de fond bleue
                         border: "none", // Supprimer la bordure
                         borderRadius: "40%", // Coins arrondis
+                        width: "45px",
                       }}
                     ></Button>
-                    <Popconfirm
-                      title="Êtes-vous sûr de vouloir supprimer  ce timbre  ?"
-                      onConfirm={() => handleDeleteTimbre(record._id)}
-                      okText="Oui"
-                      cancelText="Non"
-                    >
-                      <Button
-                        type="danger"
-                        icon={<DeleteOutlined />}
-                        className="delete-icon"
-                      ></Button>
-                    </Popconfirm>
+
+                    {role === "financier" && (
+                      <Popconfirm
+                        title="Êtes-vous sûr de vouloir supprimer ce timbre ?"
+                        onConfirm={() => handleDeleteTimbred(record._id)}
+                        okText="Oui"
+                        cancelText="Non"
+                      >
+                        <Button
+                          type="danger"
+                          icon={<CloseCircleOutlined />}
+                          className="delete-icon"
+                          style={{
+                            backgroundColor: "#f5222d",
+                            color: "#fff",
+                            border: "none",
+                            width: "50px",
+                            borderRadius: "4px",
+                            padding: "8px 16px",
+                            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                            transition:
+                              "background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s",
+                          }}
+                        ></Button>
+                      </Popconfirm>
+                    )}
                   </Space>
                 ),
               },
-            ]}
+            ].filter(Boolean)}
           />
         </TabPane>
       </Tabs>
@@ -321,10 +466,7 @@ const Taxe = () => {
             Annuler
           </Button>,
           <Button
-            style={{
-              backgroundColor: "#232492", // Couleur de fond personnalisée
-              border: "none",
-            }}
+            style={{ backgroundColor: "#232492", border: "none" }}
             key="submit"
             type="primary"
             onClick={() => {
@@ -341,17 +483,11 @@ const Taxe = () => {
             {editItem ? "Mettre à jour" : "Ajouter"}
           </Button>,
         ]}
-        style={{ border: "none", borderRadius: "8px" }}
-        className="custom-modal"
       >
         <Form
           form={form}
           layout="vertical"
-          style={{
-            padding: "20px",
-            background: "transparent",
-            borderRadius: "8px",
-          }}
+          style={{ padding: "20px", background: "transparent" }}
           initialValues={{ taxe: selectedTaxe }}
         >
           {selectedTaxe === "tva" ? (
@@ -363,19 +499,67 @@ const Taxe = () => {
                   { required: true, message: "Veuillez saisir la valeur " },
                 ]}
               >
-                <Input
-                  style={{ borderRadius: "8px", paddingRight: "24px" }} // Ajouter un espace à droite pour le symbole
-                  addonAfter="%"
-                />
+                <Input addonAfter="%" />
               </Form.Item>
+              {editItem && selectedTaxe === "tva" && role === "admin" && (
+                <Form.Item
+                  name="status"
+                  label="Statut"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Veuillez sélectionner le statut!",
+                    },
+                  ]}
+                  initialValue={status}
+                >
+                  <Switch
+                    checked={status}
+                    onChange={(checked) => setStatus(checked)}
+                    checkedChildren="Activé"
+                    unCheckedChildren="Désactivé"
+                    checkedColor="#52c41a"
+                    unCheckedColor="#f5222d"
+                    style={{ fontSize: 16 }}
+                  />
+                </Form.Item>
+              )}
             </>
           ) : (
+            selectedTaxe === "timbre" && (
+              <Form.Item
+                name="value"
+                label="Valeur"
+                rules={[
+                  { required: true, message: "Veuillez saisir la valeur" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            )
+          )}
+
+          {editItem && selectedTaxe === "timbre" && role === "admin" && (
             <Form.Item
-              name="value"
-              label="Valeur"
-              rules={[{ required: true, message: "Veuillez saisir la valeur" }]}
+              name="status"
+              label="Statut"
+              rules={[
+                {
+                  required: true,
+                  message: "Veuillez sélectionner le statut!",
+                },
+              ]}
+              initialValue={statusT}
             >
-              <Input style={{ borderRadius: "8px" }} />
+              <Switch
+                checked={statusT}
+                onChange={(checked) => setStatusT(checked)}
+                checkedChildren="Activé"
+                unCheckedChildren="Désactivé"
+                checkedColor="#52c41a"
+                unCheckedColor="#f5222d"
+                style={{ fontSize: 16 }}
+              />
             </Form.Item>
           )}
         </Form>

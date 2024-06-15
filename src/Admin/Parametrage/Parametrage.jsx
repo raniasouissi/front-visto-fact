@@ -18,9 +18,11 @@ import {
 } from "antd";
 import {
   EditOutlined,
-  DeleteOutlined,
+  CloseCircleOutlined,
   PlusOutlined,
   SearchOutlined,
+  CheckOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 
 import "./parametrage.css";
@@ -60,6 +62,25 @@ const Parametrage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [parametreStatusFilter, setParametreStatusFilter] = useState("all");
   const [status, setStatus] = useState(null);
+  const [user, setUser] = useState(null);
+  const idProfil = localStorage.getItem("id");
+  const role = localStorage.getItem("role");
+
+  const fetchUser = () => {
+    axios
+      .get("http://localhost:5000/api/users/" + idProfil)
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
+
+  useEffect(() => {
+    fetchUser();
+    console.log("user", user);
+  }, [idProfil]);
 
   const handleParametreStatusChange = (value) => {
     setParametreStatusFilter(value);
@@ -88,7 +109,13 @@ const Parametrage = () => {
         url += `/search/${searchQuery}`;
       }
       const response = await axios.get(url);
-      setParametrages(response.data);
+      let filteredParametrages = response.data;
+      if (role === "financier") {
+        filteredParametrages = response.data.filter(
+          (parametrage) => parametrage.status === true
+        );
+      }
+      setParametrages(filteredParametrages);
     } catch (error) {
       console.error("Erreur lors de la récupération des paramétrages :", error);
     }
@@ -148,16 +175,27 @@ const Parametrage = () => {
     }
   };
 
-  const handleDeleteParametrage = async (id) => {
+  const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/parametrage/${id}`);
-      fetchParametrages();
-      message.success("Paramétrage supprimé avec succès !");
-    } catch (error) {
-      console.error("Erreur lors de la suppression du paramétrage :", error);
-      message.error(
-        "Erreur lors de la suppression du paramétrage. Veuillez réessayer."
+      const response = await fetch(
+        `http://localhost:5000/api/parametrage/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: false }),
+        }
       );
+      if (response.ok) {
+        message.success("Les données ont été supprimées avec succès");
+        fetchParametrages();
+      } else {
+        throw new Error("Échec de la suppression des données");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression des données:", error);
+      message.error("Échec de la suppression des données");
     }
   };
 
@@ -241,15 +279,23 @@ const Parametrage = () => {
     form.resetFields();
   };
   const columns = [
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: 80,
-      render: (status) => (
-        <Badge dot style={{ backgroundColor: status ? "green" : "red" }} />
-      ),
-    },
+    role === "admin"
+      ? {
+          title: "Status",
+          dataIndex: "status",
+          key: "status",
+          width: 80,
+          render: (status) => (
+            <Badge
+              status={status ? "success" : "error"}
+              text={status ? "Actif" : "Inactif"}
+              style={{ fontWeight: "bold" }}
+              icon={status ? <CheckOutlined /> : <StopOutlined />}
+            />
+          ),
+          sorter: (a, b) => a.status - b.status,
+        }
+      : null,
     {
       title: "M.F",
       dataIndex: "matriculefiscal",
@@ -260,6 +306,11 @@ const Parametrage = () => {
       dataIndex: "nomEntreprise",
       key: "nomEntreprise",
     },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
 
     {
       title: "Numéro de Téléphone",
@@ -267,12 +318,14 @@ const Parametrage = () => {
       key: "phonenumber",
     },
 
+    { title: "Pays", dataIndex: "pays", key: "pays" },
+
     {
       title: "Adresse",
       dataIndex: "adresseEntreprise",
       key: "adresseEntreprise",
     },
-    { title: "Pays", dataIndex: "pays", key: "pays" },
+
     { title: "Ville", dataIndex: "ville", key: "ville" },
     { title: "Code Postale", dataIndex: "codePostal", key: "codePostal" },
     {
@@ -288,24 +341,39 @@ const Parametrage = () => {
               backgroundColor: "#1890ff", // Couleur de fond bleue
               border: "none", // Supprimer la bordure
               borderRadius: "40%", // Coins arrondis
+              width: "45px",
             }}
           ></Button>
-          <Popconfirm
-            title="Êtes-vous sûr de vouloir supprimer ce paramétrage ?"
-            onConfirm={() => handleDeleteParametrage(record._id)}
-            okText="Oui"
-            cancelText="Non"
-          >
-            <Button
-              type="danger"
-              icon={<DeleteOutlined />}
-              className="delete-icon"
-            ></Button>
-          </Popconfirm>
+
+          {role === "financier" && (
+            <Popconfirm
+              title="Êtes-vous sûr de vouloir désactiver ce paramètre ?"
+              onConfirm={() => handleDelete(record._id)}
+              okText="Oui"
+              cancelText="Non"
+            >
+              <Button
+                type="danger"
+                icon={<CloseCircleOutlined />}
+                style={{
+                  backgroundColor: "#f5222d",
+                  color: "#fff",
+                  border: "none",
+                  width: "50px",
+                  borderRadius: "4px",
+                  padding: "8px 16px",
+                  boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                  transition:
+                    "background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s",
+                }}
+                className="delete-icon"
+              ></Button>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <div className="parametrage-management-container" style={{ marginTop: 30 }}>
@@ -371,20 +439,22 @@ const Parametrage = () => {
           }
           key="1"
         >
-          <Select
-            defaultValue="all"
-            style={{
-              width: 150,
-              marginBottom: 20,
-              backgroundColor: "#f0f2f5",
-              fontFamily: "Arial, sans-serif",
-            }}
-            onChange={handleParametreStatusChange}
-          >
-            <Option value="all">Tous</Option>
-            <Option value="activated">Activé</Option>
-            <Option value="inactivated">Désactivé</Option>
-          </Select>
+          {role === "admin" && (
+            <Select
+              defaultValue="all"
+              style={{
+                width: 150,
+                marginBottom: 20,
+                backgroundColor: "#f0f2f5",
+                fontFamily: "Arial, sans-serif",
+              }}
+              onChange={handleParametreStatusChange}
+            >
+              <Option value="all">Tous</Option>
+              <Option value="activated">Activé</Option>
+              <Option value="inactivated">Désactivé</Option>
+            </Select>
+          )}
 
           <Table
             dataSource={parametrages.filter(
@@ -486,6 +556,42 @@ const Parametrage = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
+                style={{ marginLeft: 5 }}
+                name="email"
+                className="form-item"
+                rules={[
+                  {
+                    required: true,
+
+                    message: "Veuillez entrer une adresse e-mail valide",
+                  },
+                ]}
+              >
+                <Input
+                  className="custom-input"
+                  style={{
+                    border: "none", // Retirer toutes les bordures
+                    borderRadius: 0, // Retirer le rayon de bordure
+                    borderBottom: "2px solid #9e9ea3",
+                    padding: "10px 0", // Ajuster le padding
+                    fontSize: 20, // Réduire légèrement la taille de la police
+                    width: "270px", // Augmenter la largeur du champ
+                    marginBottom: 10,
+                    color: "#5f5e5e",
+                    fontfamily: "Poppins",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.outline = "none"; // Retirer le contour lorsqu'il est en focus
+
+                    e.target.style.boxShadow = "none"; // Retirer l'ombre lorsqu'il est en focus
+                    e.target.style.borderBottomColor = "#0a579f"; // Changer la couleur de la bordure du bas en cas de focus
+                  }}
+                  placeholder="Email"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
                 style={{ marginTop: 10 }}
                 name="phonenumber"
                 rules={[
@@ -516,7 +622,7 @@ const Parametrage = () => {
                     borderBottom: "2px solid #9e9ea3",
                     padding: "10px 0",
                     fontSize: 18,
-                    width: "550px",
+                    width: "220px",
                     marginLeft: "50px",
                     fontFamily: "Poppins",
                     fontWeight: "normal",
@@ -695,27 +801,29 @@ const Parametrage = () => {
             // Dans le retour de votre composant Parametrage
             <Row>
               <Col span={24}>
-                <Form.Item
-                  name="status"
-                  label="Statut"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner le statut!",
-                    },
-                  ]}
-                  initialValue={false}
-                >
-                  <Switch
-                    checked={status}
-                    onChange={(checked) => setStatus(checked)}
-                    checkedChildren="Activé"
-                    unCheckedChildren="Désactivé"
-                    checkedColor="#52c41a" // Vert pour Activé
-                    unCheckedColor="#f5222d" // Rouge pour Désactivé
-                    style={{ fontSize: 16 }}
-                  />
-                </Form.Item>
+                {role === "admin" && (
+                  <Form.Item
+                    name="status"
+                    label="Statut"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Veuillez sélectionner le statut!",
+                      },
+                    ]}
+                    initialValue={false}
+                  >
+                    <Switch
+                      checked={status}
+                      onChange={(checked) => setStatus(checked)}
+                      checkedChildren="Activé"
+                      unCheckedChildren="Désactivé"
+                      checkedColor="#52c41a" // Vert pour Activé
+                      unCheckedColor="#f5222d" // Rouge pour Désactivé
+                      style={{ fontSize: 16 }}
+                    />
+                  </Form.Item>
+                )}
               </Col>
             </Row>
           )}

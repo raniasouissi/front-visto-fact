@@ -9,9 +9,9 @@ import Footer from "./Componnets/Footer/Footer";
 import Signin from "./auth/Signin-page/Signin";
 import Signup from "./auth/Signup-page/signup";
 import Devis from "./Componnets/Devis-page/Devis";
-import DashboardAdmin from "./Admin/Dashobardadmin/dashboard-admin";
+
 import DashboardClient from "./Client/DashboardClient";
-import DashboardFinancier from "./Financier/DashboardFinancier";
+import DashboardFinancier from "./Financier/Dashborad/DashboardFinancier";
 import ResetPasswordComponent from "./auth/ResetPassword/ResetPasswordComponent";
 import VerificationPage from "./auth/Verif-email/VerificationPage";
 import SetPassword from "./Admin/ClientManagement/SetPassword/SetPassword";
@@ -45,12 +45,8 @@ const App = () => {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/fact" element={<Facture />} />
-            <Route path="/dashboard" element={<DashboardAdmin />} />
             <Route path="/dashboard-client" element={<DashboardClient />} />
-            <Route
-              path="/dashboard-financier"
-              element={<DashboardFinancier />}
-            />
+            <Route path="/dashboard" element={<DashboardFinancier />} />
             <Route path="/verification" element={<VerificationPage />} />
             <Route
               path="/dashboard/modiferprofil"

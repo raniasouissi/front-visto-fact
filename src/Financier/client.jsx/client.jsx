@@ -19,7 +19,7 @@ import {
   UserAddOutlined,
   SearchOutlined,
   EditOutlined,
-  DeleteOutlined,
+  CloseCircleOutlined,
   UserOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
@@ -109,16 +109,23 @@ const client = () => {
       if (type === "clients") {
         data = await apiusers.fetchClients(searchQuery);
 
-        let filteredClients = data;
-
+        // Filtrer les clients en fonction de la présence ou non du matricule fiscal
+        let filteredClients = [];
         if (matriculeFiscaleFilter === "with") {
           filteredClients = data.filter((client) => !!client.matriculeFiscale);
         } else if (matriculeFiscaleFilter === "without") {
           filteredClients = data.filter((client) => !client.matriculeFiscale);
+        } else {
+          filteredClients = data; // Si aucun filtre n'est sélectionné, conserver tous les clients
         }
 
+        // Filtrer les clients avec un statut true
+        const clientsWithTrueStatus = filteredClients.filter(
+          (client) => client.status === true
+        );
+
         // Inclure le chemin de l'image dans les données du client
-        const usersWithImage = filteredClients.map((client) => ({
+        const usersWithImage = clientsWithTrueStatus.map((client) => ({
           ...client,
           imagePath: `http://localhost:5000/uploads/${client.image}`, // Ajouter le chemin de l'image
         }));
@@ -138,18 +145,27 @@ const client = () => {
   const handleSearch = (value) => {
     fetchUsers(activeTab, value);
   };
-  const handleDeleteUser = async (userId) => {
+
+  const handleDeleteActv = async (id) => {
     try {
-      if (activeTab === "clients") {
-        await apiusers.deleteClient(userId);
+      const response = await fetch(`http://localhost:5000/api/clients/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: false }),
+      });
+      if (response.ok) {
+        // Effectuez les actions nécessaires après la suppression réussie
+
+        message.success("Les données ont été supprimées avec succès");
+        fetchUsers(activeTab);
+      } else {
+        throw new Error("Échec de la suppression des données");
       }
-      fetchUsers(activeTab); // Re-fetch les utilisateurs après la suppression
-      message.success("Utilisateur supprimé avec succès !");
     } catch (error) {
-      console.error("Erreur lors de la suppression de l'utilisateur :", error);
-      message.error(
-        "Erreur lors de la suppression de l'utilisateur. Veuillez réessayer."
-      );
+      console.error("Erreur lors de la suppression des données:", error);
+      message.error("Échec de la suppression des données");
     }
   };
 
@@ -341,18 +357,30 @@ const client = () => {
                 backgroundColor: "#1890ff", // Couleur de fond bleue
                 border: "none", // Supprimer la bordure
                 borderRadius: "40%", // Coins arrondis
+                width: "45px",
               }}
             />
 
             <Popconfirm
               title="Êtes-vous sûr de vouloir supprimer ce client ?"
-              onConfirm={() => handleDeleteUser(record._id)}
+              onConfirm={() => handleDeleteActv(record._id)}
               okText="Oui"
               cancelText="Non"
             >
               <Button
                 type="danger"
-                icon={<DeleteOutlined />}
+                icon={<CloseCircleOutlined />}
+                style={{
+                  backgroundColor: "#f5222d",
+                  color: "#fff",
+                  border: "none",
+                  width: "50px",
+                  borderRadius: "4px",
+                  padding: "8px 16px",
+                  boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+                  transition:
+                    "background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s",
+                }}
                 className="delete-icon"
               ></Button>
             </Popconfirm>
