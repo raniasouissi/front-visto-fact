@@ -51,7 +51,7 @@ function SetPassword() {
       );
       setTimeout(() => {
         history("/login");
-      }, 3000);
+      }, 5000);
     } finally {
       setLoading(false);
     }

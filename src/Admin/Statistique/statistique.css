@@ -1,0 +1,50 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px; /* Espacement intérieur pour la mise en page */
+}
+
+.chart-row {
+  display: flex;
+  justify-content: space-around; /* Répartit les graphiques équitablement sur la ligne */
+  width: 100%;
+  margin-bottom: 20px; /* Espacement entre chaque ligne de graphiques */
+}
+
+.chart-container {
+  width: 45%; /* Ajuste la largeur des containers de graphique */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère pour un effet de profondeur */
+  border-radius: 8px; /* Coins arrondis pour les containers */
+  background-color: #ffffff; /* Fond blanc pour les containers */
+  padding: 20px; /* Espacement intérieur pour les graphiques */
+  transition: transform 0.2s ease-in-out; /* Animation de transformation sur hover */
+}
+
+.chart-container:hover {
+  transform: scale(1.02); /* Légère agrandissement sur hover */
+}
+
+h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333333; /* Couleur du texte */
+}
+
+/* Styles spécifiques pour les étiquettes dans VictoryPie */
+.victory-pie-label text {
+  fill: #2c3e50; /* Couleur du texte des étiquettes */
+  font-size: 12px;
+}
+
+/* Media query pour rendre les graphiques réactifs */
+@media (max-width: 768px) {
+  .chart-row {
+    flex-direction: column; /* Passe à une colonne pour les écrans plus petits */
+  }
+
+  .chart-container {
+    width: 100%; /* Prend toute la largeur sur les écrans plus petits */
+    margin-bottom: 20px; /* Espacement entre chaque container */
+  }
+}

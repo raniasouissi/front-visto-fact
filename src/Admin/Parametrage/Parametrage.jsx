@@ -202,39 +202,38 @@ const Parametrage = () => {
   const handleUpdateParametrage = async (values) => {
     try {
       await form.validateFields();
-      values.status = status;
 
-      const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
+      // Créer une copie des valeurs pour éviter les modifications indésirées
+      const updatedValues = { ...values };
+      updatedValues.status = status;
 
-      // Vérifier si le code de pays est répété dans le numéro de téléphone
-      const phoneNumberWithoutRepeatedCountryCode =
-        formattedPhoneNumber.replace(new RegExp(`\\+${countryCode} `), "+");
-
-      // Ajouter un espace entre le code de pays et le numéro
-      const phoneNumberWithSpace =
-        phoneNumberWithoutRepeatedCountryCode.replace(
-          `${countryCode}`,
-          `${countryCode} `
-        );
-
-      // Vérifier si l'ID du paramétrage sélectionné correspond à l'ID de l'objet actuellement modifié
+      // Formater le numéro de téléphone uniquement pour le paramétrage sélectionné
       if (selectedParametrage && selectedParametrage._id === values._id) {
-        // Mettre à jour la valeur du numéro de téléphone dans les valeurs
-        values.phonenumber = phoneNumberWithSpace;
+        const formattedPhoneNumber = `+${countryCode} ${phonenumber}`;
+
+        // Vérifier si le code de pays est répété dans le numéro de téléphone
+        const phoneNumberWithoutRepeatedCountryCode =
+          formattedPhoneNumber.replace(new RegExp(`\\+${countryCode} `), "+");
+
+        // Ajouter un espace entre le code de pays et le numéro
+        updatedValues.phonenumber = phoneNumberWithoutRepeatedCountryCode;
       }
 
-      values.pays = selectedCountry ? selectedCountry.label : "";
+      // Ajouter le pays sélectionné aux valeurs
+      updatedValues.pays = selectedCountry ? selectedCountry.label : "";
+
+      // Envoyer la requête PUT pour mettre à jour le paramétrage spécifique
       const response = await axios.put(
         `http://localhost:5000/api/parametrage/${selectedParametrage._id}`,
-        values
+        updatedValues
       );
 
       if (response.status === 200) {
-        fetchParametrages();
-        setVisibleDrawer(false);
+        fetchParametrages(); // Actualiser la liste des paramétrages
+        setVisibleDrawer(false); // Cacher le formulaire de modification
         message.success("Paramétrage mis à jour avec succès !");
         form.resetFields(); // Réinitialiser les champs du formulaire
-        setSelectedCountry(null);
+        setSelectedCountry(null); // Réinitialiser le pays sélectionné
       } else {
         console.error(
           "Erreur lors de la mise à jour du paramétrage : Statut de réponse inattendu",
@@ -417,7 +416,7 @@ const Parametrage = () => {
               }}
             >
               <span style={{ fontWeight: "bold", fontSize: 14, marginTop: -3 }}>
-                Ajouter Paramétrage
+                Ajouter une entreprise
               </span>
             </Button>
           </div>
@@ -474,7 +473,11 @@ const Parametrage = () => {
       </Tabs>
 
       <Drawer
-        title={isAdding ? "Ajouter un Paramétrage" : "Modifier un Paramétrage"}
+        title={
+          isAdding
+            ? "Ajouter un paramètre de l'entreprise"
+            : "Modifier un paramètre de l'entreprise "
+        }
         width={700}
         onClose={onCloseDrawer}
         visible={visibleDrawer}

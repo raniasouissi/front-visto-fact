@@ -17,7 +17,7 @@ import axios from "axios";
 import moment from "moment";
 import "./facture.css";
 import {
-  CloseCircleOutlined,
+  CloseOutlined,
   EyeOutlined,
   PlusOutlined,
   MailOutlined,
@@ -25,6 +25,10 @@ import {
   EnvironmentOutlined,
   PrinterOutlined,
   DollarCircleOutlined,
+  WarningOutlined,
+  ExclamationCircleOutlined,
+  CheckCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 
 import Logo from "../../assets/images/visto.png";
@@ -56,14 +60,37 @@ const Facture = () => {
   const [timbre, settimbre] = useState(parseFloat(""));
   const [selectedFacture, setSelectedFacture] = useState(null);
   const [quantite, setQuantite] = useState(parseInt(""));
+  const [paiement, setPaiement] = useState([]);
 
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(null);
   const [paymentMode, setPaymentMode] = useState(null);
-  const [chequeFields, setChequeFields] = useState([{ key: Date.now() }]);
+
   const [montantPaye, setMontantPaye] = useState(null);
   const [etatPaiement, setEtatPaiement] = useState("");
   const [chequePaymentStatus, setChequePaymentStatus] = useState(null);
+  //const [chequeFields, setChequeFields] = useState([{ id: 1 }]);
+  const [installments, setInstallments] = useState([{ id: 1 }]); // Stocke les échéances
+  const [montantRestant, setMontantRestant] = useState(0);
+
+  const addInstallment = () => {
+    setInstallments([...installments, { id: installments.length + 1 }]);
+  };
+
+  const handleRemoveEcheance = (index) => {
+    setInstallments((prevInstallments) =>
+      prevInstallments.filter((_, i) => i !== index)
+    );
+  };
+
+  // const addChequeField = () => {
+  //   const newFieldId = chequeFields.length + 1;
+  //   setChequeFields([...chequeFields, { id: newFieldId }]);
+  // };
+  // const removeChequeField = (index) => {
+  //   const updatedFields = chequeFields.filter((field, idx) => idx !== index);
+  //   setChequeFields(updatedFields);
+  // };
 
   const handlePaymentModeChange = (value) => {
     setPaymentMode(value);
@@ -71,21 +98,48 @@ const Facture = () => {
       const totalTTC = form.getFieldValue("totalTTC");
       setMontantPaye(totalTTC);
       setEtatPaiement("Payé");
-      form.setFieldsValue({ montantPaye: totalTTC, etatPaiement: "Payé" });
+      form.setFieldsValue({ montantPaye: totalTTC, etatpaiement: "Payé" });
+    } else if (value === "cheque") {
+      setMontantPaye(null);
+      setEtatPaiement("");
+      form.setFieldsValue({ montantPaye: null, etatpaiement: "" });
     } else {
       setMontantPaye(null);
       setEtatPaiement("");
-      form.setFieldsValue({ montantPaye: null, etatPaiement: "" });
+      form.setFieldsValue({ montantPaye: null, etatpaiement: "" });
     }
-  };
-
-  const addChequeField = () => {
-    setChequeFields([...chequeFields, { key: Date.now() }]);
   };
 
   const handleChequePaymentStatusChange = (value) => {
     setChequePaymentStatus(value);
+    if (value === "Payé") {
+      const totalTTC = form.getFieldValue("totalTTC");
+      setMontantPaye(totalTTC);
+      setEtatPaiement("Payé");
+      form.setFieldsValue({ montantCheque: totalTTC, etatpaiement: "Payé" });
+    } else {
+      setMontantPaye(null);
+      form.setFieldsValue({ montantPaye: null });
+    }
   };
+
+  const calculateRemainingAmount = () => {
+    const totalTTC = form.getFieldValue("totalTTC");
+    let montantChequeTotal = 0;
+
+    installments.forEach((_, index) => {
+      const montantCheque = form.getFieldValue(`montantCheque_${index}`);
+      if (montantCheque) {
+        montantChequeTotal += montantCheque;
+      }
+    });
+
+    const montantRestant = totalTTC - montantChequeTotal;
+    setMontantRestant(montantRestant);
+  };
+  useEffect(() => {
+    calculateRemainingAmount();
+  }, [installments, form]);
 
   // Créez une fonction pour ouvrir le modal de détails de la facture
   const showDetailModal = () => {
@@ -130,7 +184,16 @@ const Facture = () => {
   useEffect(() => {
     fetchData();
     fetchFacture();
+    fetchPaiement();
   }, []);
+  const fetchPaiement = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/paiements");
+      setPaiement(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des paiements :", error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -318,9 +381,7 @@ const Facture = () => {
         totalHTApresRemise: parseFloat(values.totalHTApresRemise).toFixed(3),
         totalTVA: values.totalTVA,
         totalTTC: values.totalTTC,
-
         services: selectedServices.map((service) => ({
-          // Créez un objet avec les données pertinentes du service
           _id: service._id,
           reference: service.reference,
           libelle: service.libelle,
@@ -333,10 +394,31 @@ const Facture = () => {
         })),
       };
 
-      console.log("Données de la facture créée :", payload);
-
       // Créer la facture
-      await axios.post("http://localhost:5000/api/facture/fact", payload);
+      const factureResponse = await axios.post(
+        "http://localhost:5000/api/facture/fact",
+        payload
+      );
+
+      // Récupérer l'ID du client sélectionné
+      const clientId = payload.clientid;
+
+      // Récupérer le numéro de la facture à partir de la réponse
+      const numeroFacture = factureResponse.data.numeroFacture;
+
+      // Créer la notification pour la facture créée
+      const notificationData = {
+        type: "FactureCréée",
+        notif: `Nous vous informons que votre facture numéro ${numeroFacture} est maintenant disponible.`,
+        client: clientId,
+      };
+
+      // Envoyer la notification
+      const notificationResponse = await axios.post(
+        "http://localhost:5000/api/notifications",
+        notificationData
+      );
+      console.log("Notification créée:", notificationResponse.data);
 
       // Afficher un message de succès
       message.success("Facture créée avec succès !");
@@ -531,7 +613,7 @@ const Facture = () => {
           style={{ background: "transparent", fontSize: 15 }}
           onClick={() => handleDeleteService(record._id)}
         >
-          <CloseCircleOutlined />
+          <CloseOutlined />
         </Button>
       ),
     },
@@ -603,6 +685,21 @@ const Facture = () => {
   ]);
 
   const handleEdit = (record) => {
+    const paiementAssocie = paiement.find((p) =>
+      p.factures.includes(record._id)
+    );
+
+    if (
+      paiementAssocie &&
+      (paiementAssocie.etatpaiement === "Payé" ||
+        paiementAssocie.etatpaiement === "partiellementPayé")
+    ) {
+      message.error(
+        "Cette facture est déjà payée ou partiellement payée et ne peut pas être modifiée."
+      );
+      return;
+    }
+
     setIsEditing(record);
     setIsModalVisible(true);
 
@@ -615,41 +712,94 @@ const Facture = () => {
     });
   };
 
-  const handleUpdate = async () => {
+  const handleSubmit = async () => {
     try {
-      // Récupérer les valeurs du formulaire
       const values = await form.validateFields();
 
-      // Construire le payload pour la mise à jour de la facture
-      const payload = {
-        totalTTC: values.totalTTC,
-        montantPaye: values.montantPaye,
-        montantRestant: values.montantRestant,
-        datejour: values.datejour,
+      // Vérification du montant restant
+      if (montantRestant !== 0) {
+        message.error(
+          "Le montant restant doit être égal à 0 pour créer le paiement"
+        );
+        return;
+      }
+
+      // Construction des données de paiement à envoyer
+      const paymentData = {
         etatpaiement: values.etatpaiement,
+        montantPaye: values.montantPaye,
+        typepaiement: values.typepaiement,
+        factures: isEditing ? isEditing._id : null,
+        echeances:
+          chequePaymentStatus === "Payé"
+            ? [
+                {
+                  numCheque: values.numCheque,
+                  montantCheque: values.montantCheque,
+                  dateCh: moment(values.dateCh).toISOString(),
+                },
+              ]
+            : installments.map((installment, index) => ({
+                numCheque: values[`numCheque_${index}`],
+                montantCheque: values[`montantCheque_${index}`],
+                dateCh: moment(values[`dateCh_${index}`]).toISOString(),
+              })),
       };
 
-      console.log("Payload for update:", payload);
+      console.log("Payment Data:", paymentData);
 
-      await axios.put(
-        `http://localhost:5000/api/facture/${isEditing._id}`, // Utilisation de l'ID de la facture pour la mise à jour
-        payload
+      // Envoi de la requête de création de paiement
+      const response = await axios.post(
+        "http://localhost:5000/api/paiements",
+        paymentData
       );
 
-      // Afficher un message de succès
-      message.success("Facture mise à jour avec succès !");
+      if (response.status === 201) {
+        message.success("Paiement créé avec succès!");
+        form.resetFields();
 
-      // Réinitialiser le formulaire et fermer le modal
-      form.resetFields();
-      setIsEditing(null);
-      setIsModalVisible(false);
+        // Réinitialisation des états du formulaire
+        setPaymentMode("");
+        setChequePaymentStatus("");
+        setInstallments([]);
+        setIsModalVisible(false);
+        setIsEditing(false);
 
-      fetchFacture(); // Rafraîchir les données des factures si nécessaire
+        // Rafraîchissement des paiements et factures
+        fetchPaiement();
+        fetchFacture();
+      } else {
+        message.error("Erreur lors de la création du paiement");
+      }
+
+      await submitNotification(
+        isEditing.client._id,
+        isEditing.numeroFacture,
+        paymentData.etatpaiement
+      );
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la facture :", error);
-      message.error(
-        "Une erreur s'est produite lors de la mise à jour de la facture."
+      console.error("Erreur lors de la création du paiement:", error);
+      message.error("Erreur lors de la création du paiement");
+    }
+  };
+
+  const submitNotification = async (clientId, numeroFacture, etatpaiement) => {
+    try {
+      const notificationData = {
+        type: "PaiementRéglé",
+        notif: `Votre facture numero : ${numeroFacture} est ${etatpaiement}`,
+        client: clientId,
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/api/notifications",
+        notificationData
       );
+      console.log("Notification créée:", response.data);
+      message.success("Notification sent successfully");
+    } catch (error) {
+      console.error("Failed to send notification", error);
+      message.error("Failed to send notification.");
     }
   };
 
@@ -688,7 +838,14 @@ const Facture = () => {
       title: "Client",
       dataIndex: "client",
       key: "client",
-      render: (client) => `${client.name} (${client.namecompany})`,
+      render: (client) =>
+        client ? `${client.name} (${client.namecompany})` : "Client inconnu",
+    },
+
+    {
+      title: "Total TTC",
+      dataIndex: "totalTTC",
+      key: "totalTTC",
     },
     {
       title: "Devise",
@@ -697,67 +854,84 @@ const Facture = () => {
       render: (devise) => devise.symbole,
     },
     {
-      title: "Total TTC",
-      dataIndex: "totalTTC",
-      key: "totalTTC",
+      title: "État Paiement",
+      key: "etatpaiement",
+      render: (record) => renderEtatPaiement(record),
     },
 
-    {
-      title: "Delai de Paiement",
-      dataIndex: "delai",
-      key: "delai",
-    },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <Space size="middle">
+          {/* Bouton "Eye" */}
           <button
             style={{
-              backgroundColor: "transparent",
-              color: "#736464",
+              backgroundColor: "#3F51B5", // Fond bleu roi
+              color: "#FFFFFF", // Texte blanc
               border: "none",
               borderRadius: "50%",
-              padding: "8px",
+              padding: "12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              transition: "background-color 0.3s ease",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
             }}
             onClick={() => showFactureDetails(record)}
           >
-            <EyeOutlined />
+            <EyeOutlined style={{ fontSize: "18px" }} />
           </button>
+
+          {/* Bouton "DollarCircle" */}
           <button
             style={{
-              backgroundColor: "transparent",
-              color: "#14149f",
+              backgroundColor: "#e24947", // Fond rouge vif
+              color: "#FFFFFF", // Texte blanc
               border: "none",
               borderRadius: "50%",
-              padding: "8px",
+              padding: "12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              transition: "background-color 0.3s ease",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
+              opacity: paiement.some(
+                (p) =>
+                  p.factures.includes(record._id) &&
+                  (p.etatpaiement === "Payé" ||
+                    p.etatpaiement === "partiellementPayé")
+              )
+                ? "0.5"
+                : "1",
             }}
             onClick={() => handleEdit(record)}
+            disabled={paiement.some(
+              (p) =>
+                p.factures.includes(record._id) &&
+                (p.etatpaiement === "Payé" ||
+                  p.etatpaiement === "partiellementPayé")
+            )}
           >
-            <DollarCircleOutlined style={{ color: "#1890ff" }} />
+            <DollarCircleOutlined />
           </button>
+
+          {/* Bouton "Printer" */}
           <button
             style={{
-              backgroundColor: "transparent",
-              color: "#14149f",
+              backgroundColor: "#5f616b", // Fond bleu roi
+              color: "#FFFFFF", // Texte blanc
               border: "none",
               borderRadius: "50%",
-              padding: "8px",
+              padding: "12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              transition: "background-color 0.3s ease",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
             }}
           >
             <PrinterOutlined style={{ fontSize: "20px" }} />
@@ -767,6 +941,38 @@ const Facture = () => {
     },
   ];
 
+  const renderEtatPaiement = (record) => {
+    const paiementAssocie = paiement.find((p) =>
+      p.factures.includes(record._id)
+    );
+    let icon;
+    let text;
+
+    if (paiementAssocie) {
+      const etatpaiement = paiementAssocie.etatpaiement;
+
+      if (etatpaiement === "Payé") {
+        icon = <CheckCircleOutlined style={{ color: "green" }} />;
+        text = "Payé";
+      } else if (etatpaiement === "partiellementPayé") {
+        icon = <WarningOutlined style={{ color: "yellow" }} />;
+        text = "Partiellement Payé";
+      } else {
+        icon = <ExclamationCircleOutlined style={{ color: "red" }} />;
+        text = "Non Payé";
+      }
+    } else {
+      // Si aucun paiement associé n'est trouvé
+      icon = <ExclamationCircleOutlined style={{ color: "red" }} />;
+      text = "Non Payé";
+    }
+
+    return (
+      <span>
+        {icon} {text}
+      </span>
+    );
+  };
   return (
     <div>
       <Button
@@ -792,6 +998,19 @@ const Facture = () => {
           Ajouter Facture
         </span>
       </Button>
+
+      <Input
+        prefix={<SearchOutlined style={{ color: "#8f8fa1" }} />}
+        placeholder="Rechercher ..."
+        style={{
+          width: 250,
+          marginRight: 8,
+          height: 35,
+          borderRadius: 10, // Ajoute des coins arrondis pour un aspect plus moderne
+          boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", // Ajoute une ombre subtile
+        }}
+      />
+
       <Table
         dataSource={factures}
         columns={columnsFact}
@@ -800,9 +1019,12 @@ const Facture = () => {
         pagination={{ pageSize: 10 }}
         style={{
           marginTop: "50px",
-          borderRadius: 8,
+          borderRadius: "8px",
           border: "1px solid #e8e8e8",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          overflow: "hidden",
         }}
+        className="custom-table"
       />
       <Modal
         title={
@@ -815,13 +1037,22 @@ const Facture = () => {
               textAlign: "center",
             }}
           >
-            {isEditing ? "Ajouter un paiement" : "Ajouter une facture"}
+            {isEditing ? "Ajouter  un état paiement" : "Ajouter une facture"}
           </span>
         }
         visible={isModalVisible}
         onCancel={() => {
           setIsModalVisible(false);
           form.resetFields(); // Réinitialisez les champs du formulaire
+          setSelectedServices([]);
+
+          form.setFieldsValue({ totalHT: null });
+          form.setFieldsValue({ totalHTApresRemise: null });
+          form.setFieldsValue({ totalTVA: null });
+          form.setFieldsValue({ totalTVAA: null });
+          setPaymentMode("");
+          setChequePaymentStatus("");
+
           setIsEditing(false); // Désactivez le mode d'édition
         }}
         footer={null}
@@ -835,7 +1066,7 @@ const Facture = () => {
         <Form
           form={form}
           layout="inline"
-          onFinish={isEditing ? handleUpdate : handleCreate}
+          onFinish={isEditing ? handleSubmit : handleCreate}
           style={{ marginTop: 10, marginRight: 20 }}
         >
           {!isEditing && (
@@ -1008,7 +1239,7 @@ const Facture = () => {
                 <Col span={12}>
                   <Form.Item
                     label="Mode de paiement"
-                    name=" typepaiement"
+                    name="typepaiement"
                     rules={[
                       {
                         required: true,
@@ -1029,7 +1260,7 @@ const Facture = () => {
 
                 <Col span={12}>
                   <Form.Item
-                    label="Date Échéance"
+                    label="Date"
                     name="dateEcheance"
                     initialValue={moment()}
                   >
@@ -1058,7 +1289,7 @@ const Facture = () => {
                       <Form.Item
                         style={{ marginLeft: 20 }}
                         label="État de paiement"
-                        name="etatPaiement"
+                        name="etatpaiement"
                       >
                         <Input
                           style={{ width: "140px" }}
@@ -1076,7 +1307,7 @@ const Facture = () => {
                     <Col span={12}>
                       <Form.Item
                         label="Statut de paiement"
-                        name="chequePaymentStatus"
+                        name="etatpaiement"
                         labelCol={{ span: 22 }}
                         rules={[
                           {
@@ -1090,7 +1321,7 @@ const Facture = () => {
                           onChange={handleChequePaymentStatusChange}
                           style={{ width: "200px", marginLeft: 5 }}
                         >
-                          <Option value="payé">Payé</Option>
+                          <Option value="Payé">Payé</Option>
                           <Option value="partiellementPayé">
                             Partiellement payé
                           </Option>
@@ -1099,7 +1330,7 @@ const Facture = () => {
                     </Col>
                   </Row>
 
-                  {chequePaymentStatus === "payé" && (
+                  {chequePaymentStatus === "Payé" && (
                     <Row gutter={16} style={{ marginBottom: 20 }}>
                       <Col span={8} style={{ marginLeft: -20 }}>
                         <Form.Item
@@ -1126,13 +1357,18 @@ const Facture = () => {
                             },
                           ]}
                         >
-                          <InputNumber style={{ width: "180px" }} />
+                          <InputNumber
+                            style={{ width: "180px" }}
+                            value={montantPaye}
+                            readOnly
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={8} style={{ marginLeft: 10 }}>
                         <Form.Item
-                          label="Date"
+                          label="Date Chèque "
                           name="dateCh"
+                          s
                           initialValue={moment()}
                           rules={[
                             {
@@ -1150,16 +1386,16 @@ const Facture = () => {
 
                   {chequePaymentStatus === "partiellementPayé" && (
                     <>
-                      {chequeFields.map((field, index) => (
+                      {installments.map((installment, index) => (
                         <Row
                           gutter={16}
                           style={{ marginBottom: 20 }}
-                          key={field.key}
+                          key={installment.id} // Utilisation de field.id comme clé unique
                         >
                           <Col span={8} style={{ marginLeft: -20 }}>
                             <Form.Item
-                              label="Numéro "
-                              name={`numCheque${index}`}
+                              label="Numéro"
+                              name={`numCheque_${index}`}
                               rules={[
                                 {
                                   required: true,
@@ -1171,10 +1407,10 @@ const Facture = () => {
                               <Input style={{ width: "200px" }} />
                             </Form.Item>
                           </Col>
-                          <Col span={8} style={{ marginLeft: 10 }}>
+                          <Col span={8} style={{ marginLeft: -10 }}>
                             <Form.Item
-                              label="Montant "
-                              name={`montantCheque${index}`}
+                              label="Montant"
+                              name={`montantCheque_${index}`}
                               rules={[
                                 {
                                   required: true,
@@ -1183,13 +1419,16 @@ const Facture = () => {
                                 },
                               ]}
                             >
-                              <InputNumber style={{ width: "100%" }} />
+                              <InputNumber
+                                style={{ width: "100%" }}
+                                onChange={() => calculateRemainingAmount()}
+                              />
                             </Form.Item>
                           </Col>
-                          <Col span={8} style={{ marginLeft: 10 }}>
+                          <Col span={8} style={{ marginLeft: -50 }}>
                             <Form.Item
-                              label="Date "
-                              name={`dateCh${index}`}
+                              label="Date"
+                              name={`dateCh_${index}`}
                               initialValue={moment()}
                               rules={[
                                 {
@@ -1202,17 +1441,24 @@ const Facture = () => {
                               <DatePicker style={{ width: "100%" }} />
                             </Form.Item>
                           </Col>
+                          <Col span={2}>
+                            <Button
+                              type="link"
+                              onClick={() => handleRemoveEcheance(index)}
+                              icon={<CloseOutlined />}
+                              style={{ color: "red" }}
+                            />
+                          </Col>
                         </Row>
                       ))}
                       <Button
                         type="dashed"
-                        onClick={addChequeField}
+                        onClick={addInstallment}
                         style={{
                           width: "20%",
                           marginBottom: "20px",
                           backgroundColor: "#2b64a5", // Couleur de fond du bouton (vert)
                           borderColor: "#1d599f", // Couleur de bordure du bouton
-
                           color: "white", // Couleur du texte
                           boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Effet d'ombre légère
                         }}
@@ -1220,6 +1466,23 @@ const Facture = () => {
                         <span style={{ fontSize: "16px" }}>+</span> Ajouter un
                         autre chèque
                       </Button>
+                      <p
+                        style={{
+                          marginTop: 20,
+                          marginLeft: 500,
+                          fontSize: "14px", // Taille de la police agrandie
+                          fontWeight: "bold", // Texte en gras
+                          color: "#2b64a5", // Couleur du texte en bleu foncé
+                          padding: "10px", // Ajout d'espace autour du texte
+                          border: "2px solid #2b64a5", // Bordure de 2 pixels en bleu foncé
+                          borderRadius: "10px", // Coins arrondis
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Ombre pour l'effet 3D
+                          textAlign: "center", // Texte centré
+                          backgroundColor: "#f0f8ff", // Couleur de fond légère
+                        }}
+                      >
+                        Montant restant: {montantRestant}
+                      </p>
                     </>
                   )}
                 </>
@@ -1363,6 +1626,9 @@ const Facture = () => {
                 form.setFieldsValue({ totalHTApresRemise: null });
                 form.setFieldsValue({ totalTVA: null });
                 form.setFieldsValue({ totalTVAA: null });
+                setPaymentMode("");
+                setChequePaymentStatus("");
+                setInstallments([]);
               }}
             >
               Annuler

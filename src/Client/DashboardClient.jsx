@@ -4,20 +4,22 @@ import {
   UserOutlined,
   BellOutlined,
   LogoutOutlined,
-  AccountBookOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 import ModifierProfil from "../Financier/modiferprofil";
 import Logo1 from "../assets/images/vbil2.png";
-import AvatarImage from "../assets/images/admin1.png";
+import AvatarImage from "../assets/images/avv.png";
 import FactClient from "./FactureClient/FactClient";
+import axios from "axios";
+import "./DashboardClient.css";
 
-const { Sider, Header, Content } = Layout;
+const { Header, Content } = Layout;
 
 const DashboardClient = () => {
-  const [currentPage, setCurrentPage] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState("Facture"); // Mettez "Facture" pour charger cette page par défaut
+  const [notifications, setNotifications] = useState([]);
   const history = useNavigate();
 
   const handleMenuClick = (page) => {
@@ -42,6 +44,7 @@ const DashboardClient = () => {
 
     return token;
   }
+
   useEffect(() => {
     checkTokenExpiration();
 
@@ -52,6 +55,22 @@ const DashboardClient = () => {
 
     return () => clearInterval(interval); // Nettoyage de l'intervalle lors du démontage
   }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []); // Mettez vide, car vous ne dépendez pas de idProfil pour charger les notifications
+
+  const fetchNotifications = () => {
+    const idProfil = localStorage.getItem("id");
+    axios
+      .get("http://localhost:5000/api/notifications/" + idProfil)
+      .then((response) => {
+        setNotifications(response.data);
+      })
+      .catch((error) =>
+        console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
 
   const handleLogout = async () => {
     try {
@@ -84,16 +103,13 @@ const DashboardClient = () => {
     });
   };
 
-  console.log("token", token);
   const email = localStorage.getItem("UserEmail");
   const name = localStorage.getItem("Username");
-  console.log("email", email);
 
   const menu = (
     <Menu
       style={{
         width: "240px",
-
         borderRadius: "8px",
         boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
       }}
@@ -119,7 +135,6 @@ const DashboardClient = () => {
             >
               {name.charAt(0).toUpperCase() + name.slice(1)}
             </span>
-
             <span style={{ fontSize: "14px", color: "#999" }}>{email}</span>
           </div>
         </div>
@@ -161,68 +176,146 @@ const DashboardClient = () => {
       </Menu.Item>
     </Menu>
   );
+
+  const notificationMenu = (
+    <Menu style={{ minWidth: "200px", fontSize: "14px" }}>
+      <Menu.Item disabled key="title" style={{ fontSize: "11px" }}>
+        <div style={{ padding: "12px", borderBottom: "1px solid #f0f0f0" }}>
+          <strong style={{ fontSize: "20px", color: "#333" }}>
+            Notifications
+          </strong>
+          <br />
+          <span
+            style={{ fontSize: "20px", color: "#101e96", fontStyle: "italic" }}
+          >
+            Bonjour, {name} !
+          </span>
+        </div>
+      </Menu.Item>
+      {notifications.map((notification, index) => (
+        <Menu.Item
+          key={index}
+          style={{
+            fontSize: "14px",
+            paddingLeft: "20px",
+            paddingRight: "12px",
+            position: "relative",
+          }}
+        >
+          <div style={{ padding: "12px 0", borderBottom: "1px solid #f0f0f0" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span style={{ fontSize: "14px", color: "#333" }}>
+                {notification.notif}
+              </span>
+              <CloseOutlined
+                style={{
+                  color: "#f5222d",
+                  fontSize: "14px",
+                  marginLeft: "10px",
+                }}
+              />
+            </div>
+            <span
+              style={{
+                fontSize: "11px",
+                color: "#999",
+                marginTop: "2px",
+                display: "block",
+              }}
+            >
+              {new Date(notification.createdAt).toLocaleString()}
+            </span>
+          </div>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
   return (
     <Layout className="dashboard-container">
-      <Sider className="sidebar" collapsible={false} trigger={null} width={250}>
-        <div className="logo-title-container">
-          <img src={Logo1} alt="Menu Logo" className="sidebar-logo" />
-          <h1 className="app-title">
+      <Header className="headerad">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            marginRight: 400,
+          }}
+        >
+          <img
+            src={Logo1}
+            alt="Menu Logo"
+            style={{ marginRight: 10, height: 40 }}
+          />
+          <h1 className="app-title" style={{ margin: 0 }}>
             <span className="v">V</span>
             <span className="b">Bill</span>
           </h1>
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[currentPage]}
-          style={{ background: "white", marginTop: "-15px" }}
-          className="sidebar-menu" // Ajouter une classe pour cibler tous les éléments du menu
-        >
-          <Menu.Item
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              fontWeight: "bold",
-              color: "#19191a",
-              fontSize: "14px",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginLeft: -35,
-              borderBottom: "1px solid #ccc", // Ajoute une ligne en bas de l'élément
-              lineHeight: "50px", // Ajuste l'espacement vertical pour centrer l'icône et le texte
-              marginBottom: "10px",
-              width: "auto",
-            }}
-            key="Facture"
-            icon={<AccountBookOutlined style={{ color: "#333333" }} />}
-            onClick={() => handleMenuClick("Facture")}
-            className={currentPage === "Facture" ? "active" : ""}
-          >
-            Factures
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout className="site-layout">
-        <Header className="headerad">
-          <div className="right-menu">
-            <Badge count={0}>
-              <BellOutlined className="notification-icon" />
-            </Badge>
-            <Dropdown overlay={menu} trigger={["click"]}>
-              <a
-                className="ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
-              >
-                <Avatar size={44} src={AvatarImage} className="avatar" />{" "}
-              </a>
-            </Dropdown>
+
+        <div className="right-menu">
+          <div style={{ marginRight: 600 }}>
+            <button
+              onClick={() => handleMenuClick("Facture")}
+              className={`menu-item ${
+                currentPage === "Facture" ? "active" : ""
+              }`}
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+                color: currentPage === "Facture" ? "#121477" : "#19191a",
+                fontSize: "16px",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                borderBottom: "1px solid #ccc",
+                lineHeight: "50px",
+                marginBottom: "-10px",
+                width: "auto",
+                borderRadius: "4px",
+                cursor: "pointer",
+                padding: "0 15px",
+                transition: "color 0.3s, border-color 0.3s", // Ajout d'une transition pour la couleur et la bordure
+                border: "none",
+                outline: "none",
+                background: "none",
+                display: "inline-flex", // Permet de centrer verticalement
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative", // Pour les animations
+              }}
+            >
+              Mes Factures
+            </button>
           </div>
-        </Header>
-        <Content
-          className={`content ${currentPage && currentPage.toLowerCase()}`}
-        >
-          {currentPage === "ModifierProfil" && <ModifierProfil />}
-          {currentPage === "Facture" && <FactClient />}
-        </Content>
-      </Layout>
+
+          <Dropdown overlay={notificationMenu} trigger={["click"]}>
+            <Badge count={notifications.length} offset={[10, 0]}>
+              <BellOutlined />
+            </Badge>
+          </Dropdown>
+
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <a
+              className="ant-dropdown-link"
+              onClick={(e) => e.preventDefault()}
+            >
+              <Avatar size={44} src={AvatarImage} className="avatar" />{" "}
+            </a>
+          </Dropdown>
+        </div>
+      </Header>
+      <Content
+        className={`content ${currentPage && currentPage.toLowerCase()}`}
+      >
+        {currentPage === "ModifierProfil" && <ModifierProfil />}
+        {currentPage === "Facture" && <FactClient />}
+      </Content>
     </Layout>
   );
 };

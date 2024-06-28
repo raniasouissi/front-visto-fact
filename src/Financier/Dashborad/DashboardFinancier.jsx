@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu, Dropdown, Avatar, Badge, Modal } from "antd";
+import { Layout, Menu, Dropdown, Avatar, Modal } from "antd";
 import {
   UserOutlined,
   SettingOutlined,
-  BellOutlined,
+
   LogoutOutlined,
   AppstoreOutlined,
   AccountBookOutlined,
@@ -25,6 +25,7 @@ import ModifierProfil from "../modiferprofil";
 import Users from "../../Admin/Users/users";
 import axios from "axios";
 import "./DashboardFinancier.css";
+import Statisitique from "../../Admin/Statistique/statisitique";
 
 const { Sider, Content, Header } = Layout;
 
@@ -225,10 +226,10 @@ const DashboardFinancier = () => {
             >
               {role === "admin" && (
                 <Menu.Item
-                  key="dashboard"
+                  key="statistique"
                   icon={<DashboardOutlined style={{ color: "#333333" }} />}
-                  onClick={() => handleMenuClick("dashboard")}
-                  className={currentPage === "dashboard" ? "active" : ""}
+                  onClick={() => handleMenuClick("statistique")}
+                  className={currentPage === "statistique" ? "active" : ""}
                   style={{
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: "bold",
@@ -461,9 +462,6 @@ const DashboardFinancier = () => {
           <Layout className="site-layout">
             <Header className="headerad">
               <div className="right-menu">
-                <Badge count={0}>
-                  <BellOutlined className="notification-icon" />
-                </Badge>
                 <Dropdown overlay={menu} trigger={["click"]}>
                   <a
                     className="ant-dropdown-link"
@@ -486,6 +484,7 @@ const DashboardFinancier = () => {
               {currentPage === "Categorie" && <Categorie />}
               {currentPage === "Facture" && <Facture />}
               {currentPage === "ModifierProfil" && <ModifierProfil />}
+              {currentPage === "statistique" && <Statisitique />}
             </Content>
           </Layout>
         </Layout>

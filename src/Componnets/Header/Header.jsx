@@ -73,7 +73,7 @@ const Header = ({ isLoggedIn }) => {
         </div>
 
         <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link
               to="/devis"
               className="nav-link bordered-button devis"
@@ -81,7 +81,7 @@ const Header = ({ isLoggedIn }) => {
             >
               Devis
             </Link>
-          </li>
+          </li> */}
           {!isLoggedIn && (
             <>
               <li className="nav-item">

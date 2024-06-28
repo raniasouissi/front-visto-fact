@@ -1,0 +1,4 @@
+.menu-item:active {
+  transform: scale(0.95); /* Légère réduction de la taille */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre portée pour un effet de profondeur */
+}

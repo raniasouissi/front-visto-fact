@@ -349,7 +349,13 @@ const Categorie = () => {
               },
             ]}
           >
-            <Input />
+            <Input.TextArea
+              style={{
+                height: "150px",
+                border: "1px solid #d9d9d9",
+                borderRadius: "4px",
+              }}
+            />
           </Form.Item>
 
           <Row>

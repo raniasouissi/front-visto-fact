@@ -11,19 +11,14 @@ import {
   Col,
   Select,
   Checkbox,
-  Avatar,
   Space,
   Badge,
   Switch,
-  Upload,
 } from "antd";
 import {
   UserAddOutlined,
   SearchOutlined,
   EditOutlined,
-  DeleteOutlined,
-  UserOutlined,
-  UploadOutlined,
   CheckOutlined,
   StopOutlined,
 } from "@ant-design/icons";
@@ -31,7 +26,6 @@ import apiusers from "./apiusers";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
 
-import { Popconfirm } from "antd";
 //import { parsePhoneNumberFromString } from "libphonenumber-js";
 import PropTypes from "prop-types"; // Importer PropTypes depuis react
 
@@ -75,8 +69,8 @@ const Users = () => {
   const [status, setStatus] = useState(null);
   const [FinancierStatusFilter, setFinancierStatusFilter] = useState("all");
   const [statusf, setStatusf] = useState(null);
-  const [imageP, setImage] = useState();
-  const [imageName, setImageName] = useState("");
+  // const [imageP, setImage] = useState();
+  // const [imageName, setImageName] = useState("");
   const handleClientStatusChange = (value) => {
     setClientStatusFilter(value);
   };
@@ -93,16 +87,16 @@ const Users = () => {
     }
   };*/
 
-  const handleImageChange = (info) => {
-    if (info.fileList.length > 0) {
-      setImage(info.fileList[0].originFileObj);
-      setImageName(info.fileList[0].originFileObj.name); // Capturer le nom du fichier
-      console.log("imagep", imageP);
-    } else {
-      setImage(null);
-      setImageName(null);
-    }
-  };
+  // const handleImageChange = (info) => {
+  //   if (info.fileList.length > 0) {
+  //     setImage(info.fileList[0].originFileObj);
+  //     setImageName(info.fileList[0].originFileObj.name); // Capturer le nom du fichier
+  //     console.log("imagep", imageP);
+  //   } else {
+  //     setImage(null);
+  //     setImageName(null);
+  //   }
+  // };
   // Mise à jour de la valeur du pays lors de la sélection dans la liste déroulante
   const handleCountryChange = (selectedOption) => {
     setSelectedCountry(selectedOption);
@@ -130,14 +124,9 @@ const Users = () => {
           filteredClients = data.filter((client) => !client.matriculeFiscale);
         }
 
-        // Inclure le chemin de l'image dans les données du client
-        const usersWithImage = filteredClients.map((client) => ({
-          ...client,
-          imagePath: `http://localhost:5000/uploads/${client.image}`, // Ajouter le chemin de l'image
-        }));
-
-        setUsers(usersWithImage);
-        console.log("image", usersWithImage);
+        // Pas besoin d'inclure le chemin de l'image dans les données du client
+        setUsers(filteredClients);
+        console.log("clients", filteredClients);
       } else if (type === "financiers") {
         data = await apiusers.fetchFinanciers(searchQuery);
         setUsers(data);
@@ -154,28 +143,27 @@ const Users = () => {
   const handleSearch = (value) => {
     fetchUsers(activeTab, value);
   };
-  const handleDeleteUser = async (userId) => {
-    try {
-      if (activeTab === "clients") {
-        await apiusers.deleteClient(userId);
-      } else if (activeTab === "financiers") {
-        await apiusers.deleteFinancier(userId);
-      }
-      fetchUsers(activeTab); // Re-fetch les utilisateurs après la suppression
-      message.success("Utilisateur supprimé avec succès !");
-    } catch (error) {
-      console.error("Erreur lors de la suppression de l'utilisateur :", error);
-      message.error(
-        "Erreur lors de la suppression de l'utilisateur. Veuillez réessayer."
-      );
-    }
-  };
+  // const handleDeleteUser = async (userId) => {
+  //   try {
+  //     if (activeTab === "clients") {
+  //       await apiusers.deleteClient(userId);
+  //     } else if (activeTab === "financiers") {
+  //       await apiusers.deleteFinancier(userId);
+  //     }
+  //     fetchUsers(activeTab); // Re-fetch les utilisateurs après la suppression
+  //     message.success("Utilisateur supprimé avec succès !");
+  //   } catch (error) {
+  //     console.error("Erreur lors de la suppression de l'utilisateur :", error);
+  //     message.error(
+  //       "Erreur lors de la suppression de l'utilisateur. Veuillez réessayer."
+  //     );
+  //   }
+  // };
 
   const handleEditUser = (record) => {
     setUserType(activeTab === "clients" ? "client" : "financier");
     setEditingUser(record);
     setDrawerVisible(true);
-    setImageName(record.image.toString());
 
     // Définir les valeurs du formulaire
     form.setFieldsValue({
@@ -199,8 +187,6 @@ const Users = () => {
       const userDataToUpdate = {
         ...editingUser,
         ...values,
-
-        image: imageName,
       };
       //console.log("upload", uploadedFile.image);
       // Formater le numéro de téléphone
@@ -224,7 +210,7 @@ const Users = () => {
 
       // Envoyer une requête de mise à jour à l'API
       if (activeTab === "clients") {
-        await apiusers.updateClient(editingUser._id, userDataToUpdate, imageP);
+        await apiusers.updateClient(editingUser._id, userDataToUpdate);
       } else if (activeTab === "financiers") {
         await apiusers.updateFinancier(editingUser._id, userDataToUpdate);
       }
@@ -317,31 +303,31 @@ const Users = () => {
       sorter: (a, b) => a.status - b.status,
     },
 
-    {
-      title: "Logo",
-      dataIndex: "image",
-      key: "image",
-      render: (imagePath) => {
-        console.log("Chemin de l'image :", imagePath); // Ajout du console.log pour vérifier le chemin de l'image
-        return (
-          <>
-            {imagePath ? (
-              <Avatar
-                src={`http://localhost:5000/uploads/${imagePath}`}
-                alt="Client"
-                style={{ width: 40, height: 40 }}
-              />
-            ) : (
-              <Avatar
-                icon={<UserOutlined />}
-                alt="N/A"
-                style={{ width: 40, height: 40 }}
-              />
-            )}
-          </>
-        );
-      },
-    },
+    // {
+    //   title: "Logo",
+    //   dataIndex: "image",
+    //   key: "image",
+    //   render: (imagePath) => {
+    //     console.log("Chemin de l'image :", imagePath); // Ajout du console.log pour vérifier le chemin de l'image
+    //     return (
+    //       <>
+    //         {imagePath ? (
+    //           <Avatar
+    //             src={`http://localhost:5000/uploads/${imagePath}`}
+    //             alt="Client"
+    //             style={{ width: 40, height: 40 }}
+    //           />
+    //         ) : (
+    //           <Avatar
+    //             icon={<UserOutlined />}
+    //             alt="N/A"
+    //             style={{ width: 40, height: 40 }}
+    //           />
+    //         )}
+    //       </>
+    //     );
+    //   },
+    // },
 
     {
       title: "M.F",
@@ -394,19 +380,6 @@ const Users = () => {
                 borderRadius: "40%", // Coins arrondis
               }}
             />
-
-            <Popconfirm
-              title="Êtes-vous sûr de vouloir supprimer ce client ?"
-              onConfirm={() => handleDeleteUser(record._id)}
-              okText="Oui"
-              cancelText="Non"
-            >
-              <Button
-                type="danger"
-                icon={<DeleteOutlined />}
-                className="delete-icon"
-              ></Button>
-            </Popconfirm>
           </Space>
         </div>
       ),
@@ -455,18 +428,6 @@ const Users = () => {
                 borderRadius: "40%", // Coins arrondis
               }}
             ></Button>
-            <Popconfirm
-              title="Êtes-vous sûr de vouloir supprimer ce financier ?"
-              onConfirm={() => handleDeleteUser(record._id)}
-              okText="Oui"
-              cancelText="Non"
-            >
-              <Button
-                type="danger"
-                icon={<DeleteOutlined />}
-                className="delete-icon"
-              ></Button>
-            </Popconfirm>
           </Space>
         </div>
       ),
@@ -644,7 +605,8 @@ const Users = () => {
             : `Ajouter un ${userType === "client" ? "client" : "financier"}`
         }
         placement="right"
-        width={720}
+        width={700}
+        height={100}
         visible={drawerVisible}
         onClose={() => {
           setDrawerVisible(false);
@@ -675,7 +637,7 @@ const Users = () => {
               </Select>
             )}
 
-            {editingUser && userType === "client" && (
+            {/* {editingUser && userType === "client" && (
               <Form.Item name="uploadedFile" label="Image">
                 <Upload
                   beforeUpload={() => false}
@@ -688,7 +650,7 @@ const Users = () => {
                   <Avatar src={`http://localhost:5000/uploads/${imageName}`} />
                 )}
               </Form.Item>
-            )}
+            )} */}
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>

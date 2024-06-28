@@ -119,14 +119,14 @@ const Devise = () => {
       if (response.ok) {
         // Effectuez les actions nécessaires après la suppression réussie
 
-        message.success("Les données ont été supprimées avec succès");
+        message.success("Les données ont été désactiver  avec succès");
         fetchDeviseData();
       } else {
-        throw new Error("Échec de la suppression des données");
+        throw new Error("Échec de la  désactivation  des données");
       }
     } catch (error) {
-      console.error("Erreur lors de la suppression des données:", error);
-      message.error("Échec de la suppression des données");
+      console.error("Erreur lors de la  désactivation  des données:", error);
+      message.error("Échec de la  désactivation  des données");
     }
   };
 
@@ -235,7 +235,7 @@ const Devise = () => {
 
                 {role === "financier" && (
                   <Popconfirm
-                    title="Êtes-vous sûr de vouloir supprimer ce devise ?"
+                    title="Êtes-vous sûr de vouloir  désactiver  cette devise ?"
                     onConfirm={() => handleDeleteActv(record._id)}
                     okText="Oui"
                     cancelText="Non"

@@ -31,7 +31,6 @@ const CustomSignin = () => {
       Modal.destroyAll(); // Ferme tous les modaux
     }, 1000);
   };
-
   const onFinish = async (values) => {
     const { email, password } = values;
 
@@ -76,23 +75,37 @@ const CustomSignin = () => {
       const expireTime = currentTime + 3 * 60 * 60 * 1000;
       localStorage.setItem("expireTime", expireTime);
 
-      showSuccessModal(data.user.name);
+      // Vérification et navigation
+      let isSuccess = false;
 
-      switch (data.user.roles[0]) {
-        case "admin":
-          history("/dashboard");
-          break;
-        case "client":
+      if (
+        (data.user.roles[0] === "client" &&
+          data.user.isVerified &&
+          data.user.status) ||
+        (data.user.roles[0] === "financier" && data.user.status)
+      ) {
+        if (data.user.roles[0] === "client") {
           history("/dashboard-client");
-          break;
-        case "financier":
+        } else {
           history("/dashboard");
-          break;
-        default:
-          break;
+        }
+        isSuccess = true;
+      } else {
+        switch (data.user.roles[0]) {
+          case "admin":
+            history("/dashboard");
+            break;
+          default:
+            message.error("Vous n'êtes pas autorisé à vous connecter.");
+            break;
+        }
       }
 
       setLoading(false);
+
+      if (isSuccess) {
+        showSuccessModal(data.user.name);
+      }
     } catch (error) {
       console.error("Erreur lors de la connexion :", error);
       message.error("Erreur lors de la connexion");
@@ -226,7 +239,7 @@ const CustomSignin = () => {
                   border: "none",
                   padding: "12px",
                   borderRadius: "4px",
-                  width: "100%",
+                  width: "350px",
                   fontSize: "16px",
                   cursor: "pointer",
                   transition: "background-color 0.3s",

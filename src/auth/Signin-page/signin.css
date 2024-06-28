@@ -96,23 +96,7 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Légère ombre pour ajouter de la profondeur */
   transition: transform 0.3s ease; /* Transition pour l'effet de survol */
 }
-.custom-submit-butto {
-  width: 100%; /* Largeur fixe */
-  height: 45px; /* Hauteur fixe */
-  border: none;
-  border-radius: 5px; /* Bordures arrondies */
-  padding: 10px;
-  font-size: 20px;
 
-  color: #fff;
-  background-color: #181a8b !important;
-  cursor: pointer;
-  transition: opacity 0.3s; /* Animation d'opacité */
-  margin-bottom: 20px;
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
 .custom-signin-container
   .custom-signin-content
   .custom-form-container
