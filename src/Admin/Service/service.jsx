@@ -425,7 +425,7 @@ const Service = () => {
               : "Ajouter un nouveau service"}
           </Button>,
         ]}
-        width={800}
+        width={900}
       >
         <Form
           form={form}
@@ -434,6 +434,25 @@ const Service = () => {
           style={{ marginTop: 10 }}
           initialValues={editingService || {}} // Pré-remplir le formulaire avec les détails du service en cours d'édition
         >
+          <p
+            style={{
+              marginBottom: 16,
+              fontSize: 16,
+              fontFamily: "Poppins, sans-serif",
+              color: "#2C3E50",
+              fontWeight: "bold",
+              textAlign: "center",
+              border: "2px solid #3498db",
+              borderRadius: "8px",
+              padding: "10px",
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            Veuillez spécifier dans le champ{" "}
+            <span style={{ color: "#e74c3c" }}>{"Désignation"}</span> le pays
+            pour lequel ce service est ajouté.
+          </p>
+
           <Row gutter={[16, 16]}>
             <Col span={12}>
               <Form.Item

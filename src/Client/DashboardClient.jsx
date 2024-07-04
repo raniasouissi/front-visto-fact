@@ -7,7 +7,6 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
 import ModifierProfil from "../Financier/modiferprofil";
 import Logo1 from "../assets/images/vbil2.png";
 import AvatarImage from "../assets/images/avv.png";
@@ -37,8 +36,8 @@ const DashboardClient = () => {
     const currentTime = Date.now();
     if (currentTime > parseInt(expireTime, 10)) {
       // Le token a expiré
-      localStorage.removeItem(token);
-      localStorage.removeItem(expireTime);
+      localStorage.removeItem("token");
+      localStorage.removeItem("expireTime");
       return null;
     }
 
@@ -69,6 +68,22 @@ const DashboardClient = () => {
       })
       .catch((error) =>
         console.error("Erreur lors du chargement des données de user :", error)
+      );
+  };
+
+  const deleteNotification = (notificationId) => {
+    axios
+      .delete(`http://localhost:5000/api/notifications/${notificationId}`)
+      .then(() => {
+        setNotifications(
+          notifications.filter((notif) => notif._id !== notificationId)
+        );
+      })
+      .catch((error) =>
+        console.error(
+          "Erreur lors de la suppression de la notification :",
+          error
+        )
       );
   };
 
@@ -214,10 +229,12 @@ const DashboardClient = () => {
                 {notification.notif}
               </span>
               <CloseOutlined
+                onClick={() => deleteNotification(notification._id)}
                 style={{
                   color: "#f5222d",
                   fontSize: "14px",
                   marginLeft: "10px",
+                  cursor: "pointer",
                 }}
               />
             </div>

@@ -30,6 +30,15 @@ import {
   CheckCircleOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import {
+  PDFDownloadLink,
+  Document,
+  Page,
+  Text,
+  View,
+  Image,
+  StyleSheet,
+} from "@react-pdf/renderer";
 
 import Logo from "../../assets/images/visto.png";
 
@@ -72,6 +81,181 @@ const Facture = () => {
   //const [chequeFields, setChequeFields] = useState([{ id: 1 }]);
   const [installments, setInstallments] = useState([{ id: 1 }]); // Stocke les échéances
   const [montantRestant, setMontantRestant] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [isPrintModalVisible, setIsPrintModalVisible] = useState(false);
+  const handleDeviseSelection = (value) => {
+    const selectedServiceDevise =
+      selectedServices.length > 0 ? selectedServices[0].devise.symbole : null; // Supposant que la devise du premier service est représentative
+
+    const selectedDevise = devises.find((devise) => devise._id === value);
+
+    if (
+      selectedDevise &&
+      selectedServiceDevise &&
+      selectedDevise.symbole !== selectedServiceDevise
+    ) {
+      message.error(
+        `La devise de la facture doit correspondre à celle des services sélectionnés (${selectedServiceDevise})`
+      );
+      form.setFieldsValue({ deviseid: null }); // Réinitialisation de la valeur du Select de la devise
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+  };
+
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: "column",
+      backgroundColor: "#fff",
+      padding: 20,
+    },
+    section: {
+      marginBottom: 20,
+      padding: 10,
+    },
+    logo: {
+      marginBottom: 10,
+      width: "20%",
+    },
+    title: {
+      fontSize: 20,
+      color: "#14149f",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+      letterSpacing: 2,
+      marginLeft: "auto",
+      marginRight: "auto",
+      textDecoration: "underline",
+      paddingBottom: 4,
+      marginBottom: 10,
+    },
+    subtitle: {
+      fontSize: 11,
+      color: "#1b1b1b",
+      fontWeight: "normal",
+      marginBottom: 8,
+    },
+    table: {
+      display: "table",
+      width: "100%",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderColor: "#bfbfbf",
+      borderRightWidth: 0,
+      borderBottomWidth: 0,
+    },
+    tableRow: {
+      flexDirection: "row",
+    },
+    tableColHeader: {
+      width: "15%",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderColor: "#6696bd",
+      borderLeftWidth: 0,
+      borderTopWidth: 0,
+      backgroundColor: "#84bdea",
+    },
+    tableCol: {
+      width: "15%",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderColor: "#bfbfbf",
+      borderLeftWidth: 0,
+      borderTopWidth: 0,
+    },
+    tableCellHeader: {
+      margin: 5,
+      fontSize: 10,
+      fontWeight: "bold",
+      textAlign: "center",
+    },
+    tableCell: {
+      margin: 5,
+      fontSize: 10,
+      textAlign: "center",
+    },
+
+    totalsContainer: {
+      flexDirection: "row",
+      marginTop: 20,
+      marginBottom: 10,
+      justifyContent: "space-between",
+    },
+    totalsLeft: {
+      width: "40%",
+      marginRight: 10,
+      textAlign: "right",
+    },
+    totalsRight: {
+      width: "40%",
+      marginLeft: 10,
+    },
+    totalsText: {
+      fontSize: 10,
+      marginBottom: 5,
+      color: "#333",
+    },
+    totalsValue: {
+      fontSize: 12,
+      marginBottom: 5,
+      color: "#555",
+    },
+    totalsTable: {
+      marginLeft: 50,
+      width: "80%",
+
+      borderStyle: "solid",
+    },
+    totalsTableRow: {
+      flexDirection: "row",
+      borderBottomWidth: 1,
+      borderColor: "#ccc",
+    },
+    totalsTableCell: {
+      flex: 1,
+
+      textAlign: "center",
+      borderRightWidth: 1,
+      borderColor: "#ccc",
+    },
+    totalsTableCellHeader: {
+      flex: 1,
+
+      textAlign: "center",
+      borderRightWidth: 1,
+      borderColor: "#ccc",
+      backgroundColor: "#84bdea", // Couleur de fond pour les en-têtes de colonnes
+      fontWeight: "bold", // Gras pour les en-têtes
+    },
+    totalsLastCell: {
+      borderRightWidth: 0,
+    },
+
+    footerContainer: {
+      textAlign: "center",
+      borderTop: "2px solid #ddd",
+      paddingTop: 10,
+      marginTop: 200,
+      fontSize: 10,
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    footerText: {
+      fontSize: 11.5,
+    },
+  });
+  const showPrintModal = (record) => {
+    setSelectedFacture(record); // Sélectionnez la facture pour l'impression
+    setIsPrintModalVisible(true);
+  };
+
+  const handlePrintModalCancel = () => {
+    setIsPrintModalVisible(false);
+  };
 
   const addInstallment = () => {
     setInstallments([...installments, { id: installments.length + 1 }]);
@@ -82,15 +266,6 @@ const Facture = () => {
       prevInstallments.filter((_, i) => i !== index)
     );
   };
-
-  // const addChequeField = () => {
-  //   const newFieldId = chequeFields.length + 1;
-  //   setChequeFields([...chequeFields, { id: newFieldId }]);
-  // };
-  // const removeChequeField = (index) => {
-  //   const updatedFields = chequeFields.filter((field, idx) => idx !== index);
-  //   setChequeFields(updatedFields);
-  // };
 
   const handlePaymentModeChange = (value) => {
     setPaymentMode(value);
@@ -160,19 +335,22 @@ const Facture = () => {
     "Arrêtée la présente facture à la somme de 0"
   );
 
-  // Fonction pour convertir le montant total TTC en lettres
   const convertirEnLettres = (totalTTC) => {
-    const dinars = Math.floor(totalTTC);
-    const millimes = Math.round((totalTTC - dinars) * 1000);
+    // Séparer la partie entière et la partie décimale
+    const [partieEntiere, partieDecimale] = String(totalTTC).split(".");
 
-    const dinarsEnLettres = writtenNumber(dinars);
-    const millimesEnLettres = millimes
-      ? ` et ${writtenNumber(millimes)} millimes`
-      : "";
+    // Convertir la partie entière en lettres
+    let enLettres = writtenNumber(partieEntiere);
 
-    return `${dinarsEnLettres} dinars${millimesEnLettres}`;
+    // Si la partie décimale existe, convertir aussi cette partie
+    if (partieDecimale) {
+      const partieDecimaleNombre = Number(`0.${partieDecimale}`) * 100; // Convertir la partie décimale en nombre
+      enLettres += " virgule " + writtenNumber(partieDecimaleNombre);
+    }
+
+    // Retourner le résultat
+    return enLettres;
   };
-
   useEffect(() => {
     setTotalTTCLettre(
       `Arrêtée la présente facture à la somme de ${convertirEnLettres(
@@ -183,7 +361,7 @@ const Facture = () => {
 
   useEffect(() => {
     fetchData();
-    fetchFacture();
+
     fetchPaiement();
   }, []);
   const fetchPaiement = async () => {
@@ -247,11 +425,22 @@ const Facture = () => {
       console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    fetchFacture();
+  }, [searchQuery]);
   const fetchFacture = async () => {
-    const facturesResponse = await axios.get(
-      "http://localhost:5000/api/facture"
-    );
-    setFactures(facturesResponse.data);
+    try {
+      let url = "http://localhost:5000/api/facture";
+      if (searchQuery) {
+        url += `/search/${searchQuery}`;
+      }
+      const facturesResponse = await axios.get(url);
+      setFactures(facturesResponse.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des factures :", error);
+      // Gérer l'erreur ou afficher un message d'erreur à l'utilisateur
+    }
   };
 
   const handleAddService = (value) => {
@@ -374,7 +563,7 @@ const Facture = () => {
         clientid: values.clientid,
         parametrageid: values.parametrageid,
         deviseid: values.deviseid,
-        timbreid: timbre,
+        timbreid: timbre ? timbre : null,
         totalTTCLettre,
         totalHT: parseFloat(values.totalHT),
         totalRemise: values.totalRemise,
@@ -603,6 +792,15 @@ const Facture = () => {
       render: (_, record) => record.montant_ht, // Utilisez la valeur du montant HT du service
     },
     {
+      title: "Devise",
+      dataIndex: "devise",
+      key: "devise",
+      width: 100,
+      render: (_, record) => (
+        <span>{record.devise && record.devise.symbole}</span>
+      ),
+    },
+    {
       title: "Action",
       key: "action",
       width: 40,
@@ -717,7 +915,10 @@ const Facture = () => {
       const values = await form.validateFields();
 
       // Vérification du montant restant
-      if (montantRestant !== 0) {
+      if (
+        montantRestant !== 0 &&
+        values.etatpaiement === "Partiellement Payé"
+      ) {
         message.error(
           "Le montant restant doit être égal à 0 pour créer le paiement"
         );
@@ -933,6 +1134,7 @@ const Facture = () => {
               transition: "transform 0.3s ease, box-shadow 0.3s ease",
               boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
             }}
+            onClick={() => showPrintModal(record)}
           >
             <PrinterOutlined style={{ fontSize: "20px" }} />
           </button>
@@ -1009,6 +1211,7 @@ const Facture = () => {
           borderRadius: 10, // Ajoute des coins arrondis pour un aspect plus moderne
           boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)", // Ajoute une ombre subtile
         }}
+        onChange={(e) => handleSearch(e.target.value)}
       />
 
       <Table
@@ -1126,38 +1329,17 @@ const Facture = () => {
               <Col span={12}>
                 <Form.Item label="Date " name="date" initialValue={moment()}>
                   <DatePicker
-                    style={{ width: "100%" }}
+                    style={{ width: "200px" }}
                     defaultValue={moment()}
                     format="YYYY-MM-DD"
                   />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  style={{ marginLeft: 60 }}
-                  label="Devise"
-                  name="deviseid"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Veuillez sélectionner une devise !",
-                    },
-                  ]}
-                >
-                  <Select style={{ width: "100px" }} placeholder=" devise">
-                    {devises.map((devise) => (
-                      <Option key={devise._id} value={devise._id}>
-                        {` (${devise.symbole})`}
-                      </Option>
-                    ))}
-                  </Select>
                 </Form.Item>
               </Col>
             </Row>
           )}
           {!isEditing && (
             <Row gutter={16} style={{ width: "100%", marginTop: 10 }}>
-              <Col span={24}>
+              <Col span={12}>
                 <Form.Item
                   label="Services"
                   name="services"
@@ -1170,14 +1352,40 @@ const Facture = () => {
                   ]}
                 >
                   <Select
-                    style={{ width: "100%" }}
+                    style={{ width: "400px" }}
                     placeholder="Sélectionner un service"
                     onSelect={handleAddService}
                   >
                     {services.map((service) => (
-                      <Option key={service._id} value={service._id}>
+                      <Select.Option key={service._id} value={service._id}>
                         {service.libelle}
-                      </Option>
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  style={{ marginLeft: 50 }}
+                  label="Devise"
+                  name="deviseid"
+                  rules={[
+                    {
+                      required: true,
+                      message:
+                        "Veuillez sélectionner une devise pour la facture !",
+                    },
+                  ]}
+                >
+                  <Select
+                    style={{ width: "200px" }}
+                    placeholder="Sélectionnez la devise"
+                    onChange={handleDeviseSelection}
+                  >
+                    {devises.map((devise) => (
+                      <Select.Option key={devise._id} value={devise._id}>
+                        {` (${devise.symbole})`}
+                      </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
@@ -1563,16 +1771,7 @@ const Facture = () => {
                     />
                   </Form.Item>
 
-                  <Form.Item
-                    label="Timbre Fiscal"
-                    name="timbreid"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez saisir le timbre !",
-                      },
-                    ]}
-                  >
+                  <Form.Item label="Timbre Fiscal" name="timbreid">
                     <Select
                       onChange={(value) => {
                         settimbre(value);
@@ -1732,7 +1931,6 @@ const Facture = () => {
             fontFamily: "Poppins",
           }}
         >
-          {/* Partie gauche: Informations de la facture */}
           <div>
             <div style={{ marginTop: 10 }}>
               <img
@@ -1808,7 +2006,6 @@ const Facture = () => {
             </div>
           </div>
 
-          {/* Partie droite: Informations du client */}
           <div style={{ marginTop: 150 }}>
             {selectedFacture &&
               selectedFacture.client &&
@@ -2036,6 +2233,11 @@ const Facture = () => {
                 <span style={{ fontSize: 14 }}>
                   {selectedFacture ? selectedFacture.totalTTCLettre : "-"}
                 </span>
+                {selectedFacture && selectedFacture.devise && (
+                  <span style={{ marginLeft: 5 }}>
+                    {selectedFacture.devise.name}
+                  </span>
+                )}
               </p>
             </div>
 
@@ -2166,11 +2368,12 @@ const Facture = () => {
                         textAlign: "center",
                       }}
                     >
-                      {selectedFacture
+                      {selectedFacture && selectedFacture.timbre
                         ? selectedFacture.timbre.value.toFixed(3)
-                        : "-"}
+                        : "0"}
                     </td>
                   </tr>
+
                   <tr>
                     <td
                       style={{
@@ -2198,6 +2401,287 @@ const Facture = () => {
               </table>
             </div>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        visible={isPrintModalVisible}
+        onCancel={handlePrintModalCancel}
+        footer={
+          <PDFDownloadLink
+            document={
+              <Document>
+                <Page size="A4" style={styles.page}>
+                  <View style={styles.section}>
+                    <Image src={Logo} style={styles.logo} />
+                    <Text style={styles.title}>
+                      {selectedFacture ? selectedFacture.numeroFacture : "-"}
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      Date:{" "}
+                      {selectedFacture ? formatDate(selectedFacture.date) : "-"}
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      M.F:{" "}
+                      {selectedFacture?.parametrage?.matriculefiscal || "-"}
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      Entreprise:{" "}
+                      {selectedFacture?.parametrage?.nomEntreprise?.toUpperCase() ||
+                        "-"}
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      Tél: {selectedFacture?.parametrage?.phonenumber || "-"}
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      {selectedFacture?.parametrage
+                        ? `${selectedFacture.parametrage.adresseEntreprise}, ${selectedFacture.parametrage.ville}, ${selectedFacture.parametrage.codePostal}`
+                        : "-"}
+                    </Text>
+                  </View>
+                  {/* Informations du client à droite */}
+                  <View style={styles.section}>
+                    <View style={{ marginTop: -70, marginLeft: 375 }}>
+                      {selectedFacture?.client?.matriculeFiscale && (
+                        <Text style={styles.subtitle}>
+                          Matricule Fiscale:{" "}
+                          {selectedFacture.client.matriculeFiscale}
+                        </Text>
+                      )}
+                      <Text style={styles.subtitle}>
+                        Client: {selectedFacture?.client?.name || "-"}
+                      </Text>
+                      <Text style={styles.subtitle}>
+                        Entreprise:{" "}
+                        {selectedFacture?.client?.namecompany?.toUpperCase() ||
+                          "-"}
+                      </Text>
+                      <Text style={styles.subtitle}>
+                        Email: {selectedFacture?.client?.email || "-"}
+                      </Text>
+                      <Text style={styles.subtitle}>
+                        Tél: {selectedFacture?.client?.phonenumber || "-"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.table}>
+                    <View style={styles.tableRow}>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>Référence</Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>Désignation</Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>TVA</Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>Quantité</Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>
+                          Prix unitaire
+                        </Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>Remise (%)</Text>
+                      </View>
+                      <View style={styles.tableColHeader}>
+                        <Text style={styles.tableCellHeader}>Montant HT</Text>
+                      </View>
+                    </View>
+
+                    {selectedFacture &&
+                      selectedFacture.services &&
+                      selectedFacture.services.map((service, index) => (
+                        <View style={styles.tableRow} key={index}>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.reference}
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.libelle}
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.tva && service.tva.rate
+                                ? `${service.tva.rate}%`
+                                : "-"}
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.quantite}
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.prix_unitaire.toFixed(3)}
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.remise}%
+                            </Text>
+                          </View>
+                          <View style={styles.tableCol}>
+                            <Text style={styles.tableCell}>
+                              {service.montant_ht.toFixed(3)}
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
+                  </View>
+
+                  <View style={styles.totalsContainer}>
+                    <View style={{ marginLeft: 10 }}>
+                      <Text style={styles.totalsText}>
+                        Arrêtée la présente facture à la somme de{" "}
+                      </Text>
+                      <Text style={styles.totalsText}>
+                        {selectedFacture ? selectedFacture.totalTTCLettre : "-"}{" "}
+                        {selectedFacture &&
+                          selectedFacture.devise &&
+                          selectedFacture.devise.name}
+                      </Text>
+                    </View>
+                    <View style={styles.totalsRight}>
+                      <View style={styles.totalsTable}>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>Total HT</Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.totalHT.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>Remise</Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.totalRemise.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>
+                              Total HT après Remise
+                            </Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.totalHTApresRemise.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>
+                              Total TVA
+                            </Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.totalTVA.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>
+                              Timbre Fiscal
+                            </Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.timbre.value.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.totalsTableRow}>
+                          <View style={styles.totalsTableCellHeader}>
+                            <Text style={styles.tableCellHeader}>
+                              Total TTC
+                            </Text>
+                          </View>
+                          <View style={styles.totalsTableCell}>
+                            <Text style={styles.tableCell}>
+                              {selectedFacture
+                                ? selectedFacture.totalTTC.toFixed(3)
+                                : "-"}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.footerContainer}>
+                    <Text style={styles.footerText}>
+                      Tél: {selectedFacture?.parametrage?.phonenumber || "-"} |
+                      Email: {selectedFacture?.parametrage?.email || "-"} |
+                      Adresse:{" "}
+                      {selectedFacture
+                        ? `${selectedFacture.parametrage.adresseEntreprise}, ${selectedFacture.parametrage.ville}, ${selectedFacture.parametrage.codePostal}`
+                        : "-"}
+                    </Text>
+                  </View>
+                </Page>
+              </Document>
+            }
+            fileName="facture.pdf"
+          >
+            {({ loading }) =>
+              loading ? "Chargement..." : "Télécharger le PDF"
+            }
+          </PDFDownloadLink>
+        }
+        width={800}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            margin: "20px auto",
+            maxWidth: "600px",
+          }}
+        >
+          {selectedFacture && (
+            <>
+              <p
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  marginBottom: "10px",
+                }}
+              >
+                Numéro de facture : {selectedFacture.numeroFacture}
+              </p>
+              {/* Ajoutez d'autres détails de la facture ici si nécessaire */}
+              <p style={{ fontSize: "18px", marginBottom: "20px" }}>
+                Cliquez sur le bouton ci-dessous pour télécharger votre facture
+                au format PDF :
+              </p>
+              {/* Ajoutez votre bouton de téléchargement ici */}
+            </>
+          )}
         </div>
       </Modal>
     </div>

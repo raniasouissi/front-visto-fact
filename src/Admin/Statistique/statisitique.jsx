@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   VictoryPie,
   VictoryLabel,
@@ -8,43 +9,161 @@ import {
 } from "victory";
 
 const Statistique = () => {
-  // Données fictives pour les utilisateurs en nombre
-  const dataUtilisateurs = [
-    { type: "Client", nombre: 25 },
-    { type: "Financier", nombre: 3 },
+  const [dataServices, setDataServices] = useState([]);
+  const [dataFactures, setDataFactures] = useState([]);
+  const [dataUtilisateurs, setDataUtilisateurs] = useState([]);
+  const [dataClients, setDataClients] = useState([]);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/clients");
+        setDataClients(response.data);
+        console.log("Données des clients récupérées :", response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement des données des clients :",
+          error
+        );
+      }
+    };
+
+    fetchClients();
+  }, []);
+
+  // Chargement des données de services depuis l'API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/services");
+        setDataServices(response.data);
+        console.log("Données de services récupérées :", response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement des données de services :",
+          error
+        );
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // Chargement des données de factures depuis l'API
+  useEffect(() => {
+    const fetchFactures = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/facture");
+        setDataFactures(response.data);
+        console.log("Données de factures récupérées :", response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement des données de factures :",
+          error
+        );
+      }
+    };
+
+    fetchFactures();
+  }, []);
+
+  // Chargement des données de utilisateurs depuis l'API
+  useEffect(() => {
+    const fetchUtilisateurs = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/users");
+        setDataUtilisateurs(response.data);
+        console.log("Données de utilisateurs récupérées :", response.data);
+      } catch (error) {
+        console.error(
+          "Erreur lors du chargement des données de utilisateurs :",
+          error
+        );
+      }
+    };
+
+    fetchUtilisateurs();
+  }, []);
+
+  const countClients = dataUtilisateurs.filter(
+    (user) => user.roles[0] === "client"
+  ).length;
+  const countFinanciers = dataUtilisateurs.filter(
+    (user) => user.roles[0] === "financier"
+  ).length;
+
+  const dataUser = [
+    { type: "Clients", count: countClients },
+    { type: "Financiers", count: countFinanciers },
   ];
 
-  // Calcul du total des utilisateurs
-  const totalUtilisateurs = dataUtilisateurs.reduce(
-    (total, utilisateur) => total + utilisateur.nombre,
-    0
+  const countActifs = dataUtilisateurs.filter((u) => u.status === true).length;
+  const countInactifs = dataUtilisateurs.filter(
+    (u) => u.status === false
+  ).length;
+
+  // Données pour le graphique
+  const dataStatus = [
+    { type: "Actifs", count: countActifs },
+    { type: "Inactifs", count: countInactifs },
+  ];
+
+  // Calcul du nombre total de services
+  const totalServices = dataServices.filter(
+    (service) => service.categories !== null
+  ).length;
+
+  // Calcul du nombre total de factures
+  const totalFactures = dataFactures.length;
+
+  // Calcul du nombre de factures payées et partiellement payées
+  const countPayees = dataFactures.filter((facture) =>
+    facture.paiemnts.some((paiement) => paiement.etatpaiement === "Payé")
+  ).length;
+
+  const countPartiellementPayees = dataFactures.filter((facture) =>
+    facture.paiemnts.some(
+      (paiement) => paiement.etatpaiement === "partiellementPayé"
+    )
+  ).length;
+
+  // Calcul des pourcentages
+  const pourcentagePayees = (countPayees / totalFactures) * 100;
+  const pourcentagePartiellementPayees =
+    (countPartiellementPayees / totalFactures) * 100;
+
+  // Affichage dans la console pour vérification
+  console.log("Nombre total de factures :", totalFactures);
+  console.log("Nombre de factures payées :", countPayees);
+  console.log(
+    "Nombre de factures partiellement payées :",
+    countPartiellementPayees
+  );
+  console.log(
+    "Pourcentage de factures payées :",
+    pourcentagePayees.toFixed(2) + "%"
+  );
+  console.log(
+    "Pourcentage de factures partiellement payées :",
+    pourcentagePartiellementPayees.toFixed(2) + "%"
   );
 
-  // Conversion des nombres d'utilisateurs en pourcentage
-  const dataUtilisateursPourcentage = dataUtilisateurs.map((utilisateur) => ({
-    type: utilisateur.type,
-    pourcentage: (utilisateur.nombre / totalUtilisateurs) * 100,
-  }));
+  let physicalClientsCount = 0;
+  let legalClientsCount = 0;
 
-  // Données fictives pour les types de clients
-  const dataTypesClients = [
-    { type: "Physique", pourcentage: 70 },
-    { type: "Morale", pourcentage: 30 },
+  dataClients.forEach((client) => {
+    if (client.type === "client physique") {
+      physicalClientsCount++;
+    } else if (client.type === "client morale") {
+      legalClientsCount++;
+    }
+  });
+
+  const data = [
+    { type: "Physique", count: physicalClientsCount },
+    { type: "Moral", count: legalClientsCount },
   ];
 
-  // Données fictives pour les types d'utilisateurs actifs et inactifs
-  const dataTypesUtilisateurs = [
-    { type: "Actif", pourcentage: 80 },
-    { type: "Inactif", pourcentage: 20 },
-  ];
-
-  // Données fictives pour les factures
-  const dataFactures = [
-    { status: "Payé", quantite: 45 },
-    { status: "Partiellement payé", quantite: 15 },
-  ];
-
-  // Couleurs tendance pour les graphiques (dégradé bleu-violet)
   const gradientColors = [
     "rgba(90, 154, 230, 1)",
     "rgba(131, 111, 255, 1)",
@@ -90,7 +209,9 @@ const Statistique = () => {
           }}
         >
           <h2 style={{ fontSize: "16px" }}>Services</h2>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>25</p>
+          <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+            {totalServices}
+          </p>
         </div>
         <div
           className="total-container"
@@ -107,7 +228,7 @@ const Statistique = () => {
         >
           <h2 style={{ fontSize: "16px" }}> Utilisateurs</h2>
           <p style={{ fontSize: "24px", fontWeight: "bold" }}>
-            {totalUtilisateurs}
+            {dataUtilisateurs.length}
           </p>
         </div>
         <div
@@ -124,7 +245,9 @@ const Statistique = () => {
           }}
         >
           <h2 style={{ fontSize: "16px" }}>Factures</h2>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>20</p>
+          <p style={{ fontSize: "24px", fontWeight: "bold" }}>
+            {totalFactures}
+          </p>
         </div>
       </div>
 
@@ -147,25 +270,72 @@ const Statistique = () => {
             flex: "1 1 calc(50% - 20px)",
           }}
         >
-          <h2 style={{ fontSize: "16px", color: gradientColors[1] }}>
+          <h2
+            style={{
+              marginBottom: -40,
+              fontSize: "20px", // Taille de la police plus grande
+              color: "#2C3E50", // Couleur du texte
+              fontFamily: "'Roboto', sans-serif", // Police personnalisée, assurez-vous de l'importer si elle n'est pas déjà disponible
+              fontWeight: "700", // Gras
+              letterSpacing: "1px", // Espacement entre les lettres
+              margin: "20px 0", // Espacement autour du titre
+              background: "linear-gradient(to right, #d41ec8 0%, #330867 100%)", // Dégradé de couleur
+              WebkitBackgroundClip: "text", // Clip l'arrière-plan au texte
+              WebkitTextFillColor: "transparent", // Remplissage transparent pour montrer le dégradé
+            }}
+          >
             Utilisateurs
           </h2>
           <VictoryPie
-            data={dataUtilisateursPourcentage}
+            data={dataUser}
             x="type"
-            y="pourcentage"
+            y="count"
             innerRadius={60}
+            colorScale={gradientColors.slice(2, 4)}
+            labels={({ datum }) => `${datum.type}: ${datum.count}`}
+            labelComponent={
+              <VictoryLabel
+                textAnchor="middle"
+                style={{ fontSize: 12, fill: "#2C3E50", fontWeight: "bold" }}
+              />
+            }
+            style={{
+              labels: {
+                fontSize: 12,
+                fill: "#2C3E50",
+                fontWeight: "bold",
+                padding: 10,
+              },
+              data: {
+                stroke: "#fff",
+                strokeWidth: 2,
+                filter: "drop-shadow(0 0 5px rgba(0, 0, 0, 0.2))",
+              },
+            }}
+            animate={{
+              duration: 2000,
+              onLoad: { duration: 1000, easing: "bounce" },
+              onExit: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+              },
+              onEnter: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+                after: (datum) => ({
+                  _y: datum.y,
+                  fill: datum.fill,
+                }),
+              },
+            }}
             width={400}
             height={300}
-            colorScale={gradientColors.slice(0, 2)}
-            labels={({ datum }) =>
-              `${datum.type}: ${datum.pourcentage.toFixed(2)}%`
-            }
-            labelComponent={
-              <VictoryLabel style={{ fontSize: 12, fill: "#2C3E50" }} />
-            }
-            style={{ labels: { fontSize: 12, fill: "#2C3E50" } }}
-            animate={{ duration: 1000 }}
           />
         </div>
         <div
@@ -179,25 +349,73 @@ const Statistique = () => {
             flex: "1 1 calc(50% - 20px)",
           }}
         >
-          <h2 style={{ fontSize: "16px", color: gradientColors[2] }}>
+          <h2
+            style={{
+              marginBottom: -40,
+              fontSize: "20px", // Taille de la police plus grande
+              color: "#2C3E50", // Couleur du texte
+              fontFamily: "'Roboto', sans-serif", // Police personnalisée, assurez-vous de l'importer si elle n'est pas déjà disponible
+              fontWeight: "700", // Gras
+              letterSpacing: "1px", // Espacement entre les lettres
+              margin: "20px 0", // Espacement autour du titre
+              background: "linear-gradient(to right, #30CFD0 0%, #330867 100%)", // Dégradé de couleur
+              WebkitBackgroundClip: "text", // Clip l'arrière-plan au texte
+              WebkitTextFillColor: "transparent", // Remplissage transparent pour montrer le dégradé
+            }}
+          >
             Types de Clients
           </h2>
+
           <VictoryPie
-            data={dataTypesClients}
+            data={data}
             x="type"
-            y="pourcentage"
+            y="count"
             innerRadius={60}
+            colorScale={gradientColors}
+            labels={({ datum }) => `${datum.type}: ${datum.count}`}
+            labelComponent={
+              <VictoryLabel
+                textAnchor="middle"
+                style={{ fontSize: 12, fill: "#2C3E50", fontWeight: "bold" }}
+              />
+            }
+            style={{
+              labels: {
+                fontSize: 12,
+                fill: "#2C3E50",
+                fontWeight: "bold",
+                padding: 10,
+              },
+              data: {
+                stroke: "#fff",
+                strokeWidth: 2,
+                filter: "drop-shadow(0 0 5px rgba(0, 0, 0, 0.2))",
+              },
+            }}
+            animate={{
+              duration: 2000,
+              onLoad: { duration: 1000, easing: "bounce" },
+              onExit: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+              },
+              onEnter: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+                after: (datum) => ({
+                  _y: datum.y,
+                  fill: datum.fill,
+                }),
+              },
+            }}
             width={400}
             height={300}
-            colorScale={gradientColors.slice(2, 4)}
-            labels={({ datum }) =>
-              `${datum.type}: ${datum.pourcentage.toFixed(2)}%`
-            }
-            labelComponent={
-              <VictoryLabel style={{ fontSize: 12, fill: "#2C3E50" }} />
-            }
-            style={{ labels: { fontSize: 12, fill: "#2C3E50" } }}
-            animate={{ duration: 1000 }}
           />
         </div>
       </div>
@@ -221,25 +439,72 @@ const Statistique = () => {
             flex: "1 1 calc(50% - 20px)",
           }}
         >
-          <h2 style={{ fontSize: "16px", color: gradientColors[4] }}>
+          <h2
+            style={{
+              marginBottom: -40,
+              fontSize: "20px", // Taille de la police plus grande
+              color: "#2C3E50", // Couleur du texte
+              fontFamily: "'Roboto', sans-serif", // Police personnalisée, assurez-vous de l'importer si elle n'est pas déjà disponible
+              fontWeight: "700", // Gras
+              letterSpacing: "1px", // Espacement entre les lettres
+              margin: "20px 0", // Espacement autour du titre
+              background: "linear-gradient(to right, #7349e6 0%, #330867 100%)", // Dégradé de couleur
+              WebkitBackgroundClip: "text", // Clip l'arrière-plan au texte
+              WebkitTextFillColor: "transparent", // Remplissage transparent pour montrer le dégradé
+            }}
+          >
             Utilisateurs Actifs et Inactifs
           </h2>
           <VictoryPie
-            data={dataTypesUtilisateurs}
+            data={dataStatus}
             x="type"
-            y="pourcentage"
+            y="count"
             innerRadius={60}
             width={400}
             height={300}
-            colorScale={gradientColors.slice(4, 6)}
-            labels={({ datum }) =>
-              `${datum.type}: ${datum.pourcentage.toFixed(2)}%`
-            }
+            colorScale={gradientColors.slice(1, 3)}
+            labels={({ datum }) => `${datum.type}: ${datum.count}`}
             labelComponent={
-              <VictoryLabel style={{ fontSize: 12, fill: "#2C3E50" }} />
+              <VictoryLabel
+                textAnchor="middle"
+                style={{ fontSize: 12, fill: "#2C3E50", fontWeight: "bold" }}
+              />
             }
-            style={{ labels: { fontSize: 12, fill: "#2C3E50" } }}
-            animate={{ duration: 1000 }}
+            style={{
+              labels: {
+                fontSize: 12,
+                fill: "#2C3E50",
+                fontWeight: "bold",
+                padding: 10,
+              },
+              data: {
+                stroke: "#fff",
+                strokeWidth: 2,
+                filter: "drop-shadow(0 0 5px rgba(0, 0, 0, 0.2))",
+              },
+            }}
+            animate={{
+              duration: 2000,
+              onLoad: { duration: 1000, easing: "bounce" },
+              onExit: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+              },
+              onEnter: {
+                duration: 500,
+                before: () => ({
+                  _y: 0,
+                  fill: "rgba(0, 0, 0, 0.2)",
+                }),
+                after: (datum) => ({
+                  _y: datum.y,
+                  fill: datum.fill,
+                }),
+              },
+            }}
           />
         </div>
         <div
@@ -253,20 +518,49 @@ const Statistique = () => {
             flex: "1 1 calc(50% - 20px)",
           }}
         >
-          <h2 style={{ fontSize: "16px", color: gradientColors[6] }}>
+          <h2
+            style={{
+              fontSize: "24px", // Taille de la police plus grande
+              color: "#2C3E50", // Couleur du texte
+              fontFamily: "'Roboto', sans-serif", // Police personnalisée, assurez-vous de l'importer si elle n'est pas déjà disponible
+              fontWeight: "700", // Gras
+              letterSpacing: "1px", // Espacement entre les lettres
+              margin: "20px 0", // Espacement autour du titre
+              background: "linear-gradient(to right, #d67adc 0%, #330867 100%)", // Dégradé de couleur
+              WebkitBackgroundClip: "text", // Clip l'arrière-plan au texte
+              WebkitTextFillColor: "transparent", // Remplissage transparent pour montrer le dégradé
+            }}
+          >
             Statut des Factures
           </h2>
+
           <VictoryChart domainPadding={{ x: 50 }}>
             <VictoryBar
-              data={dataFactures}
+              data={[
+                {
+                  status: "Payé",
+                  pourcentage: pourcentagePayees,
+                  fill: "#c484b2", // Couleur personnalisée pour "Payé"
+                },
+                {
+                  status: "Partiellement payé",
+                  pourcentage: pourcentagePartiellementPayees,
+                  fill: "#0d7477", // Couleur personnalisée pour "Partiellement payé"
+                },
+              ]}
               x="status"
-              y="quantite"
+              y="pourcentage"
               style={{
-                data: { fill: gradientColors[6] },
-                labels: { fontSize: 12, fill: "#2C3E50" },
+                data: {
+                  width: 30,
+                  fill: ({ datum }) => datum.fill, // Utilisation de la couleur personnalisée
+                },
+                labels: { fontSize: 14, fill: "#2C3E50" },
               }}
-              labels={({ datum }) => `${datum.status}: ${datum.quantite}`}
-              labelComponent={<VictoryLabel dy={30} />}
+              labels={({ datum }) =>
+                `${datum.status}: ${datum.pourcentage.toFixed(2)}%`
+              }
+              labelComponent={<VictoryLabel dy={-20} />}
             />
             <VictoryAxis
               style={{ tickLabels: { fontSize: 12, fill: "#2C3E50" } }}

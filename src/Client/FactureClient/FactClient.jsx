@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Modal, Button, Space } from "antd";
+import { Table, Modal, Space } from "antd";
 import Logo from "../../assets/images/visto.png";
 import axios from "axios";
 import {
@@ -201,9 +201,10 @@ const FactClient = () => {
             remise: service.remise,
             montant_ht: service.montant_ht,
           })),
-          devise: facture.devise.name,
+          devise: facture.devise,
           parametrage: facture.parametrage,
           client: facture.client,
+
           totalHT: facture.totalHT,
           totalRemise: facture.totalRemise,
           totalHTApresRemise: facture.totalHTApresRemise,
@@ -273,16 +274,43 @@ const FactClient = () => {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
+          <button
+            style={{
+              backgroundColor: "#3F51B5", // Fond bleu roi
+              color: "#FFFFFF", // Texte blanc
+              border: "none",
+              borderRadius: "50%",
+              padding: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
+            }}
             onClick={() => showDetailModal(record)}
-          ></Button>
-          <Button
-            type="link"
-            icon={<PrinterOutlined />}
-            onClick={() => showPrintModal(record)} // Passer le record à la fonction
-          ></Button>
+          >
+            <EyeOutlined style={{ fontSize: "18px" }} />
+          </button>
+
+          <button
+            style={{
+              backgroundColor: "#5f616b", // Fond bleu roi
+              color: "#FFFFFF", // Texte blanc
+              border: "none",
+              borderRadius: "50%",
+              padding: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Ombre plus prononcée
+            }}
+            onClick={() => showPrintModal(record)}
+          >
+            <PrinterOutlined style={{ fontSize: "20px" }} />
+          </button>
         </Space>
       ),
     },
@@ -636,21 +664,26 @@ const FactClient = () => {
                 <div style={{ flex: "1 1 100%" }}>
                   <p
                     style={{
-                      fontSize: 14, // Réduction de la taille du texte
-                      marginBottom: 4, // Réduction de l'espacement après le paragraphe
+                      fontSize: 14,
+                      marginBottom: 4,
                       fontWeight: "bold",
                       color: "#302c2c",
                       marginTop: 10,
-                      whiteSpace: "pre-wrap", // Permet aux espaces et aux retours à la ligne de s'afficher correctement
+                      whiteSpace: "pre-wrap",
                     }}
                   >
                     <span style={{ fontWeight: "bold", color: "#302c2c" }}>
                       Arrêtée la présente facture à la somme de{" "}
                     </span>
-                    <br /> {/* Retour à la ligne */}
+                    <br />
                     <span style={{ fontSize: 14 }}>
                       {selectedFacture ? selectedFacture.totalTTCLettre : "-"}
                     </span>
+
+                    <span style={{ marginLeft: 5 }}> </span>
+                    {selectedFacture && selectedFacture.devise
+                      ? selectedFacture.devise.name
+                      : "-"}
                   </p>
                 </div>
 
@@ -1004,9 +1037,13 @@ const FactClient = () => {
                           <Text style={styles.totalsText}>
                             {selectedFacture
                               ? selectedFacture.totalTTCLettre
-                              : "-"}
+                              : "-"}{" "}
+                            {selectedFacture &&
+                              selectedFacture.devise &&
+                              selectedFacture.devise.name}
                           </Text>
                         </View>
+
                         <View style={styles.totalsRight}>
                           <View style={styles.totalsTable}>
                             <View style={styles.totalsTableRow}>

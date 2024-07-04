@@ -1,13 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import {
-  FaCalculator,
-  FaFileInvoice,
-  FaUsers,
-  FaListAlt,
-  FaMoneyBillAlt,
-  FaBox,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import heroImage from "../../assets/images/h4.jpg";
 import featureImage1 from "../../assets/images/im1.jpg";
@@ -19,7 +11,7 @@ import Image3 from "../../assets/images/avp.png";
 import w1 from "../../assets/images/oo.jpg";
 import w2 from "../../assets/images/ss.jpg";
 import w3 from "../../assets/images/w.jpg";
-import contactImage from "../../assets/images/contact.jpg";
+//import contactImage from "../../assets/images/contact.jpg";
 import "./Home.css";
 import "./media.css";
 
@@ -142,7 +134,7 @@ function HomePage() {
         </div>
       </section>
       {/* Nouvelle section */}
-      <section className="additional-features-section">
+      {/* <section className="additional-features-section">
         <div className="a-content">
           <h1 className="a-title">
             La solution tout-en-un{" "}
@@ -194,7 +186,7 @@ function HomePage() {
             Gérez votre inventaire de services.
           </p>
         </div>
-      </section>
+      </section> */}
       <section className="why-use-vbill-section">
         <h1 className="why-use-vbill-title">Pourquoi utiliser Vbill </h1>
         <div className="why-use-vbill-content">
@@ -286,7 +278,7 @@ function HomePage() {
           </div>
         </div>
       </section>
-
+      {/* 
       <section className="contact-us-section">
         <div className="contact-us-container">
           <div className="contact-us-content">
@@ -336,7 +328,7 @@ function HomePage() {
             <img src={contactImage} alt="Contact Us" />
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }
